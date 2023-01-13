@@ -8,21 +8,33 @@ using UnityEngine;
 
 using System.Reflection;
 
-namespace ManagedPlacedObjects
+using static Pom.Mod;
+
+namespace Pom
 {
-	public static class PlacedObjectsManager
+	public static class Pom
 	{
 		#region HOOKS
-		private static bool _hooked = false;
+		private static bool __hooked = false;
+		private static ObjectsPage.DevObjectCategories __pomcat = new("POM", true);
+		private readonly static List<string> __moddedTypes = new();
+		//private static int __unmodVer = false;
 		/// <summary>
 		/// Applies the necessary hooks for the framework to do its thing.
 		/// Called when any managed object is registered.
 		/// </summary>
 		private static void Apply()
 		{
-			if (_hooked) return;
-			_hooked = true;
 
+			if (__hooked) return;
+			__hooked = true;
+			On.DevInterface.ObjectsPage.DevObjectGetCategoryFromPlacedType += (orig, self, type)  => {
+				if (__moddedTypes.Contains(type.value)) {
+					plog.LogDebug($"Sorting {type} into {__pomcat}");
+					return __pomcat;
+				}
+				return orig(self, type);
+			};
 			On.PlacedObject.GenerateEmptyData += PlacedObject_GenerateEmptyData_Patch;
 			On.Room.Loaded += Room_Loaded_Patch;
 			On.DevInterface.ObjectsPage.CreateObjRep += ObjectsPage_CreateObjRep_Patch;
@@ -100,12 +112,12 @@ namespace ManagedPlacedObjects
 			System.Reflection.MethodBase captureInputMethod;
 
 			getKeyMethod = typeof(Input).GetMethod("GetKey", new Type[] { typeof(string) });
-			captureInputMethod = typeof(PlacedObjectsManager)
+			captureInputMethod = typeof(Pom)
 					.GetMethod("CaptureInput", bindingFlags, null, new Type[] { typeof(string) }, null);
 			inputDetour_string = new NativeDetour(getKeyMethod, captureInputMethod);
 
 			getKeyMethod = typeof(Input).GetMethod("GetKey", new Type[] { typeof(KeyCode) });
-			captureInputMethod = typeof(PlacedObjectsManager)
+			captureInputMethod = typeof(Pom)
 					.GetMethod("CaptureInput", bindingFlags, null, new Type[] { typeof(KeyCode) }, null);
 			inputDetour_code = new NativeDetour(getKeyMethod, captureInputMethod);
 
@@ -218,6 +230,7 @@ namespace ManagedPlacedObjects
 		public static void RegisterManagedObject(ManagedObjectType obj)
 		{
 			Apply();
+			//new PlacedObject.Type(obj)
 			managedObjectTypes.Add(obj);
 		}
 		/// <summary>
@@ -317,7 +330,8 @@ namespace ManagedPlacedObjects
 				Type? reprType,
 				bool singleInstance = false)
 			{
-				this.placedType = default; // type parsing deferred until actualy used, due to enumextend deferred initialization
+				this.placedType = new(name, true); //no longer deferred
+				__moddedTypes.Add(name);
 				this.name = name;
 				this.objectType = objectType;
 				this.dataType = dataType;
@@ -889,8 +903,8 @@ namespace ManagedPlacedObjects
 				Vector2 bottomLeft = collapsed ? nonCollapsedAbsPos + new Vector2(0f, size.y) : this.absPos;
 				base.MoveSprite(lineSprt, bottomLeft);
 				this.fSprites[lineSprt].scaleY = collapsed ? (this.pos + new Vector2(0f, size.y)).magnitude : this.pos.magnitude;
-				this.fSprites[lineSprt].rotation = RWCustom.Custom.AimFromOneVectorToAnother(bottomLeft, (parentNode as PositionedDevUINode).absPos);
-				(this.managedRepresentation.pObj.data as ManagedData).panelPos = this.pos; // mfw no "data with panel" intermediate class
+				this.fSprites[lineSprt].rotation = RWCustom.Custom.AimFromOneVectorToAnother(bottomLeft, (parentNode as PositionedDevUINode)!.absPos);
+				(this.managedRepresentation.pObj.data as ManagedData)!.panelPos = this.pos; // mfw no "data with panel" intermediate class
 			}
 		}
 		#endregion MANAGED
@@ -1929,7 +1943,7 @@ namespace ManagedPlacedObjects
 				switch (drivenControlType)
 				{
 				case DrivenControlType.relativeLine:
-					return new DrivenVectorControl(this, managedData, managedRepresentation.managedNodes[keyOfOther] as PositionedDevUINode, drivenControlType, label);
+					return new DrivenVectorControl(this, managedData, (managedRepresentation.managedNodes[keyOfOther] as PositionedDevUINode)!, drivenControlType, label);
 				case DrivenControlType.perpendicularLine:
 				case DrivenControlType.perpendicularOval:
 				case DrivenControlType.rectangle:
@@ -2276,7 +2290,7 @@ namespace ManagedPlacedObjects
 					if (Mathf.Abs(newPos.y) > 0.5f) newPos.y = Mathf.Sign(newPos.y);
 					newPos *= 20f;
 				}
-				Vector2 parentPos = (this.parentNode as PositionedDevUINode).pos + this.owner.game.cameras[0].pos;
+				Vector2 parentPos = (this.parentNode as PositionedDevUINode)!.pos + this.owner.game.cameras[0].pos;
 				Vector2 roompos = newPos + parentPos;
 				RWCustom.IntVector2 ownIntPos = new RWCustom.IntVector2(Mathf.FloorToInt(roompos.x / 20f), Mathf.FloorToInt(roompos.y / 20f));
 				RWCustom.IntVector2 parentIntPos = new RWCustom.IntVector2(Mathf.FloorToInt(parentPos.x / 20f), Mathf.FloorToInt(parentPos.y / 20f));
@@ -2320,7 +2334,7 @@ namespace ManagedPlacedObjects
 
 				if (rect != null)
 				{
-					Vector2 parentPos = (this.parentNode as PositionedDevUINode).pos + this.owner.game.cameras[0].pos;
+					Vector2 parentPos = (this.parentNode as PositionedDevUINode)!.pos + this.owner.game.cameras[0].pos;
 					Vector2 roompos = pos + parentPos;
 					Vector2 offset = -this.owner.game.cameras[0].pos;
 					RWCustom.IntVector2 ownIntPos = new RWCustom.IntVector2(Mathf.FloorToInt(roompos.x / 20f), Mathf.FloorToInt(roompos.y / 20f));
@@ -2370,14 +2384,25 @@ namespace ManagedPlacedObjects
 			protected readonly IInterpolablePanelField interpolable;
 			protected readonly ManagedData data;
 
-			public ManagedSlider(ManagedFieldWithPanel field, ManagedData data, DevUINode parent, float sizeOfDisplayname) : base(parent.owner, field.key, parent, Vector2.zero, sizeOfDisplayname > 0 ? field.displayName : "", false, sizeOfDisplayname)
+			public ManagedSlider(ManagedFieldWithPanel field,
+						ManagedData data,
+						DevUINode parent,
+						float sizeOfDisplayname) : base(
+							parent.owner,
+							field.key,
+							parent,
+							Vector2.zero,
+							sizeOfDisplayname > 0 ? field.displayName : "",
+							false,
+							sizeOfDisplayname)
 			{
 				this.field = field;
-				this.interpolable = field as IInterpolablePanelField;
-				if (interpolable == null) throw new ArgumentException("Field must implement IInterpolablePanelField");
+				this.interpolable = (field as IInterpolablePanelField)!;
+				if (interpolable is null) throw new ArgumentException("Field must implement IInterpolablePanelField");
 				this.data = data;
 
-				DevUILabel numberLabel = (this.subNodes[1] as DevUILabel);
+				DevUILabel numberLabel = (this.subNodes[1] as DevUILabel)!;
+				
 				numberLabel.pos.x = sizeOfDisplayname + 10f;
 				numberLabel.size.x = field.SizeOfLargestDisplayValue();
 				numberLabel.fSprites[0].scaleX = numberLabel.size.x;
@@ -2388,7 +2413,7 @@ namespace ManagedPlacedObjects
 
 			public override void NubDragged(float nubPos)
 			{
-				interpolable.NewFactor(this, data, nubPos);
+				interpolable!.NewFactor(this, data, nubPos);
 				// this.managedControlPanel.managedRepresentation.Refresh(); // is this relevant ?
 				this.Refresh();
 			}
@@ -2408,11 +2433,19 @@ namespace ManagedPlacedObjects
 			protected readonly ManagedFieldWithPanel field;
 			protected readonly IIterablePanelField iterable;
 			protected readonly ManagedData data;
-			public ManagedButton(ManagedFieldWithPanel field, ManagedData data, ManagedControlPanel panel, float sizeOfDisplayname) : base(panel.owner, field.key, panel, Vector2.zero)
+			public ManagedButton(
+				ManagedFieldWithPanel field,
+				ManagedData data,
+				ManagedControlPanel panel,
+				float sizeOfDisplayname) : base(
+					panel.owner,
+					field.key,
+					panel,
+					Vector2.zero)
 
 			{
 				this.field = field;
-				this.iterable = field as IIterablePanelField;
+				this.iterable = (field as IIterablePanelField)!;
 				if (iterable == null) throw new ArgumentException("Field must implement IIterablePanelField");
 				this.data = data;
 				this.subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0f, 0f), sizeOfDisplayname, field.displayName));
@@ -2438,26 +2471,34 @@ namespace ManagedPlacedObjects
 			protected readonly IIterablePanelField iterable;
 			protected readonly ManagedData data;
 
-			public ManagedArrowSelector(ManagedFieldWithPanel field, ManagedData managedData, ManagedControlPanel panel, float sizeOfDisplayname) : base(panel.owner, "ManagedArrowSelector", panel, Vector2.zero, field.displayName)
+			public ManagedArrowSelector(ManagedFieldWithPanel field,
+				ManagedData managedData,
+				ManagedControlPanel panel,
+				float sizeOfDisplayname) : base(
+					panel.owner,
+					"ManagedArrowSelector",
+					panel,
+					Vector2.zero,
+					field.displayName)
 			{
 				this.field = field;
-				this.iterable = field as IIterablePanelField;
+				this.iterable = (field as IIterablePanelField)!;
 				if (iterable == null) throw new ArgumentException("Field must implement IIterablePanelField");
 				this.data = managedData;
 
-				DevUILabel titleLabel = (this.subNodes[0] as DevUILabel);
+				DevUILabel titleLabel = (this.subNodes[0] as DevUILabel)!;
 				titleLabel.size.x = sizeOfDisplayname;
 				titleLabel.fSprites[0].scaleX = sizeOfDisplayname;
 
-				DevUILabel numberLabel = (this.subNodes[1] as DevUILabel);
+				DevUILabel numberLabel = (this.subNodes[1] as DevUILabel)!;
 				numberLabel.pos.x = sizeOfDisplayname + 30f;
 				numberLabel.size.x = field.SizeOfLargestDisplayValue();
 				numberLabel.fSprites[0].scaleX = numberLabel.size.x;
 
-				ArrowButton arrowL = (this.subNodes[2] as ArrowButton);
+				ArrowButton arrowL = (this.subNodes[2] as ArrowButton)!;
 				arrowL.pos.x = sizeOfDisplayname + 10f;
 
-				ArrowButton arrowR = (this.subNodes[3] as ArrowButton);
+				ArrowButton arrowR = (this.subNodes[3] as ArrowButton)!;
 				arrowR.pos.x = numberLabel.pos.x + numberLabel.size.x + 4f;
 			}
 
@@ -2490,21 +2531,28 @@ namespace ManagedPlacedObjects
 			protected readonly ManagedData data;
 			protected bool clickedLastUpdate = false;
 
-			public ManagedStringControl(ManagedFieldWithPanel field, ManagedData data,
-					ManagedControlPanel panel, float sizeOfDisplayname)
-					: base(panel.owner, "ManagedStringControl", panel, Vector2.zero)
+			public ManagedStringControl(
+				ManagedFieldWithPanel field,
+				ManagedData data,
+				ManagedControlPanel panel,
+				float sizeOfDisplayname)
+					: base(
+						  panel.owner,
+						  "ManagedStringControl",
+						  panel,
+						  Vector2.zero)
 			{
 				SetupInputDetours();
-
+				_text = null!;
 				this.field = field;
 				this.data = data;
 
 				subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0, 0), sizeOfDisplayname, field.displayName));
 				subNodes.Add(new DevUILabel(owner, "Text", this, new Vector2(60, 0), 136, ""));
 
-				Text = field.DisplayValueForNode(this, data);
+				Text = field.DisplayValueForNode(this, data)!;
 
-				DevUILabel textLabel = (this.subNodes[1] as DevUILabel);
+				DevUILabel textLabel = (this.subNodes[1] as DevUILabel)!;
 				textLabel.pos.x = sizeOfDisplayname + 10f;
 				textLabel.size.x = field.SizeOfLargestDisplayValue();
 				textLabel.fSprites[0].scaleX = textLabel.size.x;
@@ -2535,7 +2583,7 @@ namespace ManagedPlacedObjects
 			{
 				if (owner.mouseClick && !clickedLastUpdate)
 				{
-					if ((subNodes[1] as RectangularDevUINode).MouseOver && activeStringControl != this)
+					if ((subNodes[1] as RectangularDevUINode)!.MouseOver && activeStringControl != this)
 					{
 						// replace whatever instance/null that was focused
 						activeStringControl = this;
@@ -2597,7 +2645,7 @@ namespace ManagedPlacedObjects
 				}
 				if (endTransaction)
 				{
-					Text = field.DisplayValueForNode(this, data);
+					Text = field.DisplayValueForNode(this, data)!;
 					subNodes[1].fLabels[0].color = Color.black;
 					Refresh();
 				}

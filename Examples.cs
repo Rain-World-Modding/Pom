@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using static ManagedPlacedObjects.PlacedObjectsManager;
+using static Pom.Pom;
 
-namespace ManagedPlacedObjects
+namespace Pom
 {
     public static class Examples
     {

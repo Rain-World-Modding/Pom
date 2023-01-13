@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	<LangVersion>11</LangVersion>
-	<GenerateDocumentationFile>False</GenerateDocumentationFile>
-  </PropertyGroup>
-  <!-- Lib includes. -->
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>11</LangVersion>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+	</PropertyGroup>
+	<!-- Lib includes. -->
 	<ItemGroup>
 		<Reference Include="0Harmony">
 			<HintPath>lib/0Harmony.dll</HintPath>
@@ -104,7 +104,7 @@
 			<HintPath>lib/netstandard.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="com.rlabrecque.steamworks.net"> 
+		<Reference Include="com.rlabrecque.steamworks.net">
 			<HintPath>lib/com.rlabrecque.steamworks.net.dll</HintPath>
 		</Reference>
 	</ItemGroup>
