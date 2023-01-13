@@ -241,7 +241,7 @@ namespace Pom
 		/// <typeparam name="REPR"></typeparam>
 		/// <param name="key"></param>
 		/// <param name="singleInstance"></param>
-		public static void RegistermanagedObject<UAD, DATA, REPR>(
+		public static void RegisterManagedObject<UAD, DATA, REPR>(
 			string key,
 			bool singleInstance = false)
 			where UAD : UpdatableAndDeletable
