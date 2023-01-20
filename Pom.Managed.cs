@@ -37,15 +37,20 @@ public static partial class Pom
 		/// <param name="dataType">The Type of your PlacedObject.Data. Must have a constructor like (PlacedObject pObj).</param>
 		/// <param name="reprType">The Type of your PlacedObjectRepresentation. Must have a constructor like (DevUI owner, string IDstring, DevUINode parentNode, PlacedObject pObj, string name) or (PlacedObject.Type placedType, ObjectsPage objPage, PlacedObject pObj).</param>
 		/// <param name="singleInstance">Wether only one of this object should be created per room. Corruption-object that scans for other placedobjects style.</param>
+
 		public ManagedObjectType(
 			string name,
+			string category,
 			Type? objectType,
 			Type? dataType,
 			Type? reprType,
 			bool singleInstance = false)
 		{
+			if (name is null) throw new ArgumentNullException(nameof(name));
+			if (category is null) throw new ArgumentNullException(nameof(category));
 			this.placedType = new(name, true); //no longer deferred
-			__moddedTypes.Add(name);
+			__categories.Add(name, new(category, true));
+			//__moddedTypes.Add(name);
 			this.name = name;
 			this.objectType = objectType;
 			this.dataType = dataType;
@@ -144,11 +149,13 @@ public static partial class Pom
 		protected readonly ManagedField[] managedFields;
 
 		public FullyManagedObjectType(
-			string name,
+			string? name,
+			string? category,
 			Type objectType,
 			ManagedField[] managedFields,
 			bool singleInstance = false) : base(
-				name,
+				name ?? objectType.Name,
+				category ?? "POM",
 				objectType,
 				null,
 				null,

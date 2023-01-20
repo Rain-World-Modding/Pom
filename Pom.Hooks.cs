@@ -15,8 +15,9 @@ namespace Pom;
 public static partial class Pom
 {
 	private static bool __hooked = false;
-	private static ObjectsPage.DevObjectCategories __pomcat = new("POM", true);
-	private readonly static List<string> __moddedTypes = new();
+	//internal static ObjectsPage.DevObjectCategories __pomcat = new("POM", true);
+	internal static Dictionary<string, ObjectsPage.DevObjectCategories> __categories = new();
+	//private readonly static List<string> __moddedTypes = new();
 	//private static int __unmodVer = false;
 	/// <summary>
 	/// Applies the necessary hooks for the framework to do its thing.
@@ -24,15 +25,13 @@ public static partial class Pom
 	/// </summary>
 	private static void Apply()
 	{
-
 		if (__hooked) return;
 		__hooked = true;
 		On.DevInterface.ObjectsPage.DevObjectGetCategoryFromPlacedType += (orig, self, type) =>
 		{
-			if (__moddedTypes.Contains(type.value))
-			{
-				plog.LogDebug($"Sorting {type} into {__pomcat}");
-				return __pomcat;
+			if (__categories.TryGetValue(type.value, out ObjectsPage.DevObjectCategories cat)){
+				plog.LogDebug($"Sorting {type} into {cat}");
+				return cat;
 			}
 			return orig(self, type);
 		};

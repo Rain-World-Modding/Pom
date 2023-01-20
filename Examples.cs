@@ -46,10 +46,11 @@ namespace Pom
                 new IntVector2Field("ivf4", new RWCustom.IntVector2(1, 1), IntVector2Field.IntVectorReprType.eightdir),
                 new IntVector2Field("ivf5", new RWCustom.IntVector2(1, 1), IntVector2Field.IntVectorReprType.rect)
             };
+			
             // Data serialization and UI are taken care of by the manageddata and managedrepresentation types
             // And that's about it, now sillyobject will receive a placedobject with manageddata and that data will have all these fields
             // The enum is registered for you based on the name of the type you're passing in, but you can pass your own name as an optional parameter.
-            RegisterFullyManagedObjectType(fields.ToArray(), typeof(SillyObject));
+            RegisterFullyManagedObjectType(fields.ToArray(), typeof(SillyObject), "SillyObject", "POM examples");
             // Trust me I just spared you from writing some 300 lines of code with this.
 
 
@@ -61,9 +62,11 @@ namespace Pom
             // but at the expense of some extra reflection calls
 
             // A type with no object, no data, no repr, just for marking places. PlacedObject.type "CuriousObjectLocation" is registered for you.
-            ManagedObjectType curiousObjectLocation = new ManagedObjectType("CuriousObjectLocation", null, null, null);
+            ManagedObjectType curiousObjectLocation = new ManagedObjectType("CuriousObjectLocation", "POM examples", null, null, null);
             RegisterManagedObject(curiousObjectLocation);
             // Could also be done with RegisterEmptyObjectType("CuriousObjectLocation", null, null);
+			Pom.__categories.Add(EnumExt_ManagedPlacedObjects.CuriousObject.value, new("POM examples", true));
+			Pom.__categories.Add(EnumExt_ManagedPlacedObjects.CuriousObjectLocation.value, new("POM examples", true));
         }
 
         // Juuuuust an object, yet, we can place it. Data and UI are generated automatically
@@ -90,8 +93,8 @@ namespace Pom
         // Some other objects, this time we're registering type, object, data and representation on our own
         public static class EnumExt_ManagedPlacedObjects
         {
-            public static PlacedObject.Type CuriousObject;
-            public static PlacedObject.Type CuriousObjectLocation;
+            public static PlacedObject.Type CuriousObject = new(nameof(CuriousObject), true);
+            public static PlacedObject.Type CuriousObjectLocation = new(nameof(CuriousObjectLocation), true);
         }
 
         // A very curious object, part managed part manual
@@ -99,7 +102,7 @@ namespace Pom
         internal class CuriousObjectType : ManagedObjectType
         {
             // Ignore the stuff in the baseclass and write your own if you want to
-            public CuriousObjectType() : base("CuriousObject", null, typeof(CuriousData), typeof(CuriousRepresentation)) // this could have been (PlacedObjects.CuriousObject, typeof(CuriousObject), typeof(...)...)
+            public CuriousObjectType() : base("CuriousObject", "POM examples", null, typeof(CuriousData), typeof(CuriousRepresentation)) // this could have been (PlacedObjects.CuriousObject, typeof(CuriousObject), typeof(...)...)
             {
             }
 

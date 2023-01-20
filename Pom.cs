@@ -26,24 +26,6 @@ public static partial class Pom
 		managedObjectTypes.Add(obj);
 	}
 	/// <summary>
-	/// Same as <see cref="RegisterManagedObject(ManagedObjectType)"/>, but with generics.
-	/// </summary>
-	/// <typeparam name="UAD"></typeparam>
-	/// <typeparam name="DATA"></typeparam>
-	/// <typeparam name="REPR"></typeparam>
-	/// <param name="key"></param>
-	/// <param name="singleInstance"></param>
-	public static void RegisterManagedObject<UAD, DATA, REPR>(
-		string key,
-		bool singleInstance = false)
-		where UAD : UpdatableAndDeletable
-		where DATA : ManagedData
-		where REPR : ManagedRepresentation
-	{
-		RegisterManagedObject(new ManagedObjectType(key, typeof(UAD), typeof(DATA), typeof(REPR), singleInstance));
-	}
-
-	/// <summary>
 	/// Shorthand for registering a <see cref="FullyManagedObjectType"/>.
 	/// Wraps an UpdateableAndDeletable into a managed type with managed data and UI.
 	/// Can also be used with a null type to spawn a Managed data+representation with no object on room.load
@@ -55,10 +37,11 @@ public static partial class Pom
 	public static void RegisterFullyManagedObjectType(
 		ManagedField[] managedFields,
 		Type type,
-		string? name = null)
+		string? name = null,
+		string? category = null)
 	{
 		if (string.IsNullOrEmpty(name)) name = type.Name;
-		ManagedObjectType fullyManaged = new FullyManagedObjectType(name!, type, managedFields);
+		ManagedObjectType fullyManaged = new FullyManagedObjectType(name, category, type, managedFields);
 		RegisterManagedObject(fullyManaged);
 	}
 
@@ -73,10 +56,11 @@ public static partial class Pom
 	/// <param name="reprType"></param>
 	public static void RegisterEmptyObjectType(
 		string name,
+		string? category,
 		Type dataType,
 		Type reprType)
 	{
-		ManagedObjectType emptyObjectType = new ManagedObjectType(name, null, dataType, reprType);
+		ManagedObjectType emptyObjectType = new ManagedObjectType(name, category ?? "POM", null, dataType, reprType);
 		RegisterManagedObject(emptyObjectType);
 	}
 	/// <summary>
@@ -85,10 +69,28 @@ public static partial class Pom
 	/// <typeparam name="DATA"></typeparam>
 	/// <typeparam name="REPR"></typeparam>
 	/// <param name="key"></param>
-	public static void RegisterEmptyObjectType<DATA, REPR>(string key)
+	public static void RegisterEmptyObjectType<DATA, REPR>(string key, string? category = null)
 		where DATA : ManagedData
 		where REPR : ManagedRepresentation
 	{
-		RegisterEmptyObjectType(key, typeof(DATA), typeof(REPR));
+		RegisterEmptyObjectType(key, category, typeof(DATA), typeof(REPR));
+	}
+	/// <summary>
+	/// Same as <see cref="RegisterManagedObject(ManagedObjectType)"/>, but with generics.
+	/// </summary>
+	/// <typeparam name="UAD"></typeparam>
+	/// <typeparam name="DATA"></typeparam>
+	/// <typeparam name="REPR"></typeparam>
+	/// <param name="key"></param>
+	/// <param name="singleInstance"></param>
+	public static void RegisterManagedObject<UAD, DATA, REPR>(
+		string key,
+		string? category = null,
+		bool singleInstance = false)
+		where UAD : UpdatableAndDeletable
+		where DATA : ManagedData
+		where REPR : ManagedRepresentation
+	{
+		RegisterManagedObject(new ManagedObjectType(key, category ?? "POM", typeof(UAD), typeof(DATA), typeof(REPR), singleInstance));
 	}
 }
