@@ -113,18 +113,18 @@ public static partial class Pom
 				bool includeParent = Field.IncludeParent;
 				if (includeParent)
 				{
-					First = parentNode as PositionedDevUINode;
+					First = (parentNode as PositionedDevUINode)!;
 				}
 				else
 				{
-					First = new Handle(owner, field.key + "_0", this, Data.GetValue<Vector2[]>(field.key)[0]);
+					First = new Handle(owner, field.key + "_0", this, Data.GetValue<Vector2[]>(field.key)![0]);
 					subNodes.Add(First);
 				}
 
 				for (int i = 1; i < field.NodeCount; i++)
 				{
 					int currentLine = fSprites.Count;
-					PositionedDevUINode next = new Handle(owner, field.key + "_" + i, this, Data.GetValue<Vector2[]>(field.key)[i]);
+					PositionedDevUINode next = new Handle(owner, field.key + "_" + i, this, Data.GetValue<Vector2[]>(field.key)![i]);
 					subNodes.Add(next);
 					fSprites.Add(new FSprite("pixel"));
 					owner.placedObjectsContainer.AddChild(fSprites[currentLine]);
@@ -145,7 +145,7 @@ public static partial class Pom
 			public override void Move(Vector2 newPos)
 			{
 				First.Move(newPos);
-				Vector2[] vArr = Data.GetValue<Vector2[]>(Field.key);
+				Vector2[] vArr = Data.GetValue<Vector2[]>(Field.key)!;
 				vArr[0] = Field.IncludeParent ? new Vector2(0, 0) : newPos;
 				Data.SetValue(Field.key, vArr);
 				base.Move(newPos);
@@ -187,7 +187,7 @@ public static partial class Pom
 			orig(self, newpos);
 			if (self.parentNode is Vector2ArrayHandle v2ah)
 			{
-				Vector2[] vectors = v2ah.Data.GetValue<Vector2[]>(v2ah.Field.key);
+				Vector2[] vectors = v2ah.Data.GetValue<Vector2[]>(v2ah.Field.key)!;
 				int index = int.Parse(self.IDstring.Split('_')[1]);
 				if (index == 0) return;
 				vectors[index] = newpos;

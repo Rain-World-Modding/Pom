@@ -35,6 +35,7 @@ public static partial class Pom
 			}
 			return orig(self, type);
 		};
+		On.DevInterface.PositionedDevUINode.Move += Vector2ArrayField.OnPositionedDevUINodeMove;
 		On.PlacedObject.GenerateEmptyData += PlacedObject_GenerateEmptyData_Patch;
 		On.Room.Loaded += Room_Loaded_Patch;
 		On.DevInterface.ObjectsPage.CreateObjRep += ObjectsPage_CreateObjRep_Patch;
