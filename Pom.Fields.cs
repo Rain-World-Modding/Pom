@@ -414,7 +414,7 @@ public static partial class Pom
 
 		public override object FromString(string str)
 		{
-			ExtEnumBase.TryParse(typeof(XE), str, out object res);
+			ExtEnumBase.TryParse(typeof(XE), str, false, out ExtEnumBase res);
 			return PossibleValues.Contains(res) ? res : PossibleValues[0];
 		}
 
@@ -467,7 +467,7 @@ public static partial class Pom
 			ManagedData data,
 			string newValue)
 		{
-			if (!ExtEnumBase.TryParse(typeof(XE), newValue, out object o_nv))
+			if (!ExtEnumBase.TryParse(typeof(XE), newValue, false, out ExtEnumBase o_nv))
 			{
 				foreach (XE val in PossibleValues)
 				{

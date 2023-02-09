@@ -1,7 +1,7 @@
 {
 	"id": "pom",
-	"name": "Pom",
-	"version": "2.2",
+	"name": "POM",
+	"version": "2.3",
 	"authors": "Henpemaz, Thalber",
 	"description": "DevUI extender for placed objects.<LINE>Source code and instructions can be found here: https://github.com/Rain-World-Modding/Pom",
 	"requirements": [],

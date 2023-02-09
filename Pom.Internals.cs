@@ -37,7 +37,7 @@ public static partial class Pom
 		//if (PastebinMachine.EnumExtender.EnumExtender.declarations.Count > 0) PastebinMachine.EnumExtender.EnumExtender.ExtendEnumsAgain();
 		PlacedObject.Type tp;
 
-		if (PlacedObject.Type.TryParse(typeof(PlacedObject.Type), name, out object o_tp))
+		if (PlacedObject.Type.TryParse(typeof(PlacedObject.Type), name, false, out ExtEnumBase o_tp))
 		{
 			tp = (PlacedObject.Type)o_tp;
 		}

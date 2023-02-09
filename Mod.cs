@@ -6,7 +6,7 @@
 // you still can if you really want to.
 namespace Pom
 {
-	[BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.2")]
+	[BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.3")]
 	public class Mod : BepInEx.BaseUnityPlugin
 	{
 		public static Mod instance = null!;
