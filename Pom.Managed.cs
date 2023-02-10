@@ -82,17 +82,21 @@ public static partial class Pom
 				}
 				if (instance != null) return null;
 			}
-
-			try { return (UpdatableAndDeletable)Activator.CreateInstance(objectType, new object[] { room, placedObject }); }
+			const BindingFlags ALL_CONTEXTS = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+			System.Globalization.CultureInfo invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
+			try
+			{
+				return (UpdatableAndDeletable)Activator.CreateInstance(objectType, ALL_CONTEXTS, null, new object[] { room, placedObject }, invariantCulture);
+			}
 			catch (MissingMethodException)
 			{
-				try { return (UpdatableAndDeletable)Activator.CreateInstance(objectType, new object[] { placedObject, room }); }
+				try { return (UpdatableAndDeletable)Activator.CreateInstance(objectType, ALL_CONTEXTS, null, new object[] { placedObject, room, }, System.Globalization.CultureInfo.InvariantCulture); }
 				catch (MissingMethodException)
 				{
-					try { return (UpdatableAndDeletable)Activator.CreateInstance(objectType, new object[] { placedObject }); }
+					try { return (UpdatableAndDeletable)Activator.CreateInstance(objectType, ALL_CONTEXTS, null, new object[] { placedObject }, invariantCulture); }
 					catch (MissingMethodException)
 					{
-						try { return (UpdatableAndDeletable)Activator.CreateInstance(objectType, new object[] { room }); } // Objects that scan room for data or no data;
+						try { return (UpdatableAndDeletable)Activator.CreateInstance(objectType, ALL_CONTEXTS, null, new object[] { room }, invariantCulture); } // Objects that scan room for data or no data;
 						catch (MissingMethodException) { throw new ArgumentException("ManagedObjectType.MakeObject : objectType " + objectType.Name + " must have a constructor like (Room room, PlacedObject pObj) or (PlacedObject pObj, Room room) or (Room room)"); }
 					}
 				}
@@ -120,14 +124,15 @@ public static partial class Pom
 		public virtual PlacedObjectRepresentation? MakeRepresentation(PlacedObject pObj, ObjectsPage objPage)
 		{
 			if (reprType is null || placedType is null) return null;
-
-			try { return (PlacedObjectRepresentation)Activator.CreateInstance(reprType, new object[] { objPage.owner, placedType.ToString() + "_Rep", objPage, pObj, placedType.ToString() }); }
+			const BindingFlags ALL_CONTEXTS = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+			System.Globalization.CultureInfo invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
+			try { return (PlacedObjectRepresentation)Activator.CreateInstance(reprType, ALL_CONTEXTS, null, new object[] { objPage.owner, placedType.ToString() + "_Rep", objPage, pObj, placedType.ToString() }, invariantCulture); }
 			catch (MissingMethodException)
 			{
-				try { return (PlacedObjectRepresentation)Activator.CreateInstance(reprType, new object[] { objPage.owner, placedType.ToString() + "_Rep", objPage, pObj, placedType.ToString(), false }); } // Resizeables man
+				try { return (PlacedObjectRepresentation)Activator.CreateInstance(reprType, ALL_CONTEXTS, null, new object[] { objPage.owner, placedType.ToString() + "_Rep", objPage, pObj, placedType.ToString(), false }, invariantCulture); } // Resizeables man
 				catch (MissingMethodException)
 				{
-					try { return (PlacedObjectRepresentation)Activator.CreateInstance(reprType, new object[] { pObj.type, objPage, pObj }); } // Our own silly types
+					try { return (PlacedObjectRepresentation)Activator.CreateInstance(reprType, ALL_CONTEXTS, null, new object[] { pObj.type, objPage, pObj }, invariantCulture); } // Our own silly types
 					catch (MissingMethodException) { throw new ArgumentException("ManagedObjectType.MakeRepresentation : reprType " + reprType.Name + " must have a constructor like (DevUI owner, string IDstring, DevUINode parentNode, PlacedObject pObj, string name) or (PlacedObject.Type placedType, ObjectsPage objPage, PlacedObject pObj)"); }
 				}
 			}
