@@ -1,24 +1,32 @@
 using DevInterface;
-using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using UnityEngine;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
 
-using System.Reflection;
-
-using static Pom.Mod;
+using ObjCategory = DevInterface.ObjectsPage.DevObjectCategories;
 
 namespace Pom;
 
 public static partial class Pom
 {
+	/// <summary>
+	/// How to sort object entries inside a devtools object category
+	/// </summary>
+	public enum CategorySortKind
+	{
+		/// <summary>
+		/// No sorting, items in the order they were registered
+		/// </summary>
+		Default,
+		/// <summary>
+		/// Alphabetical sorting (invariant culture)
+		/// </summary>
+		Alphabetical,
+	}
 	private static bool __hooked = false;
 	//internal static ObjectsPage.DevObjectCategories __pomcat = new("POM", true);
-	internal static Dictionary<string, ObjectsPage.DevObjectCategories> __categories = new();
-	//private readonly static List<string> __moddedTypes = new();
-	//private static int __unmodVer = false;
+	internal static Dictionary<string, ObjCategory> __objectCategories = new();
+	internal static Dictionary<ObjCategory, CategorySortKind> __sortCategorySettings = new();
+	internal static CategorySortKind __sortByDefault = CategorySortKind.Default;
 	/// <summary>
 	/// Applies the necessary hooks for the framework to do its thing.
 	/// Called when any managed object is registered.
@@ -27,20 +35,78 @@ public static partial class Pom
 	{
 		if (__hooked) return;
 		__hooked = true;
-		On.DevInterface.ObjectsPage.DevObjectGetCategoryFromPlacedType += (orig, self, type) =>
-		{
-			if (__categories.TryGetValue(type.value, out ObjectsPage.DevObjectCategories cat)){
-				plog.LogDebug($"Sorting {type} into {cat}");
-				return cat;
-			}
-			return orig(self, type);
-		};
+		On.DevInterface.ObjectsPage.DevObjectGetCategoryFromPlacedType += ObjectsPage_Sort;
 		On.DevInterface.PositionedDevUINode.Move += Vector2ArrayField.OnPositionedDevUINodeMove;
 		On.PlacedObject.GenerateEmptyData += PlacedObject_GenerateEmptyData_Patch;
 		On.Room.Loaded += Room_Loaded_Patch;
 		On.DevInterface.ObjectsPage.CreateObjRep += ObjectsPage_CreateObjRep_Patch;
-
+		try
+		{
+			IL.DevInterface.ObjectsPage.AssembleObjectPages += IL_ObjectsPage_AssemblePages;
+		}
+		catch (Exception ex)
+		{
+			plog.LogError($"Error adding sorter ilhook {ex}");
+		}
 		//PlacedObjectsExample();
+	}
+	private static void IL_ObjectsPage_AssemblePages(MonoMod.Cil.ILContext il)
+	{
+		plog.LogDebug("ILHook body start");
+		MonoMod.Cil.ILCursor c = new(il);
+		c.GotoNext(MonoMod.Cil.MoveType.Before,
+			//x => x.MatchLdcI4(0),
+			x => x.MatchStloc(2),
+			x => x.MatchLdarg(0),
+			x => x.MatchLdloc(1),
+			x => x.MatchNewarr<PlacedObject.Type>()
+			);//TryFindNext(out )
+		plog.LogDebug($"Found inj point, emitting");
+		//c.Remove();
+		c.Emit(OpCodes.Pop);
+		c.Emit(OpCodes.Ldloc_0);
+		//c.Index -= 1;
+		//var newLabel = c.MarkLabel();
+		//c.Index += 1;
+		c.EmitDelegate((Dictionary<ObjCategory, List<PlacedObject.Type>> dict) =>
+		{
+			plog.LogDebug("Sorter ilhook go");
+			foreach (var kvp in dict)
+			{
+				var cat = kvp.Key;
+				var list = kvp.Value;
+				if (!__sortCategorySettings.TryGetValue(cat, out CategorySortKind doSort)) doSort = __sortByDefault;
+				if (doSort is CategorySortKind.Default)
+				{
+					plog.LogDebug($"Sorting of {cat} not required");
+					continue;
+				}
+				System.Comparison<PlacedObject.Type> sorter = doSort switch
+				{
+					CategorySortKind.Alphabetical => static (ot1, ot2) => {
+						if (ot1 == PlacedObject.Type.None && ot2 == PlacedObject.Type.None) return 0;
+						if (ot1 == PlacedObject.Type.None) return 1;
+						if (ot2 == PlacedObject.Type.None) return -1;
+						else return StringComparer.InvariantCulture.Compare(ot1?.value, ot2?.value);},
+					_ => throw new ArgumentException($"ERROR: INVALID {nameof(CategorySortKind)} VALUE {doSort}")
+				};
+				list.Sort(sorter);
+				plog.LogDebug($"sorting of {cat} completed ({list.Count} items)");
+			}
+		});
+		c.Emit(OpCodes.Ldc_I4_0);
+		plog.LogDebug("emit complete");
+		plog.LogDebug(il.ToString());
+	}
+
+	private static ObjCategory ObjectsPage_Sort(On.DevInterface.ObjectsPage.orig_DevObjectGetCategoryFromPlacedType orig, DevInterface.ObjectsPage self, PlacedObject.Type type)
+	{
+		if (__objectCategories.TryGetValue(type.value, out ObjectsPage.DevObjectCategories cat))
+		{
+			plog.LogDebug($"Sorting {type} into {cat}");
+			return cat;
+		}
+		return orig(self, type);
 	}
 
 	private static void ObjectsPage_CreateObjRep_Patch(

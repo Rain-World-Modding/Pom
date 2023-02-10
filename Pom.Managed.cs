@@ -1,14 +1,8 @@
 using DevInterface;
-using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 using System.Reflection;
-
-using static Pom.Mod;
 
 namespace Pom;
 
@@ -49,7 +43,7 @@ public static partial class Pom
 			if (name is null) throw new ArgumentNullException(nameof(name));
 			if (category is null) throw new ArgumentNullException(nameof(category));
 			this.placedType = new(name, true); //no longer deferred
-			__categories.Add(name, new(category, true));
+			__objectCategories.Add(name, new(category, true));
 			//__moddedTypes.Add(name);
 			this.name = name;
 			this.objectType = objectType;

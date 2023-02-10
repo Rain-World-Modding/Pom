@@ -1,20 +1,7 @@
-﻿using DevInterface;
-using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using UnityEngine;
-
-using System.Reflection;
-
-using static Pom.Mod;
-
-namespace Pom;
+﻿namespace Pom;
 
 public static partial class Pom
 {
-
 	/// <summary>
 	/// Register a <see cref="ManagedObjectType"/> or <see cref="FullyManagedObjectType"/> to handle object, data and repr initialization during room load and devtools hooks
 	/// </summary>
@@ -92,5 +79,25 @@ public static partial class Pom
 		where REPR : ManagedRepresentation
 	{
 		RegisterManagedObject(new ManagedObjectType(key, category ?? "POM", typeof(UAD), typeof(DATA), typeof(REPR), singleInstance));
+	}
+	/// <summary>
+	/// Forces a selected PlacedObjectType to be sorted into specific category. Works for non-POM objects. <para/>
+	/// Note that calling this force-creates the category.
+	/// </summary>
+	public static void RegisterCategoryOverride(PlacedObject.Type type, string category){
+		if (type.Index < 0) {
+			plog.LogWarning($"Tried creating a category override for {type} but it is not registered! skipping");
+			return;}
+		__objectCategories.Add(type.value, new(category, true));
+	}
+	/// <summary>
+	/// Selects how an object category should be sorted.<para/>
+	/// Note that calling this force-creates the category.
+	/// </summary>
+	/// <param name="category"></param>
+	/// <param name="sortBehavior"></param>
+	public static void RegisterSortingOverride(string category, CategorySortKind sortBehavior){
+		__sortCategorySettings.Add(new(category, true), sortBehavior);
+		//if (new Category)
 	}
 }

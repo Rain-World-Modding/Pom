@@ -1,15 +1,5 @@
-using DevInterface;
 using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
-
-using System.Reflection;
-
-using static Pom.Mod;
-
 namespace Pom;
 
 public static partial class Pom

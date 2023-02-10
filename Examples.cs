@@ -6,6 +6,7 @@ using RWCustom;
 using static Pom.Pom;
 
 namespace Pom;
+#pragma warning disable 1591
 
 public static class Examples
 {
@@ -32,8 +33,10 @@ public static class Examples
 		{
 		}
 	}
-	internal static void PlacedObjectsExample()
+	internal static void RegisterExamples()
 	{
+		//__sortCategorySettings.Add(new("POM examples", true), CategorySortKind.Alphabetical);
+		//__sortCategorySettings.Add(new("RegionKit", true), CategorySortKind.Alphabetical);
 		RegisterEmptyObjectType<OneOfAll, ManagedRepresentation>("OneOfAll", "POM examples");
 		// This is one possible approach to register an object, almost zero boilerplate code, but accessing these fields requires passing a key as seen in SillyObject class
 		// Registers a type with a loooooot of fields
@@ -90,8 +93,8 @@ public static class Examples
 		ManagedObjectType curiousObjectLocation = new ManagedObjectType("CuriousObjectLocation", "POM examples", null, null, null);
 		RegisterManagedObject(curiousObjectLocation);
 		// Could also be done with RegisterEmptyObjectType("CuriousObjectLocation", null, null);
-		Pom.__categories.Add(EnumExt_ManagedPlacedObjects.CuriousObject.value, new("POM examples", true));
-		Pom.__categories.Add(EnumExt_ManagedPlacedObjects.CuriousObjectLocation.value, new("POM examples", true));
+		Pom.__objectCategories.Add(EnumExt_ManagedPlacedObjects.CuriousObject.value, new("POM examples", true));
+		Pom.__objectCategories.Add(EnumExt_ManagedPlacedObjects.CuriousObjectLocation.value, new("POM examples", true));
 	}
 
 	// Juuuuust an object, yet, we can place it. Data and UI are generated automatically
@@ -298,3 +301,4 @@ public static class Examples
 	}
 	// And that was it, 3 somewhat functional objects in not an awful lot of code.
 }
+#pragma warning restore 1591

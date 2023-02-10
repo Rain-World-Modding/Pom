@@ -1,15 +1,8 @@
 using DevInterface;
-using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 using System.Reflection;
-
-using static Pom.Mod;
-
 namespace Pom;
 
 public static partial class Pom
@@ -482,7 +475,7 @@ public static partial class Pom
 				throw new ArgumentException($"Cannot parse {newValue} as {typeof(XE).FullName}");
 			}
 			XE fromstring = (XE)o_nv;
-			if (!PossibleValues.Contains(fromstring)) throw new ArgumentException();
+			if (!PossibleValues.Contains(fromstring)) throw new ArgumentException($"Value {fromstring} not present in PossibleValues");
 			data.SetValue(key, fromstring);
 			//base.ParseFromText(node, data, newValue);
 		}

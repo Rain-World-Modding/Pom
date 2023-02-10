@@ -4,22 +4,23 @@
 // to be "stackable" at runtime with multiple instances of POM
 // in multiple mods. It is not recommended to do that anymore, but
 // you still can if you really want to.
-namespace Pom
+global using static Pom.Mod;
+
+namespace Pom;
+
+[BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.3")]
+public class Mod : BepInEx.BaseUnityPlugin
 {
-	[BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.3")]
-	public class Mod : BepInEx.BaseUnityPlugin
+	internal static Mod instance = null!;
+	public static BepInEx.Logging.ManualLogSource plog => instance.Logger;
+	public void OnEnable()
 	{
-		public static Mod instance = null!;
-		public static BepInEx.Logging.ManualLogSource plog => instance.Logger;
-		public void OnEnable()
-		{
-			instance = this;
-			Examples.PlacedObjectsExample();
-		}
+		instance = this;
+		Examples.RegisterExamples();
+	}
 
-		public void OnDisable(){
+	public void OnDisable(){
 
-			instance = null!;
-		}
+		instance = null!;
 	}
 }
