@@ -1,4 +1,4 @@
-using DevInterface;
+﻿using DevInterface;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 
@@ -40,6 +40,7 @@ public static partial class Pom
 		On.PlacedObject.GenerateEmptyData += PlacedObject_GenerateEmptyData_Patch;
 		On.Room.Loaded += Room_Loaded_Patch;
 		On.DevInterface.ObjectsPage.CreateObjRep += ObjectsPage_CreateObjRep_Patch;
+		ApplyInputHooks();
 		try
 		{
 			IL.DevInterface.ObjectsPage.AssembleObjectPages += IL_ObjectsPage_AssemblePages;

@@ -1,4 +1,4 @@
-using DevInterface;
+﻿using DevInterface;
 using MonoMod.RuntimeDetour;
 using System;
 using System.Collections.Generic;
@@ -470,7 +470,6 @@ public static partial class Pom
 					  panel,
 					  Vector2.zero)
 		{
-			SetupInputDetours();
 			_text = null!;
 			this.field = field;
 			this.data = data;

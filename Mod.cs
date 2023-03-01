@@ -19,8 +19,9 @@ public class Mod : BepInEx.BaseUnityPlugin
 		Examples.RegisterExamples();
 	}
 
-	public void OnDisable(){
-
+	public void OnDisable()
+	{
+		Pom.DisposeStaticInputHooks();
 		instance = null!;
 	}
 }
