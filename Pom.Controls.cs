@@ -453,7 +453,7 @@ public static partial class Pom
 
 	public class ManagedStringControl : PositionedDevUINode
 	{
-		public static ManagedStringControl? activeStringControl = null;
+		public static DevUINode? activeStringControl = null;
 
 		protected readonly ManagedFieldWithPanel field;
 		protected readonly ManagedData data;
