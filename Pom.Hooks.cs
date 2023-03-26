@@ -97,7 +97,7 @@ public static partial class Pom
 		});
 		c.Emit(OpCodes.Ldc_I4_0);
 		plog.LogDebug("emit complete");
-		plog.LogDebug(il.ToString());
+		//plog.LogDebug(il.ToString());
 	}
 
 	private static ObjCategory ObjectsPage_Sort(On.DevInterface.ObjectsPage.orig_DevObjectGetCategoryFromPlacedType orig, DevInterface.ObjectsPage self, PlacedObject.Type type)
