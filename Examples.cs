@@ -17,17 +17,17 @@ public static class Examples
 		[FloatField("float", 0f, 10f, 0f)]
 		internal float Float;
 		[StringField("string", "AAAA")]
-		internal string String;
+		internal string String = "AAAA";
 		[Vector2Field("vector", 10f, 30f)]
 		internal Vector2 Vec;
 		[IntVector2Field("intvector", 3, 3, IntVector2Field.IntVectorReprType.tile)]
 		internal IntVector2 IntVec;
 		[Vector2ArrayField("vectorarray", 5, false, Vector2ArrayField.Vector2ArrayRepresentationType.Chain, 10f, 10f, 20f, 20f, 20f, -20f, -20f, -20f, -20f, 20f)]
-		internal Vector2[] VecArray;
+		internal Vector2[] VecArray = new Vector2[0];
 		[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
 		BepInEx.Logging.LogLevel Enum;
 		[ExtEnumField<AbstractCreature.AbstractObjectType>("extenum", nameof(AbstractCreature.AbstractObjectType.AttachedBee), new[] {nameof(AbstractCreature.AbstractObjectType.AttachedBee), nameof(AbstractCreature.AbstractObjectType.BubbleGrass)} )]
-		AbstractCreature.AbstractObjectType ExtEnum;
+		AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;
 
 		public OneOfAll(PlacedObject owner) : base(owner, null)
 		{
@@ -178,7 +178,7 @@ public static class Examples
 				UnityEngine.Debug.Log("CuriousObject started and found " + otherPlaces.Count + " location");
 			}
 			// IDrawable stuff
-			public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+			public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer? newContatiner)
 			{
 				if (newContatiner == null) newContatiner = rCam.ReturnFContainer("Midground");
 				for (int i = 0; i < sLeaser.sprites.Length; i++)
@@ -295,7 +295,7 @@ public static class Examples
 			{
 				base.Update();
 				if (UnityEngine.Input.GetKey("b")) return;
-				(pObj.data as CuriousData).rotation = RWCustom.Custom.VecToDeg(this.owner.mousePos - absPos);
+				(pObj.data as CuriousData)!.rotation = RWCustom.Custom.VecToDeg(this.owner.mousePos - absPos);
 			}
 		}
 	}
