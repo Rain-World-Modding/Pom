@@ -26,7 +26,7 @@ public static class Examples
 		internal Vector2[] VecArray = new Vector2[0];
 		[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
 		BepInEx.Logging.LogLevel Enum;
-		[ExtEnumField<AbstractCreature.AbstractObjectType>("extenum", nameof(AbstractCreature.AbstractObjectType.AttachedBee), new[] {nameof(AbstractCreature.AbstractObjectType.AttachedBee), nameof(AbstractCreature.AbstractObjectType.BubbleGrass)} )]
+		[ExtEnumField<AbstractCreature.AbstractObjectType>("extenum", nameof(AbstractCreature.AbstractObjectType.AttachedBee), new[] { nameof(AbstractCreature.AbstractObjectType.AttachedBee), nameof(AbstractCreature.AbstractObjectType.BubbleGrass) })]
 		AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;
 
 		public OneOfAll(PlacedObject owner) : base(owner, null)
@@ -106,14 +106,14 @@ public static class Examples
 		{
 			this.room = room;
 			this.placedObject = pObj;
-			UnityEngine.Debug.Log("SillyObject create");
+			//Mod.__.Log("SillyObject create");
 		}
 
 		public override void Update(bool eu)
 		{
 			base.Update(eu);
 			if (room.game.clock % 100 == 0)
-				Debug.Log("SillyObject vf1.x is " + (placedObject.data as ManagedData).GetValue<Vector2>("vf1").x); // This is how you access those fields you created when using ManagedData directly.
+				Mod.plog.LogMessage("SillyObject vf1.x is " + (placedObject.data as ManagedData).GetValue<Vector2>("vf1").x); // This is how you access those fields you created when using ManagedData directly.
 		}
 	}
 
@@ -175,7 +175,7 @@ public static class Examples
 						otherPlaces.Add(pobj);
 				}
 
-				UnityEngine.Debug.Log("CuriousObject started and found " + otherPlaces.Count + " location");
+				Mod.plog.LogMessage("CuriousObject started and found " + otherPlaces.Count + " location");
 			}
 			// IDrawable stuff
 			public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer? newContatiner)
