@@ -8,7 +8,7 @@ global using static Pom.Mod;
 
 namespace Pom;
 
-[BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.6")]
+[BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.7")]
 public class Mod : BepInEx.BaseUnityPlugin
 {
 	internal static Mod instance = null!;

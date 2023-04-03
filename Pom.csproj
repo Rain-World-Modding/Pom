@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>11</LangVersion>
-		<FileVersion>2.6</FileVersion>
-		<AssemblyVersion>2.6</AssemblyVersion>
+		<FileVersion>2.7</FileVersion>
+		<AssemblyVersion>2.7</AssemblyVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 	<!-- Lib includes. -->
@@ -111,22 +111,25 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="PolySharp" Version="1.12.1">
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	    <PrivateAssets>all</PrivateAssets>
-	  </PackageReference>
+		<PackageReference Include="PolySharp" Version="1.12.1">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<Target Name="CopyOutput" AfterTargets="Build" Condition="'$(RWMods_POM)'!=''">
 		<!-- <Delete Files="$(RWMods_POM)/assets"/> -->
 		<Delete Files="$(RWMods_POM)/plugins" />
-		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ $(RWMods_POM) ] - @(_CopyItems)" Importance="high" />
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(RWMods_POM)/plugins" Retries="3" RetryDelayMilliseconds="300" />
+		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ $(RWMods_POM) ] - @(_CopyItems)"
+			Importance="high" />
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+			RetryDelayMilliseconds="300" />
 		<!-- <Copy
 			SourceFiles="@(_CopyItems)"
 			DestinationFolder="$(RWMods_POM)/assets/regionkit/%(RecursiveDir)"
 			Retries="3"
 			RetryDelayMilliseconds="300" /> -->
-		<Copy SourceFiles="modinfo.json" DestinationFolder="$(RWMods_POM)" Retries="3" RetryDelayMilliseconds="300" />
+		<Copy SourceFiles="modinfo.json" DestinationFolder="$(RWMods_POM)" Retries="3"
+			RetryDelayMilliseconds="300" />
 	</Target>
 </Project>
