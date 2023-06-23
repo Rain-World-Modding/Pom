@@ -12,6 +12,7 @@ public static partial class Eff
 	{
 		new("-", "%1"),
 		new( ",","%2" ),
+		new (":", "%3"),
 		new("%","%0"), // this goes last, very important
 	};
 	internal static string __EscapeString(string s)
