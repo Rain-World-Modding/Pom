@@ -18,7 +18,7 @@ public sealed class EffectExtraData
 		Effect = effect;
 		RawData = rawData;
 		Definition = definition;
-		foreach (var kvp in definition.fields)
+		foreach (var kvp in definition._fields)
 		{
 			string fieldname = kvp.Key;
 			EffectField fielddef = kvp.Value;

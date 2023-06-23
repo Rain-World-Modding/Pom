@@ -1,10 +1,18 @@
 namespace Pom.Eff;
 
-public sealed class EffectDefinition
+public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCategories? category)
 {
-    public DevInterface.RoomSettingsPage.DevEffectsCategories? category;
-	public Dictionary<string, EffectField> fields { get; set; } = new();
-	public static EffectDefinition @default = new();
+	internal bool _sealed;
+	internal Dictionary<string, EffectField> _fields { get; } = new();
+	private System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> _c_fieldReadOnly;
+	public System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
+	{
+		get {
+			_c_fieldReadOnly ??= new(_fields);
+			return _c_fieldReadOnly;
+		}
+	}
+	public static EffectDefinition @default = new(category: null);
 
 	private static void __ValidateDefaultValue(DataType t, object? value)
 	{
@@ -22,11 +30,16 @@ public sealed class EffectDefinition
 		}
 	}
 
-    public EffectDefinition AddField(EffectField field) {
-        fields[field.Name] = field;
-        return this;
-    }
-	//todo: impl builder pattern for defining fields
+	public EffectDefinition AddField(EffectField field)
+	{
+		if (_sealed) return this;
+		_fields[field.Name] = field;
+		return this;
+	}
+	public EffectDefinition Seal() {
+		this._sealed = true;
+		return this;
+	}
 }
 
 #pragma warning restore 1591

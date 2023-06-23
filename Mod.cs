@@ -20,7 +20,14 @@ public class Mod : BepInEx.BaseUnityPlugin
 
 			instance = this;
 			//Examples.RegisterExamples();
-			Eff.Eff.RegisterEffectDefinition("testeffect", new Eff.EffectDefinition().AddField(new Eff.IntField("testfield1", 0, 10, 5)));
+			Eff.Eff.RegisterEffectDefinition
+			(
+				"testeffect",
+				new Eff.EffectDefinition(category: null)
+					.AddField(new Eff.IntField("testfield1", 0, 10, 5))
+					.Seal()
+			)
+					;
 		}
 		catch (Exception ex)
 		{
