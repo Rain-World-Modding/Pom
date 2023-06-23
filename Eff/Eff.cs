@@ -6,6 +6,22 @@ namespace Pom.Eff;
 /// </summary>
 public static partial class Eff
 {
+	static Eff()
+	{
+		try
+		{
+			__ImplInit();
+		}
+		catch (Exception ex)
+		{
+			plog.LogFatal(ex);
+		}
+	}
+
+	private static void __ImplInit()
+	{
+		__AddHooks();
+	}
 	public readonly static Dictionary<RoomSettings.RoomEffect, EffectExtraData> attachedData = new();
 	public readonly static Dictionary<string, EffectDefinition> effectDefinitions = new();
 	internal readonly static List<KeyValuePair<string, string>> __escapeSequences = new()
@@ -19,63 +35,9 @@ public static partial class Eff
 		=> __escapeSequences.Aggregate(s, (s, kvp) => s.Replace(kvp.Key, kvp.Value));
 	internal static string __UnescapeString(string s)
 		=> System.Linq.Enumerable.Reverse(__escapeSequences).Aggregate(s, (s, kvp) => s.Replace(kvp.Value, kvp.Key));
-
-
-	private static FnOnce __Init = new(static () =>
-	{
-		plog.LogWarning("Eff init");
-		On.RainWorldGame.ctor += (orig, self, manager) =>
-		{
-			orig(self, manager);
-			attachedData.Clear();
-		};
-		On.RoomSettings.RoomEffect.FromString += (orig, self, data) =>
-		{
-			orig(self, data);
-			plog.LogWarning($"Deserializing {self.type}");
-			plog.LogWarning(effectDefinitions.TryGetValue(self.type.ToString(), out EffectDefinition? def));
-			plog.LogWarning((self.unrecognizedAttributes?.Length ?? 0).ToString() ?? "EMPTY ATTRIBUTES");
-			self.unrecognizedAttributes ??= new string[0];
-			
-			var newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
-			attachedData[self] = newdata;
-			plog.LogWarning(attachedData[self]);
-		};
-		On.RoomSettings.RoomEffect.ToString += (orig, self) =>
-		{
-			List<string> attributes = new();
-			attributes.AddRange(self.unrecognizedAttributes ?? new string[0]);
-			plog.LogWarning($"Serializing {self.type}");
-			if (!attachedData.TryGetValue(self, out EffectExtraData data))
-			{
-				plog.LogWarning("Could not find EffectExtraData, aborting");
-				goto done;
-			}
-			foreach (var kvp in data.Definition.Fields)
-			{
-				string fieldkey = kvp.Key;
-				EffectField fielddef = kvp.Value;
-				if (!data.RawData.TryGetValue(fieldkey, out string fieldval)) fieldval = fielddef.DefaultValue?.ToString() ?? "";
-				plog.LogWarning($"serializing {fieldkey} : {fielddef} (value {fieldval})");
-				attributes.Add($"{fieldkey}:{__EscapeString(fieldval)}");
-			}
-			self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
-		//todo: test ser
-		done:
-			return orig(self);
-
-		};
-
-		//todo: add serialization
-	});
 	#region API
 	public static void RegisterEffectDefinition(string name, EffectDefinition definition)
 	{
-		__Init.Invoke();
-		if (__Init.error is Exception ex)
-		{
-			plog.LogFatal($"Error on Eff init {ex}");
-		}
 		if (!definition._sealed) throw new ArgumentException("Effect definition not sealed! Make sure to call Seal() after you are done adding fields");
 		effectDefinitions[new RoomSettings.RoomEffect.Type(name, true).ToString()] = definition;
 	}

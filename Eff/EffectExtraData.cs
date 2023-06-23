@@ -6,10 +6,10 @@ public sealed class EffectExtraData
 	public Dictionary<string, string> RawData { get; private set; }
 	public EffectDefinition Definition { get; private set; }
 
-	private Dictionary<string, (IntField, Cached<int>)> _ints = new();
-	private Dictionary<string, (FloatField, Cached<float>)> _floats = new();
-	private Dictionary<string, (BoolField, Cached<bool>)> _bools = new();
-	private Dictionary<string, (StringField, Cached<string>)> _strings = new();
+	internal Dictionary<string, (IntField, Cached<int>)> _ints = new();
+	internal Dictionary<string, (FloatField, Cached<float>)> _floats = new();
+	internal Dictionary<string, (BoolField, Cached<bool>)> _bools = new();
+	internal Dictionary<string, (StringField, Cached<string>)> _strings = new();
 	public EffectExtraData(
 		RoomSettings.RoomEffect effect,
 		Dictionary<string, string> rawData,

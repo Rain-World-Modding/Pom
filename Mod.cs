@@ -18,7 +18,7 @@ namespace Pom;
 public class Mod : BepInEx.BaseUnityPlugin
 {
 	internal static Mod instance = null!;
-	public static BepInEx.Logging.ManualLogSource plog => instance.Logger;
+	public static BepInEx.Logging.ManualLogSource plog => instance.Logger; //new BepInEx.Logging.ManualLogSource("POM");//instance.Logger;
 	public void OnEnable()
 	{
 		try
@@ -30,7 +30,9 @@ public class Mod : BepInEx.BaseUnityPlugin
 				"testeffect",
 				new Eff.EffectDefinition(category: null)
 					.AddField(new Eff.IntField("testfield1", 0, 10, 5))
-					.AddField(new Eff.FloatField("testfield2", 0f, 10f, 5f, 1f))
+					.AddField(new Eff.FloatField("testfield21", 0f, 10f, 5f, 1f))
+					.AddField(new Eff.FloatField("testfield22", 0f, 10f, 5f, 1f))
+					.AddField(new Eff.FloatField("testfield23", 0f, 10f, 5f, 1f))
 					.AddField(new Eff.BoolField("testfield3", true))
 					.AddField(new Eff.StringField("testfield4", "idk%%--"))
 					.Seal()
@@ -76,6 +78,5 @@ public class Mod : BepInEx.BaseUnityPlugin
 	public void OnDisable()
 	{
 		Pom.DisposeStaticInputHooks();
-		instance = null!;
 	}
 }
