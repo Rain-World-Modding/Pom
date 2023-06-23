@@ -106,6 +106,10 @@
 			<HintPath>lib/netstandard.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="Newtonsoft.Json">
+			<HintPath>lib/Newtonsoft.Json.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="com.rlabrecque.steamworks.net">
 			<HintPath>lib/com.rlabrecque.steamworks.net.dll</HintPath>
 		</Reference>
@@ -122,7 +126,9 @@
 		<Delete Files="$(RWMods_POM)/plugins" />
 		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ $(RWMods_POM) ] - @(_CopyItems)"
 			Importance="high" />
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+		<Copy SourceFiles="$(OutDir)Pom.dll" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+			RetryDelayMilliseconds="300" />
+		<Copy SourceFiles="$(OutDir)Pom.pdb" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
 		<!-- <Copy
 			SourceFiles="@(_CopyItems)"

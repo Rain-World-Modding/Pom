@@ -15,8 +15,17 @@ public class Mod : BepInEx.BaseUnityPlugin
 	public static BepInEx.Logging.ManualLogSource plog => instance.Logger;
 	public void OnEnable()
 	{
-		instance = this;
-		Examples.RegisterExamples();
+		try
+		{
+
+			instance = this;
+			//Examples.RegisterExamples();
+			Eff.Eff.RegisterEffectDefinition("testeffect", new Eff.EffectDefinition().AddField(new Eff.IntField("testfield1", 0, 10, 5)));
+		}
+		catch (Exception ex)
+		{
+			plog.LogFatal(ex);
+		}
 	}
 
 	public void OnDisable()

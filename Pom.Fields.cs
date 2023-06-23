@@ -598,14 +598,14 @@ public static partial class Pom
 
 		}
 
-		protected readonly static Dictionary<string, string> replacements = new Dictionary<string, string>
-			{
-				{ ": ","%1" },
-				{ ", ","%2" },
-				{ "><","%3" },
-				{ "~","%4" },
-				{ "%","%0" }, // this goes last, very important
-            };
+		protected readonly static List<KeyValuePair<string, string>> replacements = new()
+		{
+			new(": ","%1"),
+			new( ", ","%2" ),
+			new("><","%3"),
+			new("~","%4"),
+			new("%","%0"), // this goes last, very important
+		};
 
 		public override object FromString(string str)
 		{
@@ -617,7 +617,7 @@ public static partial class Pom
 		public override string ToString(object value)
 		{
 			//return new string[] { value.ToString() };
-			return replacements.Reverse().Aggregate
+			return System.Linq.Enumerable.Reverse(replacements).Aggregate
 				(
 					value.ToString(),
 					(current, val) => current.Replace(val.Key, val.Value)
@@ -1177,5 +1177,5 @@ public static partial class Pom
 			}
 		}
 	}
-	
+
 }
