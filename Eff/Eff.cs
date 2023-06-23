@@ -33,7 +33,9 @@ public static partial class Eff
 			orig(self, data);
 			plog.LogWarning($"Deserializing {self.type}");
 			plog.LogWarning(effectDefinitions.TryGetValue(self.type.ToString(), out EffectDefinition? def));
+			plog.LogWarning((self.unrecognizedAttributes?.Length ?? 0).ToString() ?? "EMPTY ATTRIBUTES");
 			self.unrecognizedAttributes ??= new string[0];
+			
 			var newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
 			attachedData[self] = newdata;
 			plog.LogWarning(attachedData[self]);
@@ -54,7 +56,7 @@ public static partial class Eff
 				EffectField fielddef = kvp.Value;
 				if (!data.RawData.TryGetValue(fieldkey, out string fieldval)) fieldval = fielddef.DefaultValue?.ToString() ?? "";
 				plog.LogWarning($"serializing {fieldkey} : {fielddef} (value {fieldval})");
-				attributes.Add($"{fieldkey}:{fieldval}");
+				attributes.Add($"{fieldkey}:{__EscapeString(fieldval)}");
 			}
 			self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
 		//todo: test ser
@@ -88,7 +90,6 @@ public static partial class Eff
 		for (int i = 0; i < effect.unrecognizedAttributes.Length; i++)
 		{
 			ref string? attr = ref effect.unrecognizedAttributes[i];
-			if (attr is null) continue;
 			int splitindex = attr.IndexOf(':');
 			if (splitindex < 0)
 			{
@@ -96,11 +97,13 @@ public static partial class Eff
 				continue;
 			}
 			var name = attr.Substring(0, splitindex);
-			var value = attr.Substring(splitindex);
+			var value = __UnescapeString(attr.Substring(splitindex + 1));
+			plog.LogWarning($"Deserialized named property {name} : {value}");
 			result[name] = value;
 			attr = null; //remove from array
 		}
 		effect.unrecognizedAttributes = effect.unrecognizedAttributes.SkipWhile(x => x == null).ToArray();
+
 		return result;
 	}
 

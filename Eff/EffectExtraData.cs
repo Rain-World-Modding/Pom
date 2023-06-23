@@ -29,6 +29,7 @@ public sealed class EffectExtraData
 			// 	fielddef = new StringField(fieldname, "");
 			// }
 			plog.LogDebug(fielddef);
+			plog.LogDebug(fieldstringvalue);
 
 			switch (fielddef)
 			{
