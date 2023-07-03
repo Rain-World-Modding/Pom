@@ -4,8 +4,6 @@ using DevInterface;
 namespace Pom.Eff;
 public class CustomFloatSlider : Slider
 {
-
-
 	public CustomFloatSlider(
 		DevUI owner,
 		string IDstring,

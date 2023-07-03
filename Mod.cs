@@ -60,17 +60,18 @@ public class Mod : BepInEx.BaseUnityPlugin
 			(x) => x.MatchLdarg(1),
 			(x) => x.MatchLdarg(0),
 			(x) => x.MatchLdlen(),
-			(x) => x.MatchConvI4()
+			(x) => x.MatchConvI4(),
+			(x) => x.MatchBlt(out ILLabel target)
 			))
 		{
-			//il.Body.Instructions.RemoveAt(c.Index + 1);
-			c.Next.OpCode = OpCodes.Pop;
-			c.Next.Operand = null;
+			c.Prev.OpCode = OpCodes.Pop;
+			c.Prev.Operand = null;
 			c.Emit(OpCodes.Pop);
-			
-			plog.LogDebug(il.ToString());
+
+			//plog.LogDebug(il.ToString());
 		}
-		else {
+		else
+		{
 			throw new Exception("Could not find injection point; presumed an identical hook is already in place");
 		}
 	}

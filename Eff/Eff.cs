@@ -22,7 +22,7 @@ public static partial class Eff
 	{
 		__AddHooks();
 	}
-	public readonly static Dictionary<RoomSettings.RoomEffect, EffectExtraData> attachedData = new();
+	public readonly static Dictionary<int, EffectExtraData> attachedData = new();
 	public readonly static Dictionary<string, EffectDefinition> effectDefinitions = new();
 	internal readonly static List<KeyValuePair<string, string>> __escapeSequences = new()
 	{

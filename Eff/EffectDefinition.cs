@@ -4,10 +4,11 @@ public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCa
 {
 	internal bool _sealed;
 	internal Dictionary<string, EffectField> _fields { get; } = new();
-	private System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> _c_fieldReadOnly;
+	private System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField>? _c_fieldReadOnly;
 	public System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
 	{
-		get {
+		get
+		{
 			_c_fieldReadOnly ??= new(_fields);
 			return _c_fieldReadOnly;
 		}
@@ -32,11 +33,11 @@ public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCa
 
 	public EffectDefinition AddField(EffectField field)
 	{
-		if (_sealed) return this;
-		_fields[field.Name] = field;
+		if (!_sealed) _fields[field.Name] = field;
 		return this;
 	}
-	public EffectDefinition Seal() {
+	public EffectDefinition Seal()
+	{
 		this._sealed = true;
 		return this;
 	}
