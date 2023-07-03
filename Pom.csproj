@@ -7,7 +7,7 @@
 		<LangVersion>11</LangVersion>
 		<FileVersion>2.7</FileVersion>
 		<AssemblyVersion>2.7</AssemblyVersion>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
 	<!-- Lib includes. -->
 	<ItemGroup>
