@@ -1,9 +1,11 @@
 namespace Pom.Eff;
 
-public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCategories? category)
+public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCategories? Category, string Name)
 {
+	internal Func<Room, EffectExtraData, bool, UpdatableAndDeletable?>? _UADFactory;
 	internal bool _sealed;
 	internal Dictionary<string, EffectField> _fields { get; } = new();
+
 	private System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField>? _c_fieldReadOnly;
 	public System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
 	{
@@ -13,7 +15,7 @@ public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCa
 			return _c_fieldReadOnly;
 		}
 	}
-	public static EffectDefinition @default = new(category: null);
+	public static EffectDefinition @default = new(null, "DefaultEffectDef");
 
 	private static void __ValidateDefaultValue(DataType t, object? value)
 	{
@@ -34,6 +36,11 @@ public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCa
 	public EffectDefinition AddField(EffectField field)
 	{
 		if (!_sealed) _fields[field.Name] = field;
+		return this;
+	}
+	public EffectDefinition SetUADFactory(Func<Room, EffectExtraData, bool, UpdatableAndDeletable?>? factory)
+	{
+		if (!_sealed) _UADFactory = factory;
 		return this;
 	}
 	public EffectDefinition Seal()

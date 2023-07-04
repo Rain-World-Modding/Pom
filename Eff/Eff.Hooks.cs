@@ -7,9 +7,9 @@ public static partial class Eff
 {
 	public static void __AddHooks()
 	{
+		//todo: factory consumption
 		plog.LogWarning("Eff init");
 		// On.RainWorldGame.ctor += __ClearAttachedData;
-
 		On.RoomSettings.RoomEffect.FromString += __ParseExtraData;
 		On.RoomSettings.RoomEffect.ToString += __SaveExtraData;
 		On.ProcessManager.PostSwitchMainProcess += (orig, self, procID) =>
@@ -22,6 +22,35 @@ public static partial class Eff
 			}
 		};
 		On.DevInterface.EffectPanel.ctor += __ConstructEffectPanel;
+		On.Room.Loaded += (orig, self) =>
+		{
+			bool firstTimeRealized = self.abstractRoom.firstTimeRealized;
+			orig(self);
+			foreach (RoomSettings.RoomEffect effect in self.roomSettings.effects)
+			{
+				if (!effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
+				{
+					continue;
+				}
+				if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
+				{
+					plog.LogDebug($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
+					continue;
+				}
+				try
+				{
+					UpdatableAndDeletable? uad = def._UADFactory?.Invoke(self, data, firstTimeRealized);
+					if (uad is null) continue;
+					plog.LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
+					self.AddObject(uad);
+
+				}
+				catch (Exception ex)
+				{
+					plog.LogWarning($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
+				}
+			}
+		};
 	}
 
 	private static void __ConstructEffectPanel(On.DevInterface.EffectPanel.orig_ctor orig, EffectPanel self, DevUI owner, DevUINode parent, Vector2 pos, RoomSettings.RoomEffect effect)
@@ -35,7 +64,7 @@ public static partial class Eff
 			return;
 		}
 
-		Vector2 shift = new(H_SPACING, 0f);
+		Vector2 shift = new(H_SPACING, V_SPACING);
 		foreach ((var key, (var field, var cache)) in data._floats)
 		{
 			StretchBounds();

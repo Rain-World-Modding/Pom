@@ -10,6 +10,10 @@ public sealed class EffectExtraData
 	internal Dictionary<string, (FloatField, Cached<float>)> _floats = new();
 	internal Dictionary<string, (BoolField, Cached<bool>)> _bools = new();
 	internal Dictionary<string, (StringField, Cached<string>)> _strings = new();
+	
+	public float Amount => Effect.amount;
+	public RoomSettings.RoomEffect.Type EffectType => Effect.type;
+
 	public EffectExtraData(
 		RoomSettings.RoomEffect effect,
 		Dictionary<string, string> rawData,

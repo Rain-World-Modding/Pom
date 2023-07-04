@@ -23,18 +23,18 @@ public class Mod : BepInEx.BaseUnityPlugin
 	{
 		try
 		{
-
 			instance = this;
 			Eff.Eff.RegisterEffectDefinition
 			(
 				"testeffect",
-				new Eff.EffectDefinition(category: null)
+				new Eff.EffectDefinition(Category: null, Name: "testeffect")
 					.AddField(new Eff.IntField("testfield1", 0, 10, 5))
 					.AddField(new Eff.FloatField("testfield21", 0f, 10f, 5f, 1f))
 					.AddField(new Eff.FloatField("testfield22", 0f, 10f, 0.1f, 1f))
 					.AddField(new Eff.FloatField("testfield23", 0f, 10f, 5f, 1f))
 					.AddField(new Eff.BoolField("testfield3", true))
 					.AddField(new Eff.StringField("testfield4", "idk%%--"))
+					.SetUADFactory((room, data, firstTimeRealized) => new Eff.ExampleEffectUAD())
 					.Seal()
 			)
 					;
