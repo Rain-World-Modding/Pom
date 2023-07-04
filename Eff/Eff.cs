@@ -22,6 +22,13 @@ public static partial class Eff
 	{
 		__AddHooks();
 	}
+	public const float DEVUI_TITLE_WIDTH = 110f;
+	public const float V_SPACING = 5f;
+	public const float H_SPACING = 5f;
+	public const float ROW_HEIGHT = 18f;
+	public const float INT_BUTTON_WIDTH = 20f;
+	public const float INT_VALUELABEL_WIDTH = 60f;
+	public const float NAMELABEL_WIDTH = DEVUI_TITLE_WIDTH;
 	public readonly static Dictionary<int, EffectExtraData> attachedData = new();
 	public readonly static Dictionary<string, EffectDefinition> effectDefinitions = new();
 	internal readonly static List<KeyValuePair<string, string>> __escapeSequences = new()

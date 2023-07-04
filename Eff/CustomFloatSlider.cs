@@ -18,7 +18,7 @@ public class CustomFloatSlider : Slider
 			pos,
 			title,
 			false,
-			110f)
+			Eff.DEVUI_TITLE_WIDTH)
 	{
 		Effect = effect;
 		Value = value;
@@ -35,7 +35,7 @@ public class CustomFloatSlider : Slider
 			plog.LogError(Value);
 			return;
 		}
-        this.NumberText = Value.cache.val.ToString();
+		this.NumberText = Value.cache.val.ToString();
 		float amount = Mathf.InverseLerp(Value.field.Min, Value.field.Max, Value.cache.val);
 		RefreshNubPos(amount);
 	}
@@ -47,7 +47,9 @@ public class CustomFloatSlider : Slider
 			return;
 
 		}
-		this.Value.cache.val = Mathf.Lerp(Value.field.Min, Value.field.Max, nubPos);
+
+		float unroundedVal = Mathf.Lerp(Value.field.Min, Value.field.Max, nubPos);
+		this.Value.cache.val = unroundedVal - unroundedVal % this.Value.field.Step;
 		this.Refresh();
 		//base.NubDragged(nubPos);
 	}

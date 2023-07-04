@@ -26,6 +26,7 @@ public static partial class Eff
 
 	private static void __ConstructEffectPanel(On.DevInterface.EffectPanel.orig_ctor orig, EffectPanel self, DevUI owner, DevUINode parent, Vector2 pos, RoomSettings.RoomEffect effect)
 	{
+
 		orig(self, owner, parent, pos, effect);
 		effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition? def);
 		if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
@@ -33,20 +34,38 @@ public static partial class Eff
 			plog.LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {attachedData.Count}, {def}");
 			return;
 		}
-		Vector2 shift = new(5f, 20f);
+
+		Vector2 shift = new(H_SPACING, 0f);
 		foreach ((var key, (var field, var cache)) in data._floats)
 		{
-			if (key is null || field is null || cache is null)
-			{
-				plog.LogError($"{key} {field} {cache}");
-				continue;
-			}
-
+			StretchBounds();
 			(FloatField field, Cached<float> cache) value = (field, cache);
 			plog.LogWarning($"Adding slider for {value}");
-			self.subNodes.Add(new CustomFloatSlider(owner, $"{key}_Slider", self, shift, $"{key}: ", value, effect));
-			shift.y += 20f;
-			self.size += new Vector2(0f, 20f);
+			var item = new CustomFloatSlider(owner, $"{key}_Slider", self, shift, $"{key}: ", value, effect);
+			self.subNodes.Add(item);
+		}
+		foreach ((var key, (var field, var cache)) in data._ints)
+		{
+			StretchBounds();
+			(IntField field, Cached<int> cache) value = (field, cache);
+			plog.LogWarning($"Adding int buttons for {value}");
+			Vector2 inRowShift = shift;
+			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.val.ToString());
+			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, NAMELABEL_WIDTH, field.Name); //buttons need it
+			inRowShift.x += NAMELABEL_WIDTH + H_SPACING;
+			CustomIntButton buttonDec = new(owner, $"{key}_Decrease", self, inRowShift, CustomIntButton.BType.Decrement, value, labelValue);
+			inRowShift.x += INT_BUTTON_WIDTH + H_SPACING;
+			labelValue.pos = inRowShift;
+			inRowShift.x += INT_VALUELABEL_WIDTH + H_SPACING;
+			CustomIntButton buttonInc = new(owner, $"{key}_Increase", self, inRowShift, CustomIntButton.BType.Increment, value, labelValue);
+			self.subNodes.AddRange(new DevUINode[] { labelName, buttonDec, labelValue, buttonInc });
+
+		}
+
+		void StretchBounds()
+		{
+			self.size.y += ROW_HEIGHT + V_SPACING;
+			shift.y += ROW_HEIGHT + V_SPACING;
 		}
 	}
 
