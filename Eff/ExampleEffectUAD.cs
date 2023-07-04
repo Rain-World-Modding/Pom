@@ -1,4 +1,4 @@
-namespace Pom.Eff;
+namespace Eff;
 
 public class ExampleEffectUAD : UpdatableAndDeletable
 {

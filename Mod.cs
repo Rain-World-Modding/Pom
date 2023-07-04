@@ -36,8 +36,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 					.AddField(new Eff.StringField("testfield4", "idk%%--"))
 					.SetUADFactory((room, data, firstTimeRealized) => new Eff.ExampleEffectUAD())
 					.Seal()
-			)
-					;
+			);
 		}
 		catch (Exception ex)
 		{

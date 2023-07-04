@@ -1,4 +1,4 @@
-namespace Pom.Eff;
+namespace Eff;
 
 public abstract record EffectField(string Name, DataType Dt, object DefaultValue);
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using DevInterface;
 
-namespace Pom.Eff;
+namespace Eff;
 
 public static partial class Eff
 {

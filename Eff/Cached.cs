@@ -1,4 +1,4 @@
-namespace Pom.Eff;
+namespace Eff;
 
 public class Cached<T> where T : IEquatable<T>
 {

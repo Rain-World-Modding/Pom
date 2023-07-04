@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-namespace Pom.Eff;
+namespace Eff;
 
 /// <summary>
 /// Functionality for extending effects with additional settings.

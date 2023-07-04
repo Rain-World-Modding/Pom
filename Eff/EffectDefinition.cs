@@ -1,4 +1,4 @@
-namespace Pom.Eff;
+namespace Eff;
 
 public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCategories? Category, string Name)
 {
