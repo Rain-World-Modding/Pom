@@ -193,7 +193,7 @@ public static partial class Eff
 			//not discarding unknown data
 			//if (!data.RawData.TryGetValue(fieldkey, out string fieldval)) fieldval = fielddef.ToString() ?? "";
 			plog.LogWarning($"serializing {fieldkey} : {fieldval} (value {fieldval})");
-			attributes.Add($"{fieldkey}:{__EscapeString(fieldval)}");
+			attributes.Add($"{__EscapeString(fieldkey)}:{__EscapeString(fieldval)}");
 		}
 		self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
 	//todo: test ser
