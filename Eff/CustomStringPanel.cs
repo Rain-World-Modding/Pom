@@ -10,13 +10,16 @@ public class CustomStringPanel : PositionedDevUINode
 	private bool _clickedLastUpdate;
 	private DevUILabel _labelValue;
 	public (StringField field, Cached<string> cache) Data { get; }
+	public RoomSettings.RoomEffect Effect { get; }
+
 	public CustomStringPanel(
 		DevUI owner,
 		string IDstring,
 		DevUINode parentNode,
 		Vector2 pos,
 		float width,
-		(StringField field, Cached<string> cache) data
+		(StringField field, Cached<string> cache) data,
+		RoomSettings.RoomEffect effect
 		) : base(
 			owner,
 			IDstring,
@@ -24,6 +27,7 @@ public class CustomStringPanel : PositionedDevUINode
 			pos)
 	{
 		Data = data;
+		Effect = effect;
 
 		//subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0, 0), Eff.DEVUI_TITLE_WIDTH, Data.field.Name));
 		_labelValue = new DevUILabel(owner, "Text", this, new Vector2(0, 0), width, Data.cache.val);
@@ -31,6 +35,10 @@ public class CustomStringPanel : PositionedDevUINode
 	}
 	public override void Update()
 	{
+		if (Effect.inherited)
+		{
+			goto done;
+		}
 		if (owner.mouseClick && !_clickedLastUpdate)
 		{
 			if (_labelValue.MouseOver && activeStringControl != this)
@@ -44,14 +52,7 @@ public class CustomStringPanel : PositionedDevUINode
 				// focus lost
 				LoseFocusAndWriteCached();
 			}
-
-			_clickedLastUpdate = true;
 		}
-		else if (!owner.mouseClick)
-		{
-			_clickedLastUpdate = false;
-		}
-
 		if (activeStringControl == this)
 		{
 			foreach (char c in Input.inputString)
@@ -62,8 +63,7 @@ public class CustomStringPanel : PositionedDevUINode
 					if (_labelValue.Text.Length != 0)
 					{
 						_labelValue.Text = _labelValue.Text.Substring(0, _labelValue.Text.Length - 1);
-						// Text = Text.Substring(0, Text.Length - 1);
-						// TrySetValue(Text, false);
+						WriteCached();
 					}
 					break;
 				case '\n':
@@ -77,6 +77,8 @@ public class CustomStringPanel : PositionedDevUINode
 				}
 			}
 		}
+	done:
+		_clickedLastUpdate = owner.mouseClick && _labelValue.MouseOver;
 	}
 
 	private void LoseFocusAndWriteCached()

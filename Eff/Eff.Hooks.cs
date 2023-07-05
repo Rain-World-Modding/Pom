@@ -130,7 +130,14 @@ public static partial class Eff
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
-			CustomStringPanel panelValue = new(owner, $"{key}_ValuePanel", self, inRowShift, INT_VALUELABEL_WIDTH/* self.size.x - inRowShift.x + H_SPACING */, value);
+			CustomStringPanel panelValue = new(
+				owner, 
+				$"{key}_ValuePanel", 
+				self, 
+				inRowShift, 
+				INT_VALUELABEL_WIDTH/* self.size.x - inRowShift.x + H_SPACING */, 
+				value, 
+				effect);
 
 			// CustomBoolButton buttonValue = new(
 			// 	owner,
