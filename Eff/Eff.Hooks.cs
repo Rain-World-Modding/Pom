@@ -53,9 +53,10 @@ public static partial class Eff
 
 	private static void __ConstructEffectPanel(On.DevInterface.EffectPanel.orig_ctor orig, EffectPanel self, DevUI owner, DevUINode parent, Vector2 pos, RoomSettings.RoomEffect effect)
 	{
-
 		orig(self, owner, parent, pos, effect);
-		effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition? def);
+		if (!effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def)) {
+			return;
+		}
 		if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 		{
 			plog.LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {attachedData.Count}, {def}");
@@ -80,11 +81,27 @@ public static partial class Eff
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.val.ToString()); //buttons need it
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
-			CustomIntButton buttonDec = new(owner, $"{key}_Decrease", self, inRowShift, CustomIntButton.BType.Decrement, value, labelValue);
+			CustomIntButton buttonDec = new(
+				owner,
+				$"{key}_Decrease",
+				self,
+				inRowShift,
+				CustomIntButton.BType.Decrement,
+				value,
+				labelValue,
+				effect);
 			inRowShift.x += INT_BUTTON_WIDTH + H_SPACING;
 			labelValue.pos = inRowShift;
 			inRowShift.x += INT_VALUELABEL_WIDTH + H_SPACING;
-			CustomIntButton buttonInc = new(owner, $"{key}_Increase", self, inRowShift, CustomIntButton.BType.Increment, value, labelValue);
+			CustomIntButton buttonInc = new(
+				owner,
+				$"{key}_Increase",
+				self,
+				inRowShift,
+				CustomIntButton.BType.Increment,
+				value,
+				labelValue,
+				effect);
 			self.subNodes.AddRange(new DevUINode[] { labelName, buttonDec, labelValue, buttonInc });
 		}
 		foreach ((var key, (var field, var cache)) in data._bools)
@@ -95,12 +112,16 @@ public static partial class Eff
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
-			CustomBoolButton buttonValue = new(owner, $"{key}_Toggle", self, inRowShift, value);
+			CustomBoolButton buttonValue = new(
+				owner,
+				$"{key}_Toggle",
+				self,
+				inRowShift,
+				value,
+				effect);
 			self.subNodes.AddRange(new DevUINode[] { labelName, buttonValue });
 
 		}
-
-
 		void StretchBounds()
 		{
 			self.size.y += ROW_HEIGHT + V_SPACING;

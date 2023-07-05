@@ -45,9 +45,7 @@ public class CustomFloatSlider : Slider
 		{
 			this.Refresh();
 			return;
-
 		}
-
 		float unroundedVal = Mathf.Lerp(Data.field.Min, Data.field.Max, nubPos);
 		this.Data.cache.val = unroundedVal - unroundedVal % this.Data.field.Step;
 		this.Refresh();

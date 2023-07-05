@@ -7,6 +7,8 @@ public class CustomIntButton : DevInterface.Button
 {
 	public BType Btype { get; }
 	public (IntField field, Cached<int> cache) Data { get; }
+	public RoomSettings.RoomEffect Effect { get; }
+
 	private readonly DevUILabel _valueLabel;
 
 	public CustomIntButton(
@@ -16,7 +18,8 @@ public class CustomIntButton : DevInterface.Button
 		Vector2 pos,
 		BType Btype,
 		(IntField field, Cached<int> cache) data,
-		DevUILabel valueLabel
+		DevUILabel valueLabel,
+		RoomSettings.RoomEffect effect
 		) : base(
 			owner,
 			IDstring,
@@ -28,11 +31,13 @@ public class CustomIntButton : DevInterface.Button
 		this.Btype = Btype;
 		this.Data = data;
 		this._valueLabel = valueLabel;
+		Effect = effect;
 	}
 
 	public override void Clicked()
 	{
 		base.Clicked();
+		if (Effect.inherited) return;
 		int newval = this.Data.cache.val + Btype switch { BType.Decrement => -1, BType.Increment => +1, _ => 0 };
 		if (newval > this.Data.field.Max)
 		{
