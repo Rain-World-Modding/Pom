@@ -34,7 +34,10 @@ public sealed class EffectExtraData
 		{
 			string fieldname = kvp.Key;
 			EffectField fielddef = kvp.Value;
-			rawData.TryGetValue(fieldname, out string? fieldstringvalue);
+			if (!rawData.TryGetValue(fieldname, out string? fieldstringvalue)) {
+				plog.LogWarning($"Missing data entry for {fieldname}. Possible version mismatch");
+				fieldstringvalue = fielddef.DefaultValue?.ToString();
+			};
 			fieldstringvalue ??= "";
 			plog.LogDebug(fielddef);
 			plog.LogDebug(fieldstringvalue);
