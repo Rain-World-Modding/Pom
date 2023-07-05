@@ -54,7 +54,8 @@ public static partial class Eff
 	private static void __ConstructEffectPanel(On.DevInterface.EffectPanel.orig_ctor orig, EffectPanel self, DevUI owner, DevUINode parent, Vector2 pos, RoomSettings.RoomEffect effect)
 	{
 		orig(self, owner, parent, pos, effect);
-		if (!effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def)) {
+		if (!effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
+		{
 			return;
 		}
 		if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
@@ -68,7 +69,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(FloatField field, Cached<float> cache) value = (field, cache);
-			plog.LogWarning($"Adding slider for {value}");
+			plog.LogDebug($"Adding slider for {value}");
 			var item = new CustomFloatSlider(owner, $"{key}_Slider", self, shift, $"{key}: ", value, effect);
 			self.subNodes.Add(item);
 		}
@@ -76,7 +77,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(IntField field, Cached<int> cache) value = (field, cache);
-			plog.LogWarning($"Adding int buttons for {value}");
+			plog.LogDebug($"Adding int buttons for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.val.ToString()); //buttons need it
@@ -108,7 +109,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(BoolField field, Cached<bool> cache) value = (field, cache);
-			plog.LogWarning($"Adding bool button for {value}");
+			plog.LogDebug($"Adding bool button for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
@@ -120,8 +121,27 @@ public static partial class Eff
 				value,
 				effect);
 			self.subNodes.AddRange(new DevUINode[] { labelName, buttonValue });
-
 		}
+		foreach ((var key, (var field, var cache)) in data._strings)
+		{
+			StretchBounds();
+			(StringField field, Cached<string> cache) value = (field, cache);
+			plog.LogDebug($"Adding string panel for {value}");
+			Vector2 inRowShift = shift;
+			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
+			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
+			CustomStringPanel panelValue = new(owner, $"{key}_ValuePanel", self, inRowShift, INT_VALUELABEL_WIDTH/* self.size.x - inRowShift.x + H_SPACING */, value);
+
+			// CustomBoolButton buttonValue = new(
+			// 	owner,
+			// 	$"{key}_Toggle",
+			// 	self,
+			// 	inRowShift,
+			// 	value,
+			// 	effect);
+			self.subNodes.AddRange(new DevUINode[] { labelName, panelValue });
+		}
+
 		void StretchBounds()
 		{
 			self.size.y += ROW_HEIGHT + V_SPACING;
