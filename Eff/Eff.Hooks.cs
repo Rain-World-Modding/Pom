@@ -135,7 +135,7 @@ public static partial class Eff
 				$"{key}_ValuePanel", 
 				self, 
 				inRowShift, 
-				INT_VALUELABEL_WIDTH/* self.size.x - inRowShift.x + H_SPACING */, 
+				self.size.x - (inRowShift.x + H_SPACING), 
 				value, 
 				effect);
 
