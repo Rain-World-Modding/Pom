@@ -7,18 +7,14 @@ public sealed class EffectExtraData
 	public EffectDefinition Definition { get; private set; }
 
 	internal Dictionary<string, (IntField fieldDef, Cached<int> valueCache)> _ints = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (IntField fieldDef, Cached<int> valueCache)> _ints_readonly;
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (IntField fieldDef, Cached<int> valueCache)> Ints => _ints_readonly;
+	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (IntField fieldDef, Cached<int> valueCache)> Ints { get; }
 	internal Dictionary<string, (FloatField fieldDef, Cached<float> valueCache)> _floats = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (FloatField fieldDef, Cached<float> valueCache)> _floats_readonly;
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (FloatField fieldDef, Cached<float> valueCache)> Floats => _floats_readonly;
+	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (FloatField fieldDef, Cached<float> valueCache)> Floats { get; }
 	internal Dictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> _bools = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> _bools_readonly;
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> Bools => _bools_readonly;
+	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> Bools { get; }
 	internal Dictionary<string, (StringField fieldDef, Cached<string> valueCache)> _strings = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (StringField fieldDef, Cached<string> valueCache)> _strings_readonly;
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (StringField fieldDef, Cached<string> valueCache)> Strings => _strings_readonly;
-	
+	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (StringField fieldDef, Cached<string> valueCache)> Strings { get; }
+
 	public float Amount => Effect.amount;
 	public RoomSettings.RoomEffect.Type EffectType => Effect.type;
 
@@ -27,10 +23,10 @@ public sealed class EffectExtraData
 		Dictionary<string, string> rawData,
 		EffectDefinition definition)
 	{
-		_ints_readonly = new(_ints);
-		_floats_readonly = new(_floats);
-		_bools_readonly = new(_bools);
-		_strings_readonly = new(_strings);
+		Ints = new(_ints);
+		Floats = new(_floats);
+		Bools = new(_bools);
+		Strings = new(_strings);
 		Effect = effect;
 		RawData = rawData;
 		Definition = definition;
@@ -40,10 +36,6 @@ public sealed class EffectExtraData
 			EffectField fielddef = kvp.Value;
 			rawData.TryGetValue(fieldname, out string? fieldstringvalue);
 			fieldstringvalue ??= "";
-			// if (!definition.fields.TryGetValue(fieldname, out var fielddef))
-			// {
-			// 	fielddef = new StringField(fieldname, "");
-			// }
 			plog.LogDebug(fielddef);
 			plog.LogDebug(fieldstringvalue);
 
