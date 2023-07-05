@@ -7,7 +7,6 @@ public static partial class Eff
 {
 	public static void __AddHooks()
 	{
-		//todo: factory consumption
 		plog.LogWarning("Eff init");
 		// On.RainWorldGame.ctor += __ClearAttachedData;
 		On.RoomSettings.RoomEffect.FromString += __ParseExtraData;
@@ -39,11 +38,10 @@ public static partial class Eff
 				}
 				try
 				{
-					UpdatableAndDeletable? uad = def._UADFactory?.Invoke(self, data, firstTimeRealized);
+					UpdatableAndDeletable? uad = def._UADFactory?.Invoke(self, data, firstTimeRealized ? FirstTimeRealized.Yes : FirstTimeRealized.No);
 					if (uad is null) continue;
 					plog.LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
 					self.AddObject(uad);
-
 				}
 				catch (Exception ex)
 				{
@@ -79,17 +77,29 @@ public static partial class Eff
 			(IntField field, Cached<int> cache) value = (field, cache);
 			plog.LogWarning($"Adding int buttons for {value}");
 			Vector2 inRowShift = shift;
-			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.val.ToString());
-			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, NAMELABEL_WIDTH, field.Name); //buttons need it
-			inRowShift.x += NAMELABEL_WIDTH + H_SPACING;
+			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
+			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.val.ToString()); //buttons need it
+			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
 			CustomIntButton buttonDec = new(owner, $"{key}_Decrease", self, inRowShift, CustomIntButton.BType.Decrement, value, labelValue);
 			inRowShift.x += INT_BUTTON_WIDTH + H_SPACING;
 			labelValue.pos = inRowShift;
 			inRowShift.x += INT_VALUELABEL_WIDTH + H_SPACING;
 			CustomIntButton buttonInc = new(owner, $"{key}_Increase", self, inRowShift, CustomIntButton.BType.Increment, value, labelValue);
 			self.subNodes.AddRange(new DevUINode[] { labelName, buttonDec, labelValue, buttonInc });
+		}
+		foreach ((var key, (var field, var cache)) in data._bools)
+		{
+			StretchBounds();
+			(BoolField field, Cached<bool> cache) value = (field, cache);
+			plog.LogWarning($"Adding bool button for {value}");
+			Vector2 inRowShift = shift;
+			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
+			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
+			CustomBoolButton buttonValue = new(owner, $"{key}_Toggle", self, inRowShift, value);
+			self.subNodes.AddRange(new DevUINode[] { labelName, buttonValue });
 
 		}
+
 
 		void StretchBounds()
 		{

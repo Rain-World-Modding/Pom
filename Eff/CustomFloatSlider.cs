@@ -10,7 +10,7 @@ public class CustomFloatSlider : Slider
 		DevUINode parentNode,
 		Vector2 pos,
 		string title,
-		(FloatField field, Cached<float> cache) value,
+		(FloatField field, Cached<float> cache) data,
 		RoomSettings.RoomEffect effect) : base(
 			owner,
 			IDstring,
@@ -21,22 +21,22 @@ public class CustomFloatSlider : Slider
 			Eff.DEVUI_TITLE_WIDTH)
 	{
 		Effect = effect;
-		Value = value;
+		Data = data;
 	}
 
-	public (FloatField field, Cached<float> cache) Value { get; }
+	public (FloatField field, Cached<float> cache) Data { get; }
 	public RoomSettings.RoomEffect Effect { get; }
 
 	public override void Refresh()
 	{
 		base.Refresh();
-		if (Value.cache is null || Value.field is null)
+		if (Data.cache is null || Data.field is null)
 		{
-			plog.LogError(Value);
+			plog.LogError(Data);
 			return;
 		}
-		this.NumberText = Value.cache.val.ToString();
-		float amount = Mathf.InverseLerp(Value.field.Min, Value.field.Max, Value.cache.val);
+		this.NumberText = Data.cache.val.ToString();
+		float amount = Mathf.InverseLerp(Data.field.Min, Data.field.Max, Data.cache.val);
 		RefreshNubPos(amount);
 	}
 	public override void NubDragged(float nubPos)
@@ -48,8 +48,8 @@ public class CustomFloatSlider : Slider
 
 		}
 
-		float unroundedVal = Mathf.Lerp(Value.field.Min, Value.field.Max, nubPos);
-		this.Value.cache.val = unroundedVal - unroundedVal % this.Value.field.Step;
+		float unroundedVal = Mathf.Lerp(Data.field.Min, Data.field.Max, nubPos);
+		this.Data.cache.val = unroundedVal - unroundedVal % this.Data.field.Step;
 		this.Refresh();
 		//base.NubDragged(nubPos);
 	}

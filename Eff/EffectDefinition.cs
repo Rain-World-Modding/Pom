@@ -2,7 +2,7 @@ namespace Eff;
 
 public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCategories? Category, string Name)
 {
-	internal Func<Room, EffectExtraData, bool, UpdatableAndDeletable?>? _UADFactory;
+	internal Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? _UADFactory;
 	internal bool _sealed;
 	internal Dictionary<string, EffectField> _fields { get; } = new();
 
@@ -38,7 +38,7 @@ public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCa
 		if (!_sealed) _fields[field.Name] = field;
 		return this;
 	}
-	public EffectDefinition SetUADFactory(Func<Room, EffectExtraData, bool, UpdatableAndDeletable?>? factory)
+	public EffectDefinition SetUADFactory(Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? factory)
 	{
 		if (!_sealed) _UADFactory = factory;
 		return this;

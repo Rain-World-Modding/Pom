@@ -28,7 +28,7 @@ public static partial class Eff
 	public const float ROW_HEIGHT = 18f;
 	public const float INT_BUTTON_WIDTH = 20f;
 	public const float INT_VALUELABEL_WIDTH = 60f;
-	public const float NAMELABEL_WIDTH = DEVUI_TITLE_WIDTH;
+	public const float BOOL_BUTTON_WIDTH = 50f;
 	public readonly static Dictionary<int, EffectExtraData> attachedData = new();
 	public readonly static Dictionary<string, EffectDefinition> effectDefinitions = new();
 	internal readonly static List<KeyValuePair<string, string>> __escapeSequences = new()

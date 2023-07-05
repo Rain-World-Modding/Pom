@@ -5,8 +5,8 @@ namespace Eff;
 
 public class CustomIntButton : DevInterface.Button
 {
-	private readonly BType type;
-	private readonly (IntField field, Cached<int> cache) _data;
+	public BType Btype { get; }
+	public (IntField field, Cached<int> cache) Data { get; }
 	private readonly DevUILabel _valueLabel;
 
 	public CustomIntButton(
@@ -14,7 +14,7 @@ public class CustomIntButton : DevInterface.Button
 		string IDstring,
 		DevUINode parentNode,
 		Vector2 pos,
-		BType type,
+		BType Btype,
 		(IntField field, Cached<int> cache) data,
 		DevUILabel valueLabel
 		) : base(
@@ -23,25 +23,27 @@ public class CustomIntButton : DevInterface.Button
 			parentNode,
 			pos,
 			Eff.INT_BUTTON_WIDTH,
-			type switch { BType.Decrement => " - ", BType.Increment => " + ", _ => "???" })
+			Btype switch { BType.Decrement => " - ", BType.Increment => " + ", _ => "???" })
 	{
-		this.type = type;
-		this._data = data;
+		this.Btype = Btype;
+		this.Data = data;
 		this._valueLabel = valueLabel;
 	}
 
 	public override void Clicked()
 	{
 		base.Clicked();
-        int newval = this._data.cache.val + type switch { BType.Decrement => -1, BType.Increment => +1, _ => 0 };
-        if (newval > this._data.field.Max) {
-            newval = this._data.field.Min;
-        }
-        else if (newval < this._data.field.Min) {
-            newval = this._data.field.Max;
-        }
-        this._data.cache.val = newval;
-		this._valueLabel.Text = this._data.cache.val.ToString();
+		int newval = this.Data.cache.val + Btype switch { BType.Decrement => -1, BType.Increment => +1, _ => 0 };
+		if (newval > this.Data.field.Max)
+		{
+			newval = this.Data.field.Min;
+		}
+		else if (newval < this.Data.field.Min)
+		{
+			newval = this.Data.field.Max;
+		}
+		this.Data.cache.val = newval;
+		this._valueLabel.Text = this.Data.cache.val.ToString();
 	}
 
 	public enum BType
