@@ -66,7 +66,7 @@ public static partial class Eff
 				plog.LogError($"Eff: Unrecognized attribute needs a name! {attr} skipping");
 				continue;
 			}
-			var name = attr.Substring(0, splitindex);
+			var name = __UnescapeString(attr.Substring(0, splitindex));
 			var value = __UnescapeString(attr.Substring(splitindex + 1));
 			plog.LogWarning($"Deserialized named property {name} : {value}");
 			result[name] = value;
