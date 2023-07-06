@@ -8,6 +8,21 @@
 		<FileVersion>2.7</FileVersion>
 		<AssemblyVersion>2.7</AssemblyVersion>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<RootNamespace></RootNamespace>
+	</PropertyGroup>
+	<!-- Debug configuration. Build for release. -->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>Portable</DebugType>
+		<TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+		<WarningsAsErrors>$(WarningsAsErrors);NU1605;Nullable;</WarningsAsErrors>
+		<DefineConstants>$(DefineConstants)TRACE;RK;REMIX</DefineConstants>
+	</PropertyGroup>
+	<!-- Release configuration. Build for release. -->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>Portable</DebugType>
+		<TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+		<WarningsAsErrors>$(WarningsAsErrors);NU1605;Nullable;</WarningsAsErrors>
+		<DefineConstants>$(DefineConstants)TRACE;RK;REMIX</DefineConstants>
 	</PropertyGroup>
 	<!-- Lib includes. -->
 	<ItemGroup>
