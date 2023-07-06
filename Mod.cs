@@ -1,4 +1,4 @@
-﻿global using static Pom.Mod;
+﻿global using static PomCore.Mod;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using Mono.Cecil.Cil;
@@ -12,7 +12,7 @@ using MonoMod.Cil;
 // you still can if you really want to.
 
 
-namespace Pom;
+namespace PomCore;
 
 [BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.7")]
 public class Mod : BepInEx.BaseUnityPlugin
@@ -77,6 +77,6 @@ public class Mod : BepInEx.BaseUnityPlugin
 
 	public void OnDisable()
 	{
-		Pom.DisposeStaticInputHooks();
+		Pom.Pom.DisposeStaticInputHooks();
 	}
 }

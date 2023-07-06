@@ -486,7 +486,7 @@ public static partial class Pom
 			{
 				if (array.Length == datastart + i)
 				{
-					Mod.plog.LogError("Error: Not enough fields for managed data type for "
+					plog.LogError("Error: Not enough fields for managed data type for "
 						+ owner.type.ToString()
 						+ "\nMaybe there's a version missmatch between the settings and the running version of the mod.");
 					break;
@@ -498,7 +498,7 @@ public static partial class Pom
 				}
 				catch (Exception)
 				{
-					Mod.plog.LogError("Error parsing field "
+					plog.LogError("Error parsing field "
 						+ fields[i].key
 						+ " from managed data type for "
 						+ owner.type.ToString()

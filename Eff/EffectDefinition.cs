@@ -49,5 +49,3 @@ public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCa
 		return this;
 	}
 }
-
-#pragma warning restore 1591

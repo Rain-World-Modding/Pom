@@ -113,7 +113,7 @@ public static class Examples
 		{
 			base.Update(eu);
 			if (room.game.clock % 100 == 0)
-				Mod.plog.LogMessage("SillyObject vf1.x is " + (placedObject.data as ManagedData).GetValue<Vector2>("vf1").x); // This is how you access those fields you created when using ManagedData directly.
+				plog.LogMessage("SillyObject vf1.x is " + ((ManagedData)placedObject.data).GetValue<Vector2>("vf1").x); // This is how you access those fields you created when using ManagedData directly.
 		}
 	}
 
@@ -175,7 +175,7 @@ public static class Examples
 						otherPlaces.Add(pobj);
 				}
 
-				Mod.plog.LogMessage("CuriousObject started and found " + otherPlaces.Count + " location");
+				plog.LogMessage("CuriousObject started and found " + otherPlaces.Count + " location");
 			}
 			// IDrawable stuff
 			public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer? newContatiner)
@@ -199,11 +199,11 @@ public static class Examples
 			{
 				for (int i = 0; i < sLeaser.sprites.Length; i++)
 				{
-					sLeaser.sprites[i].SetPosition(otherPlaces[i].pos + (this.placedObject.data as CuriousData).extraPos - camPos);
-					sLeaser.sprites[i].scale = (this.placedObject.data as CuriousData).GetValue<float>("scale");
-					sLeaser.sprites[i].rotation = (this.placedObject.data as CuriousData).rotation;
+					sLeaser.sprites[i].SetPosition(otherPlaces[i].pos + ((CuriousData)this.placedObject.data).extraPos - camPos);
+					sLeaser.sprites[i].scale = ((CuriousData)this.placedObject.data).GetValue<float>("scale");
+					sLeaser.sprites[i].rotation = ((CuriousData)this.placedObject.data).rotation;
 					Color clr = sLeaser.sprites[i].color;
-					clr.r = (this.placedObject.data as CuriousData).redcolor;
+					clr.r = ((CuriousData)this.placedObject.data).redcolor;
 					sLeaser.sprites[i].color = clr;
 				}
 			}

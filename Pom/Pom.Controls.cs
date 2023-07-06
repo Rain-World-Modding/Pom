@@ -1,14 +1,5 @@
 ﻿using DevInterface;
-using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEngine;
-
-using System.Reflection;
-
-using static Pom.Mod;
 
 namespace Pom;
 
@@ -513,7 +504,7 @@ public static partial class Pom
 				if ((subNodes[1] as RectangularDevUINode)!.MouseOver && activeStringControl != this)
 				{
 					// replace whatever instance/null that was focused
-					 Text = field.DisplayValueForNode(this, data);
+					Text = field.DisplayValueForNode(this, data) ?? "";
 					activeStringControl = this;
 					subNodes[1].fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
 				}
