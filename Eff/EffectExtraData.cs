@@ -11,7 +11,7 @@ public sealed class EffectExtraData
 	/// </summary>
 	public RoomSettings.RoomEffect Effect { get; private set; }
 	/// <summary>
-	/// Dictionary containing raw string vaues of all fields. May contain data that has not been bound to a specific effect field (such as when a version change removed a field)
+	/// Dictionary containing raw string values of all fields. May contain data that has not been bound to a specific effect field (such as when a version change removed a field)
 	/// </summary>
 	public Dictionary<string, string> RawData { get; private set; }
 	/// <summary>
