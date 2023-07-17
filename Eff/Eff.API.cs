@@ -8,7 +8,14 @@ public static partial class Eff
 	/// <param name="definition"></param>
 	public static void RegisterEffectDefinition(EffectDefinition definition)
 	{
-		effectDefinitions[new RoomSettings.RoomEffect.Type(definition.Name, true).ToString()] = definition;
+		//if (effectDefinitions.ContainsKey())
+		var type = new RoomSettings.RoomEffect.Type(definition.Name, true);
+		if (!effectDefinitions.TryAdd(type.ToString(), definition))
+		{
+			throw new System.ArgumentException(
+				$"There is already an effect definition for {type.ToString()}; cannot register twice. " +
+				"If you wish to replace your definition for whatever reason, call RemoveEffectDefinition.");
+		}
 	}
 	/// <summary>
 	/// Removes an existing effect definition
@@ -18,8 +25,15 @@ public static partial class Eff
 	{
 		try
 		{
-			RoomSettings.RoomEffect.Type.values.RemoveEntry(name);
-			effectDefinitions.Remove(name);
+
+			if (effectDefinitions.Remove(name))
+			{
+				RoomSettings.RoomEffect.Type.values.RemoveEntry(name);
+			}
+			else
+			{
+				plog.LogWarning($"Definition for {name} has not been registered; nothing to unregister.");
+			}
 		}
 		catch (Exception ex)
 		{
