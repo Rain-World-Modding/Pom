@@ -38,7 +38,15 @@ public static partial class Eff
 				}
 				try
 				{
-					UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized ? FirstTimeRealized.Yes : FirstTimeRealized.No);
+					def.EffectInitializer?.Invoke(self, data, firstTimeRealized);
+				}
+				catch (Exception ex)
+				{
+					plog.LogWarning($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
+				}
+				try
+				{
+					UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized);
 					if (uad is null) continue;
 					plog.LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
 					self.AddObject(uad);
@@ -131,12 +139,12 @@ public static partial class Eff
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
 			CustomStringPanel panelValue = new(
-				owner, 
-				$"{key}_ValuePanel", 
-				self, 
-				inRowShift, 
-				self.size.x - (inRowShift.x + H_SPACING), 
-				value, 
+				owner,
+				$"{key}_ValuePanel",
+				self,
+				inRowShift,
+				self.size.x - (inRowShift.x + H_SPACING),
+				value,
 				effect);
 
 			// CustomBoolButton buttonValue = new(
@@ -196,7 +204,6 @@ public static partial class Eff
 			attributes.Add($"{__EscapeString(fieldkey)}:{__EscapeString(fieldval)}");
 		}
 		self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
-	//todo: test ser
 	done:
 		return orig(self);
 	}

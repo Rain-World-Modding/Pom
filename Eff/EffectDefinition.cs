@@ -6,17 +6,19 @@ namespace Eff;
 /// <param name="Category">Devtools category where the effect appears. Optional.</param>
 /// <param name="Name">Name of the effect. Obligatory.</param>
 /// <param name="UADFactory"></param>
+/// <param name="Initializer"></param>
 /// <param name="Fields"></param>
 /// <returns></returns>
 public sealed record EffectDefinition(
 	DevInterface.RoomSettingsPage.DevEffectsCategories? Category,
 	string Name,
-	Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? UADFactory,
+	UADFactory? UADFactory,
+	EffectInitializer? EffectInitializer,
 	System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
 	)
 {
 	
-	internal static EffectDefinition @default = new(null, "DefaultEffectDef", null, new(new Dictionary<string, EffectField>()));
+	internal static EffectDefinition @default = new(null, "DefaultEffectDef", null, null, new(new Dictionary<string, EffectField>()));
 
 	private static void __ValidateDefaultValue(DataType t, object? value)
 	{

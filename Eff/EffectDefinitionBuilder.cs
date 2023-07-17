@@ -8,7 +8,8 @@ public sealed class EffectDefinitionBuilder
 	private bool _built = false;
 	private string? _category;
 	private string _name;
-	private Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? _UADFactory;
+	private UADFactory? _UADFactory;
+	private EffectInitializer? _initializer;
 	private Dictionary<string, EffectField> _fields = new();
 
 	/// <summary>
@@ -50,12 +51,15 @@ public sealed class EffectDefinitionBuilder
 	/// </summary>
 	/// <param name="factory"></param>
 	/// <returns></returns>
-	public EffectDefinitionBuilder SetUADFactory(Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? factory)
+	public EffectDefinitionBuilder SetUADFactory(UADFactory factory)
 	{
 		ThrowIfBuilt();
 		_UADFactory = factory;
 		return this;
 	}
+	/// <summary>
+	/// Registers effect definition and closes this instance from further use.
+	/// </summary>
 	public void Register() {
 		Eff.RegisterEffectDefinition(this._Build());
 	}
@@ -71,6 +75,7 @@ public sealed class EffectDefinitionBuilder
 			(_category is null ? null : new(_category, true)),
 			_name,
 			_UADFactory,
+			_initializer,
 			new(_fields));
 	}
 	/// <summary>
