@@ -383,7 +383,7 @@ public static partial class Pom
 			string? displayName = null) : this(
 				key,
 				(XE)ExtEnumBase.Parse(typeof(XE), defaultValue, false),
-				possibleValues.Select(x => (XE)(ExtEnumBase.Parse(typeof(XE), x, false))).ToArray(),
+				possibleValues?.Select(x => (XE)(ExtEnumBase.Parse(typeof(XE), x, false))).ToArray(),
 				control,
 				displayName
 			)
