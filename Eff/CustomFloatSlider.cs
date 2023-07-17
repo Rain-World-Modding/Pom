@@ -2,7 +2,7 @@ using UnityEngine;
 using DevInterface;
 
 namespace Eff;
-public class CustomFloatSlider : Slider
+internal class CustomFloatSlider : Slider
 {
 	public CustomFloatSlider(
 		DevUI owner,

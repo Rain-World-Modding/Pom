@@ -18,7 +18,7 @@ namespace PomCore;
 public class Mod : BepInEx.BaseUnityPlugin
 {
 	internal static Mod instance = null!;
-	public static BepInEx.Logging.ManualLogSource plog => instance.Logger; //new BepInEx.Logging.ManualLogSource("POM");//instance.Logger;
+	internal static BepInEx.Logging.ManualLogSource plog => instance.Logger; //new BepInEx.Logging.ManualLogSource("POM");//instance.Logger;
 	public void OnEnable()
 	{
 		try

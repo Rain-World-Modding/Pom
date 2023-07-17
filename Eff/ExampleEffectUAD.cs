@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Eff;
 
-public class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
+internal class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
 {
 	private FnOnce init;
 	private Cached<float> acceleration_intensity;

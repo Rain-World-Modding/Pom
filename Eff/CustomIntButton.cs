@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Eff;
 
-public class CustomIntButton : DevInterface.Button
+internal class CustomIntButton : DevInterface.Button
 {
 	public BType Btype { get; }
 	public (IntField field, Cached<int> cache) Data { get; }

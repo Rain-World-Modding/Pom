@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 namespace Eff;
 
 /// <summary>
@@ -22,15 +21,15 @@ public static partial class Eff
 	{
 		__AddHooks();
 	}
-	public const float DEVUI_TITLE_WIDTH = 110f;
-	public const float V_SPACING = 5f;
-	public const float H_SPACING = 5f;
-	public const float ROW_HEIGHT = 18f;
-	public const float INT_BUTTON_WIDTH = 20f;
-	public const float INT_VALUELABEL_WIDTH = 60f;
-	public const float BOOL_BUTTON_WIDTH = 50f;
-	public readonly static Dictionary<int, EffectExtraData> attachedData = new();
-	public readonly static Dictionary<string, EffectDefinition> effectDefinitions = new();
+	internal const float DEVUI_TITLE_WIDTH = 110f;
+	internal const float V_SPACING = 5f;
+	internal const float H_SPACING = 5f;
+	internal const float ROW_HEIGHT = 18f;
+	internal const float INT_BUTTON_WIDTH = 20f;
+	internal const float INT_VALUELABEL_WIDTH = 60f;
+	internal const float BOOL_BUTTON_WIDTH = 50f;
+	internal readonly static Dictionary<int, EffectExtraData> attachedData = new();
+	internal readonly static Dictionary<string, EffectDefinition> effectDefinitions = new();
 	internal readonly static List<KeyValuePair<string, string>> __escapeSequences = new()
 	{
 		new("-", "%1"),
@@ -42,17 +41,7 @@ public static partial class Eff
 		=> __escapeSequences.Aggregate(s, (s, kvp) => s.Replace(kvp.Key, kvp.Value));
 	internal static string __UnescapeString(string s)
 		=> System.Linq.Enumerable.Reverse(__escapeSequences).Aggregate(s, (s, kvp) => s.Replace(kvp.Value, kvp.Key));
-	#region API
-	public static void RegisterEffectDefinition(EffectDefinition definition)
-	{
-		//if (!definition._sealed) throw new ArgumentException("Effect definition not sealed! Make sure to call Seal() after you are done adding fields");
-		effectDefinitions[new RoomSettings.RoomEffect.Type(definition.Name, true).ToString()] = definition;
-	}
-	public static void RemoveEffectDefinition(string name)
-	{
-		effectDefinitions.Remove(name);
-	}
-	#endregion
+	
 	private static Dictionary<string, string> __ExtractRawExtraData(this RoomSettings.RoomEffect effect)
 	{
 		//List<int> popIndices = new();

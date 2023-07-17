@@ -5,7 +5,7 @@ namespace Eff;
 
 public static partial class Eff
 {
-	public static void __AddHooks()
+	internal static void __AddHooks()
 	{
 		plog.LogWarning("Eff init");
 		// On.RainWorldGame.ctor += __ClearAttachedData;

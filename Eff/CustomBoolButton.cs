@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Eff;
 
-public class CustomBoolButton : DevInterface.Button
+internal class CustomBoolButton : DevInterface.Button
 {
     public (BoolField field, Cached<bool> cache) Data { get; }
 	public RoomSettings.RoomEffect Effect { get; }

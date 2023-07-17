@@ -1,24 +1,54 @@
 namespace Eff;
 
+/// <summary>
+/// Carries additional data that is attached to a given instance of <see cref="global::RoomSettings.RoomEffect"/>.
+/// To get values of your effect's settings, see contents of <see cref="Ints"/>, <see cref="Floats"/>, <see cref="Bools"/>, and <see cref="Strings"/> properties. Values are accessed through <see cref="Cached{T}"/>.
+/// </summary>
 public sealed class EffectExtraData
 {
+	/// <summary>
+	/// Effect instance this ExtraData is attached to.
+	/// </summary>
 	public RoomSettings.RoomEffect Effect { get; private set; }
+	/// <summary>
+	/// Dictionary containing raw string vaues of all fields. May contain data that has not been bound to a specific effect field (such as when a version change removed a field)
+	/// </summary>
 	public Dictionary<string, string> RawData { get; private set; }
+	/// <summary>
+	/// The definition of this effect. Describes what fields it should contain.
+	/// </summary>
 	public EffectDefinition Definition { get; private set; }
 
 	internal Dictionary<string, (IntField fieldDef, Cached<int> valueCache)> _ints = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (IntField fieldDef, Cached<int> valueCache)> Ints { get; }
+	/// <summary>
+	/// All integer fields for this effect.
+	/// </summary>
+	public System.Collections.ObjectModel.ReadOnlyDictionary<string, (IntField fieldDef, Cached<int> valueCache)> Ints { get; }
 	internal Dictionary<string, (FloatField fieldDef, Cached<float> valueCache)> _floats = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (FloatField fieldDef, Cached<float> valueCache)> Floats { get; }
+	/// <summary>
+	/// All float fields for this effect.
+	/// </summary>
+	public System.Collections.ObjectModel.ReadOnlyDictionary<string, (FloatField fieldDef, Cached<float> valueCache)> Floats { get; }
 	internal Dictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> _bools = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> Bools { get; }
+	/// <summary>
+	/// All boolean fields for this effect.
+	/// </summary>
+	public System.Collections.ObjectModel.ReadOnlyDictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> Bools { get; }
 	internal Dictionary<string, (StringField fieldDef, Cached<string> valueCache)> _strings = new();
-	internal System.Collections.ObjectModel.ReadOnlyDictionary<string, (StringField fieldDef, Cached<string> valueCache)> Strings { get; }
-
+	/// <summary>
+	/// All string fields for this effect.
+	/// </summary>
+	public System.Collections.ObjectModel.ReadOnlyDictionary<string, (StringField fieldDef, Cached<string> valueCache)> Strings { get; }
+	/// <summary>
+	/// Mirrors <see cref="global::RoomSettings.RoomEffect.amount"/>
+	/// </summary>
 	public float Amount => Effect.amount;
+	/// <summary>
+	/// Mirrors <see cref="global::RoomSettings.RoomEffect.type"/>
+	/// </summary>
 	public RoomSettings.RoomEffect.Type EffectType => Effect.type;
-
-	public EffectExtraData(
+	
+	internal EffectExtraData(
 		RoomSettings.RoomEffect effect,
 		Dictionary<string, string> rawData,
 		EffectDefinition definition)
@@ -34,7 +64,8 @@ public sealed class EffectExtraData
 		{
 			string fieldname = kvp.Key;
 			EffectField fielddef = kvp.Value;
-			if (!rawData.TryGetValue(fieldname, out string? fieldstringvalue)) {
+			if (!rawData.TryGetValue(fieldname, out string? fieldstringvalue))
+			{
 				plog.LogWarning($"Missing data entry for {fieldname}. Possible version mismatch");
 				fieldstringvalue = fielddef.DefaultValue?.ToString();
 			};

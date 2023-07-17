@@ -5,7 +5,7 @@ using static Pom.Pom.ManagedStringControl;
 
 namespace Eff;
 
-public class CustomStringPanel : PositionedDevUINode
+internal class CustomStringPanel : PositionedDevUINode
 {
 	private bool _clickedLastUpdate;
 	private DevUILabel _labelValue;

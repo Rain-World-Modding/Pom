@@ -7,7 +7,7 @@
 		<LangVersion>11</LangVersion>
 		<FileVersion>2.7</FileVersion>
 		<AssemblyVersion>2.7</AssemblyVersion>
-		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<RootNamespace></RootNamespace>
 	</PropertyGroup>
 	<!-- Debug configuration. Build for release. -->
