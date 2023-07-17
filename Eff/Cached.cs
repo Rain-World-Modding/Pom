@@ -1,18 +1,18 @@
 namespace Eff;
 
 /// <summary>
-/// Contains a value (<see cref="val"/>) and a callback (<see cref="OnValueChange"/>).
-/// The callback is raised when <see cref="val"/> is changed to a NEW value.
+/// Contains a value (<see cref="Value"/>) and a callback (<see cref="OnValueChange"/>).
+/// The callback is raised when <see cref="Value"/> is changed to a NEW value.
 /// Contained value must be <see cref="IEquatable{T}"/>.
 /// </summary>
 /// <typeparam name="T">Type of contained value.</typeparam>
-public class Cached<T> where T : IEquatable<T>
+internal class Cached<T> where T : IEquatable<T>
 {
 	/// <summary>
 	/// Contained value. Setter invokes the <see cref="OnValueChange"/> when new value is different from previous one.
 	/// </summary>
 	/// <value></value>
-	public T val
+	public T Value
 	{
 		set
 		{
@@ -38,7 +38,6 @@ public class Cached<T> where T : IEquatable<T>
 	/// <summary>
 	/// Exception encountered last time there was an attempt to invoke setter <see cref="OnValueChange"/>, if there was one.
 	/// </summary>
-	/// <value></value>
 	public Exception? LastError { get; private set; } = null;
 
 	/// <summary>

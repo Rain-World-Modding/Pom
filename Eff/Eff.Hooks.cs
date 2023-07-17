@@ -88,7 +88,7 @@ public static partial class Eff
 			plog.LogDebug($"Adding int buttons for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
-			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.val.ToString()); //buttons need it
+			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.Value.ToString()); //buttons need it
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
 			CustomIntButton buttonDec = new(
 				owner,

@@ -30,7 +30,7 @@ internal class CustomStringPanel : PositionedDevUINode
 		Effect = effect;
 
 		//subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0, 0), Eff.DEVUI_TITLE_WIDTH, Data.field.Name));
-		_labelValue = new DevUILabel(owner, "Text", this, new Vector2(0, 0), width, Data.cache.val);
+		_labelValue = new DevUILabel(owner, "Text", this, new Vector2(0, 0), width, Data.cache.Value);
 		subNodes.Add(_labelValue);
 	}
 	public override void Update()
@@ -91,6 +91,6 @@ internal class CustomStringPanel : PositionedDevUINode
 
 	private void WriteCached()
 	{
-		Data.cache.val = _labelValue.Text;
+		Data.cache.Value = _labelValue.Text;
 	}
 }

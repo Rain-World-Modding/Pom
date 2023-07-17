@@ -38,7 +38,7 @@ internal class CustomIntButton : DevInterface.Button
 	{
 		base.Clicked();
 		if (Effect.inherited) return;
-		int newval = this.Data.cache.val + Btype switch { BType.Decrement => -1, BType.Increment => +1, _ => 0 };
+		int newval = this.Data.cache.Value + Btype switch { BType.Decrement => -1, BType.Increment => +1, _ => 0 };
 		if (newval > this.Data.field.Max)
 		{
 			newval = this.Data.field.Min;
@@ -47,8 +47,8 @@ internal class CustomIntButton : DevInterface.Button
 		{
 			newval = this.Data.field.Max;
 		}
-		this.Data.cache.val = newval;
-		this._valueLabel.Text = this.Data.cache.val.ToString();
+		this.Data.cache.Value = newval;
+		this._valueLabel.Text = this.Data.cache.Value.ToString();
 	}
 
 	public enum BType

@@ -25,7 +25,7 @@ internal class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
 	{
 		init.Invoke();
 		base.Update(eu);
-		acceleration = new Vector2(UnityEngine.Random.value * 2f - 1, UnityEngine.Random.value * 2f - 1) * acceleration_intensity.val;
+		acceleration = new Vector2(UnityEngine.Random.value * 2f - 1, UnityEngine.Random.value * 2f - 1) * acceleration_intensity.Value;
 		vel += acceleration;
 		pos += vel;
 		Rect bounds = new(new(), screenspace);

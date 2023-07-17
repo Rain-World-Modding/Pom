@@ -35,8 +35,8 @@ internal class CustomFloatSlider : Slider
 			plog.LogError(Data);
 			return;
 		}
-		this.NumberText = Data.cache.val.ToString();
-		float amount = Mathf.InverseLerp(Data.field.Min, Data.field.Max, Data.cache.val);
+		this.NumberText = Data.cache.Value.ToString();
+		float amount = Mathf.InverseLerp(Data.field.Min, Data.field.Max, Data.cache.Value);
 		RefreshNubPos(amount);
 	}
 	public override void NubDragged(float nubPos)
@@ -47,7 +47,7 @@ internal class CustomFloatSlider : Slider
 			return;
 		}
 		float unroundedVal = Mathf.Lerp(Data.field.Min, Data.field.Max, nubPos);
-		this.Data.cache.val = unroundedVal - unroundedVal % this.Data.field.Step;
+		this.Data.cache.Value = unroundedVal - unroundedVal % this.Data.field.Step;
 		this.Refresh();
 		//base.NubDragged(nubPos);
 	}

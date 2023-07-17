@@ -21,7 +21,7 @@ internal class CustomBoolButton : DevInterface.Button
 			parentNode,
 			pos,
 			Eff.BOOL_BUTTON_WIDTH,
-			data.cache.val.ToString())
+			data.cache.Value.ToString())
 	{
 		Data = data;
 		Effect = effect;
@@ -30,8 +30,8 @@ internal class CustomBoolButton : DevInterface.Button
 	{
 		base.Clicked();
 		if (Effect.inherited) return;
-        Data.cache.val = !Data.cache.val;
-        this.Text = Data.cache.val.ToString();
+        Data.cache.Value = !Data.cache.Value;
+        this.Text = Data.cache.Value.ToString();
 	}
 
 	
