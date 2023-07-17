@@ -3,7 +3,7 @@ namespace Eff;
 /// <summary>
 /// Builder class for creating an effect definition.
 /// </summary>
-public sealed class EffectDefinitionBuilder : IDisposable
+public sealed class EffectDefinitionBuilder
 {
 	private bool _built = false;
 	private string? _category;
@@ -56,15 +56,22 @@ public sealed class EffectDefinitionBuilder : IDisposable
 		_UADFactory = factory;
 		return this;
 	}
+	public void Register() {
+		Eff.RegisterEffectDefinition(this._Build());
+	}
 	/// <summary>
 	/// Creates an EffectDefinition from itself, and prevents itself from being used again.
 	/// </summary>
 	/// <returns>The resulting definition.</returns>
-	public EffectDefinition Build()
+	private EffectDefinition _Build()
 	{
 		ThrowIfBuilt();
 		this.Dispose();
-		return new((_category is null ? null : new(_category, true)), _name, _UADFactory, new(_fields));
+		return new(
+			(_category is null ? null : new(_category, true)),
+			_name,
+			_UADFactory,
+			new(_fields));
 	}
 	/// <summary>
 	/// Prevents the instance from being used again.
