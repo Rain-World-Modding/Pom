@@ -36,7 +36,7 @@ public class Cached<T> where T : IEquatable<T>
 	private T currentval;
 	private T oldval;
 	/// <summary>
-	/// Exception envountered last time there was an attempt to invoke setter <see cref="OnValueChange"/>, if there was one.
+	/// Exception encountered last time there was an attempt to invoke setter <see cref="OnValueChange"/>, if there was one.
 	/// </summary>
 	/// <value></value>
 	public Exception? LastError { get; private set; } = null;
