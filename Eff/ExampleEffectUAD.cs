@@ -4,8 +4,9 @@ namespace Eff;
 
 internal class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
 {
-	private FnOnce init;
-	private Cached<float> acceleration_intensity;
+	//private FnOnce init;
+	private bool setupRan;
+	//private Cached<float> acceleration_intensity;
 	private Vector2 pos;
 	private Vector2 vel;
 	private Vector2 acceleration;
@@ -13,19 +14,19 @@ internal class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
 	public EffectExtraData EffectData { get; }
 	public ExampleEffectUAD(EffectExtraData effectData)
 	{
-		acceleration_intensity = effectData._floats["floatfield"].valueCache;
-		init = new(() =>
-		{
-			plog.LogWarning($"Example effect go in room {room.abstractRoom.name}");
-		});
+		//acceleration_intensity = effectData._floats["floatfield"].valueCache;
 		EffectData = effectData;
 	}
 
 	public override void Update(bool eu)
 	{
-		init.Invoke();
+		if (!setupRan)
+		{
+			plog.LogWarning($"Example effect go in room {room.abstractRoom.name}");
+		}
 		base.Update(eu);
-		acceleration = new Vector2(UnityEngine.Random.value * 2f - 1, UnityEngine.Random.value * 2f - 1) * acceleration_intensity.Value;
+		float acceleration_intensity = this.EffectData.GetFloat("floatfield");
+		acceleration = new Vector2(UnityEngine.Random.value * 2f - 1, UnityEngine.Random.value * 2f - 1) * acceleration_intensity;
 		vel += acceleration;
 		pos += vel;
 		Rect bounds = new(new(), screenspace);
