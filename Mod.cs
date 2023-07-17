@@ -26,8 +26,8 @@ public class Mod : BepInEx.BaseUnityPlugin
 			instance = this;
 			Eff.Eff.RegisterEffectDefinition
 			(
-				"testeffect",
-				new Eff.EffectDefinition(Category: null, Name: "testeffect")
+				new Eff.EffectDefinitionBuilder("testeffect")
+
 					.AddField(new Eff.IntField("intfield", 0, 10, 5))
 					.AddField(new Eff.FloatField("floatfield", 0f, 10f, 0.1f, 1f))
 					// .AddField(new Eff.FloatField("testfield22", 0f, 10f, 0.1f, 1f))
@@ -35,7 +35,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 					.AddField(new Eff.BoolField("boolfield", true))
 					.AddField(new Eff.StringField("stringfield", "example_string%-%"))
 					.SetUADFactory((room, data, firstTimeRealized) => new Eff.ExampleEffectUAD(data))
-					.Seal()
+					.Build()
 			);
 		}
 		catch (Exception ex)

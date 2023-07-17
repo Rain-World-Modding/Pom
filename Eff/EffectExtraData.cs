@@ -30,7 +30,7 @@ public sealed class EffectExtraData
 		Effect = effect;
 		RawData = rawData;
 		Definition = definition;
-		foreach (var kvp in definition._fields)
+		foreach (var kvp in definition.Fields)
 		{
 			string fieldname = kvp.Key;
 			EffectField fielddef = kvp.Value;

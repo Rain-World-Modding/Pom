@@ -43,10 +43,10 @@ public static partial class Eff
 	internal static string __UnescapeString(string s)
 		=> System.Linq.Enumerable.Reverse(__escapeSequences).Aggregate(s, (s, kvp) => s.Replace(kvp.Value, kvp.Key));
 	#region API
-	public static void RegisterEffectDefinition(string name, EffectDefinition definition)
+	public static void RegisterEffectDefinition(EffectDefinition definition)
 	{
-		if (!definition._sealed) throw new ArgumentException("Effect definition not sealed! Make sure to call Seal() after you are done adding fields");
-		effectDefinitions[new RoomSettings.RoomEffect.Type(name, true).ToString()] = definition;
+		//if (!definition._sealed) throw new ArgumentException("Effect definition not sealed! Make sure to call Seal() after you are done adding fields");
+		effectDefinitions[new RoomSettings.RoomEffect.Type(definition.Name, true).ToString()] = definition;
 	}
 	public static void RemoveEffectDefinition(string name)
 	{

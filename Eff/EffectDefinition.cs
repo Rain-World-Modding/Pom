@@ -1,21 +1,13 @@
 namespace Eff;
 
-public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCategories? Category, string Name)
+public sealed record EffectDefinition(
+	DevInterface.RoomSettingsPage.DevEffectsCategories? Category,
+	string Name,
+	Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? UADFactory,
+	System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
+	)
 {
-	internal Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? _UADFactory;
-	internal bool _sealed;
-	internal Dictionary<string, EffectField> _fields { get; } = new();
-
-	private System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField>? _c_fieldReadOnly;
-	public System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
-	{
-		get
-		{
-			_c_fieldReadOnly ??= new(_fields);
-			return _c_fieldReadOnly;
-		}
-	}
-	public static EffectDefinition @default = new(null, "DefaultEffectDef");
+	public static EffectDefinition @default = new(null, "DefaultEffectDef", null, new(new Dictionary<string, EffectField>()));
 
 	private static void __ValidateDefaultValue(DataType t, object? value)
 	{
@@ -33,19 +25,5 @@ public sealed record EffectDefinition(DevInterface.RoomSettingsPage.DevEffectsCa
 		}
 	}
 
-	public EffectDefinition AddField(EffectField field)
-	{
-		if (!_sealed) _fields[field.Name] = field;
-		return this;
-	}
-	public EffectDefinition SetUADFactory(Func<Room, EffectExtraData, FirstTimeRealized, UpdatableAndDeletable?>? factory)
-	{
-		if (!_sealed) _UADFactory = factory;
-		return this;
-	}
-	public EffectDefinition Seal()
-	{
-		this._sealed = true;
-		return this;
-	}
+
 }

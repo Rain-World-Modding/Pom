@@ -38,7 +38,7 @@ public static partial class Eff
 				}
 				try
 				{
-					UpdatableAndDeletable? uad = def._UADFactory?.Invoke(self, data, firstTimeRealized ? FirstTimeRealized.Yes : FirstTimeRealized.No);
+					UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized ? FirstTimeRealized.Yes : FirstTimeRealized.No);
 					if (uad is null) continue;
 					plog.LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
 					self.AddObject(uad);
