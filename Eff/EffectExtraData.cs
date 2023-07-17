@@ -2,7 +2,6 @@ namespace Eff;
 
 /// <summary>
 /// Carries additional data that is attached to a given instance of <see cref="global::RoomSettings.RoomEffect"/>.
-/// To get values of your effect's settings, see contents of <see cref="Ints"/>, <see cref="Floats"/>, <see cref="Bools"/>, and <see cref="Strings"/> properties. Values are accessed through <see cref="Cached{T}"/>.
 /// </summary>
 public sealed class EffectExtraData
 {

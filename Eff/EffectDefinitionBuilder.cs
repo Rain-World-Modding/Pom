@@ -44,10 +44,6 @@ public sealed class EffectDefinitionBuilder
 	}
 	/// <summary>
 	/// Sets a callback that will be used to add UpdatableAndDeletables to rooms where this effect is enabled.
-	/// <para/>
-	/// Callback's arguments are: current room, <see cref="global::Eff.EffectExtraData"/> object which holds field values,
-	/// an <see cref="FirstTimeRealized"/> enum which indicates whether the room is being realized for the first time.
-	/// Callback should return the new UpdatableAndDeletable, or null if the effect should not spawn an object in this room.
 	/// </summary>
 	/// <param name="factory"></param>
 	/// <returns></returns>
@@ -55,6 +51,16 @@ public sealed class EffectDefinitionBuilder
 	{
 		ThrowIfBuilt();
 		_UADFactory = factory;
+		return this;
+	}
+	/// <summary>
+	/// Sets a callback that runs on room load for this effect but does not produce an object.
+	/// </summary>
+	/// <param name="initializer"></param>
+	/// <returns></returns>
+	public EffectDefinitionBuilder SetEffectInitializer(EffectInitializer initializer) {
+		ThrowIfBuilt();
+		_initializer = initializer;
 		return this;
 	}
 	/// <summary>
