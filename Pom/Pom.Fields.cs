@@ -95,12 +95,15 @@ public static partial class Pom
 			this.max = Math.Max(min, max);
 			this.increment = increment;
 		}
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			return Mathf.Clamp(float.Parse(str), min, max);
 		}
-
+		/// <summary>
+		/// Returns number of decimals to display after dot
+		/// </summary>
+		/// <returns></returns>
 		protected virtual int NumberOfDecimals()
 		{
 			// fix decimals from https://stackoverflow.com/a/30205131
@@ -116,7 +119,7 @@ public static partial class Pom
 			}
 			return decimalPlaces;
 		}
-
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			return
@@ -125,7 +128,7 @@ public static partial class Pom
 			+ 2
 			+ NumberOfDecimals());
 		}
-
+		/// <inheritdoc/>
 		public override string DisplayValueForNode(PositionedDevUINode node, ManagedData data)
 		{
 			//return base.DisplayValueForNode(node, data);
@@ -174,7 +177,7 @@ public static partial class Pom
 			if (val < min) val = max;
 			data.SetValue<float>(key, val);
 		}
-
+		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
 			ManagedData data,
@@ -209,12 +212,12 @@ public static partial class Pom
 				displayName)
 		{
 		}
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			return bool.Parse(str);
 		}
-
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			return HUD.DialogBox.meanCharWidth * 5;
@@ -265,8 +268,13 @@ public static partial class Pom
 	public class EnumField<E> : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField
 		where E : struct, Enum
 	{
-		[EnumField<BindingFlags>("A", BindingFlags.IgnoreCase, new[] { BindingFlags.IgnoreCase })]
+		/// <summary>
+		/// Array with all values this field can list through. If null by inst time, will get replaced with enum.getvalues
+		/// </summary>
 		protected E[] _possibleValues;
+		/// <summary>
+		/// Cached number of enum entries
+		/// </summary>
 		protected int _c_enumlen = -1;
 		/// <summary>
 		/// Creates a <see cref="ManagedField"/> that stores an <see cref="Enum"/> of the specified type.
@@ -281,9 +289,12 @@ public static partial class Pom
 		{
 			//this.type = typeof(E);
 			//this.type = type;
-			this._possibleValues = possibleValues!;
+			this._possibleValues = possibleValues ?? new E[0];
 		}
 
+		/// <summary>
+		/// Returns all available values the field should display and cycle through
+		/// </summary> 
 		protected virtual E[] PossibleValues // We defer this listing so enumextend can do its magic.
 		{
 			get
@@ -295,14 +306,14 @@ public static partial class Pom
 			}
 		}
 
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			if (Enum.TryParse<E>(str, out E fromstring))
 				return PossibleValues.Contains(fromstring) ? fromstring : PossibleValues[0];
 			return default!;
 		}
-
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			int longestEnum = PossibleValues.Aggregate<E, int>(0, (longest, next) =>
@@ -337,7 +348,7 @@ public static partial class Pom
 		{
 			data.SetValue<Enum>(key, PossibleValues[(Array.IndexOf(PossibleValues, data.GetValue<Enum>(key)) - 1 + PossibleValues.Length) % PossibleValues.Length]);
 		}
-
+		/// <inheritdoc/>
 		public override void ParseFromText(PositionedDevUINode node, ManagedData data, string newValue)
 		{
 			E fromstring = default;
@@ -371,15 +382,23 @@ public static partial class Pom
 	public class ExtEnumField<XE> : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField
 		where XE : ExtEnum<XE>
 	{
-		//[ExtEnumField("A", typeof(Ext), BindingFlags.DeclaredOnly, new Enum[] {BindingFlags.CreateInstance})]
+		/// <summary>
+		/// ExtEnumType of <typeparamref name="XE"/>
+		/// </summary>
 		protected readonly ExtEnumType type;
-
-		[ExtEnumField<AbstractPhysicalObject.AbstractObjectType>("A", "", null)]
+		/// <summary>
+		/// Array of all allowed values
+		/// </summary>
 		protected XE[] _possibleValues;
+		/// <summary>
+		/// Cached ExtEnum version for re-getting possiblevalues if needed
+		/// </summary>
 		protected int _c_enumver = -1;
 		/// <summary>
 		/// Creates a <see cref="ManagedField"/> that stores an <see cref="ExtEnumBase"/> of the specified type.
-		/// Cannot be used as Attribute, instead you should pass this object to <see cref="ManagedData.ManagedData(PlacedObject, ManagedField[])"/> and mark your field with the <see cref="ManagedData.BackedByField"/> attribute.
+		/// Cannot be used as Attribute, instead you should pass this object to <see cref="ManagedData.ManagedData(PlacedObject, ManagedField[])"/> 
+		/// and mark your field with the <see cref="ManagedData.BackedByField"/> attribute, 
+		/// or use the second constructor.
 		/// </summary>
 		/// <param name="key">The key to access that field with</param>
 		/// <param name="defaultValue">the value a new data object is generated with</param>
@@ -424,7 +443,9 @@ public static partial class Pom
 		{
 
 		}
-
+		/// <summary>
+		/// Returns all values this field can cycle through
+		/// </summary>
 		protected virtual XE[] PossibleValues
 		{
 			get
@@ -438,13 +459,13 @@ public static partial class Pom
 				return _possibleValues;
 			}
 		}
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			ExtEnumBase.TryParse(typeof(XE), str, false, out ExtEnumBase res);
 			return PossibleValues.Contains(res) ? res : PossibleValues[0];
 		}
-
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			int longestExtEnumBase = PossibleValues.Aggregate<ExtEnumBase, int>(0, (longest, next) =>
@@ -488,7 +509,7 @@ public static partial class Pom
 		{
 			data.SetValue<ExtEnumBase>(key, PossibleValues[(Array.IndexOf(PossibleValues, data.GetValue<ExtEnumBase>(key)) - 1 + PossibleValues.Length) % PossibleValues.Length]);
 		}
-
+		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
 			ManagedData data,
@@ -520,7 +541,13 @@ public static partial class Pom
 	/// </summary>
 	public class IntegerField : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField
 	{
+		/// <summary>
+		/// Minimum value data of this field can take
+		/// </summary>
 		protected readonly int min;
+		/// <summary>
+		/// Maximum value data of this field can take
+		/// </summary>
 		protected readonly int max;
 		/// <summary>
 		/// Creates a <see cref="ManagedField"/> that stores an <see cref="int"/>. Can be used as an Attribute for a field in your data class derived from <see cref="ManagedData"/>.
@@ -546,12 +573,12 @@ public static partial class Pom
 			this.min = Math.Min(min, max); // trust nobody
 			this.max = Math.Max(min, max);
 		}
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			return Mathf.Clamp(int.Parse(str), min, max);
 		}
-
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			return HUD.DialogBox.meanCharWidth * ((Mathf.Max(Mathf.Abs(min), Mathf.Abs(max))).ToString().Length + 2);
@@ -597,7 +624,7 @@ public static partial class Pom
 			if (val < min) val = max;
 			data.SetValue<int>(key, val);
 		}
-
+		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
 			ManagedData data,
@@ -631,7 +658,9 @@ public static partial class Pom
 		{
 
 		}
-
+		/// <summary>
+		/// String escape sequences for saving/loading string data
+		/// </summary>
 		protected readonly static List<KeyValuePair<string, string>> replacements = new()
 		{
 			new(": ","%1"),
@@ -640,14 +669,14 @@ public static partial class Pom
 			new("~","%4"),
 			new("%","%0"), // this goes last, very important
 		};
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			//return str[0];
 			return replacements.Aggregate(str, (current, value) =>
 				current.Replace(value.Value, value.Key));
 		}
-
+		/// <inheritdoc/>
 		public override string ToString(object value)
 		{
 			//return new string[] { value.ToString() };
@@ -657,19 +686,19 @@ public static partial class Pom
 					(current, val) => current.Replace(val.Key, val.Value)
 				);
 		}
-
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			return HUD.DialogBox.meanCharWidth * 25; // No character limit but this is the expected reasonable max anyone would be using ?
 		}
-
+		/// <inheritdoc/>
 		public override string? DisplayValueForNode(
 			PositionedDevUINode node,
 			ManagedData data) // bypass replacements
 		{
 			return data.GetValue<string>(key);
 		}
-
+		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
 			ManagedData data,
@@ -684,16 +713,26 @@ public static partial class Pom
 	/// </summary>
 	public class Vector2Field : ManagedField
 	{
+		/// <summary>
+		/// Chosen control type
+		/// </summary>
 		protected readonly VectorReprType controlType;
+		/// <summary>
+		/// Label text displayed together with vector handle
+		/// </summary>
 		protected readonly string label;
 
 		/// <summary>
 		/// Creates a <see cref="ManagedField"/> that stores a <see cref="Vector2"/>.
-		/// Cannot be used as Attribute, instead you should pass this object to <see cref="ManagedData.ManagedData(PlacedObject, ManagedField[])"/> and mark your field with the <see cref="ManagedData.BackedByField"/> attribute.
+		/// Cannot be used as Attribute, instead you should pass this object to 
+		/// <see cref="ManagedData.ManagedData(PlacedObject, ManagedField[])"/> 
+		/// and mark your field with the <see cref="ManagedData.BackedByField"/> attribute, 
+		/// or use the second constructor.
 		/// </summary>
 		/// <param name="key">The key to access that field with</param>
 		/// <param name="defaultValue">the value a new data object is generated with</param>
 		/// <param name="controlType">the type of UI for this field, from <see cref="Vector2Field.VectorReprType"/></param>
+		/// <param name="label">Optional label to be displayed next to handle</param>
 		public Vector2Field(
 			string key,
 			Vector2 defaultValue,
@@ -705,40 +744,63 @@ public static partial class Pom
 			this.controlType = controlType;
 			this.label = label ?? "";
 		}
-
+		/// <summary>
+		/// Can be used as an Attribute.
+		/// </summary>
+		/// <param name="key">Field name</param>
+		/// <param name="defX">Vector's default X</param>
+		/// <param name="defY">Vector's default X</param>
+		/// <param name="reprType">Chosen representation type</param>
+		/// <param name="label">Label text to be displayed next to handle</param>
+		/// <returns></returns>
 		public Vector2Field(
 			string key,
 			float defX,
 			float defY,
-			VectorReprType ct = VectorReprType.line,
+			VectorReprType reprType = VectorReprType.line,
 			string? label = null) : this(
 				  key,
 				  new Vector2(defX, defY),
-				  ct,
+				  reprType,
 				  label)
 		{
 
 		}
+		/// <summary>
+		/// How the vector handle should look like
+		/// </summary>
 		public enum VectorReprType
 		{
+			/// <summary>
+			/// No handle
+			/// </summary>
 			none,
+			/// <summary>
+			/// Handle is a line
+			/// </summary>
 			line,
+			/// <summary>
+			/// handle is a circle
+			/// </summary>
 			circle,
+			/// <summary>
+			/// Handle is a filled rect
+			/// </summary>
 			rect,
 		}
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			string[] arr = Regex.Split(str, "\\^");
 			return new Vector2(float.Parse(arr[0]), float.Parse(arr[1]));
 		}
-
+		/// <inheritdoc/>
 		public override string ToString(object value)
 		{
 			Vector2 vec = (Vector2)value;
 			return string.Join("^", new string[] { vec.x.ToString(), vec.y.ToString() });
 		}
-
+		/// <inheritdoc/>
 		public override DevUINode? MakeAditionalNodes(ManagedData managedData, ManagedRepresentation managedRepresentation)
 		{
 			return new ManagedVectorHandle(this, managedData, managedRepresentation, controlType);
@@ -750,6 +812,9 @@ public static partial class Pom
 	/// </summary>
 	public class IntVector2Field : ManagedField
 	{
+		/// <summary>
+		/// Chosen control type
+		/// </summary>
 		protected readonly IntVectorReprType controlType;
 		/// <summary>
 		/// Creates a <see cref="ManagedField"/> that stores a <see cref="RWCustom.IntVector2"/>.
@@ -816,19 +881,19 @@ public static partial class Pom
 			///</summary>
 			rect,
 		}
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			string[] arr = Regex.Split(str, "\\^");
 			return new RWCustom.IntVector2(int.Parse(arr[0]), int.Parse(arr[1]));
 		}
-
+		/// <inheritdoc/>
 		public override string ToString(object value)
 		{
 			RWCustom.IntVector2 vec = (RWCustom.IntVector2)value;
 			return string.Join("^", new string[] { vec.x.ToString(), vec.y.ToString() });
 		}
-
+		/// <inheritdoc/>
 		public override DevUINode MakeAditionalNodes(
 			ManagedData managedData,
 			ManagedRepresentation managedRepresentation)
@@ -849,6 +914,7 @@ public static partial class Pom
 		/// <param name="key">The key to access that field with</param>
 		/// <param name="defaultColor">the value a new data object is generated with</param>
 		/// <param name="controlType">one of <see cref="ManagedFieldWithPanel.ControlType.text"/> or <see cref="ManagedFieldWithPanel.ControlType.slider"/></param>
+		/// <param name="displayName">How the field's name should appear in devui</param>
 		public ColorField(
 			string key,
 			Color defaultColor,
@@ -868,22 +934,26 @@ public static partial class Pom
 		/// Can be used as an attribute
 		/// </summary>
 		/// <param name="key">The key to access that field with</param>
-		/// <param name="defaultColor">the value a new data object is generated with</param>
+		/// <param name="defR">Default red channel</param>
+		/// <param name="defG">Default green channel</param>
+		/// <param name="defB">Default blue channel</param>
+		/// <param name="defA">Default alpha channel</param>
 		/// <param name="controlType">one of <see cref="ManagedFieldWithPanel.ControlType.text"/> or <see cref="ManagedFieldWithPanel.ControlType.slider"/></param>
+		/// <param name="DisplayName">How the field's name should appear in devui</param>
 		public ColorField(
 			string key,
 			float defR,
 			float defG,
 			float defB,
 			float defA = 1f,
-			ControlType ct = ControlType.text,
+			ControlType controlType = ControlType.text,
 			string? DisplayName = null) : this(
 				key,
 				new Color(defR, defG, defB, defA),
-				ct,
+				controlType,
 				DisplayName)
 		{ }
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			return new Color(
@@ -891,7 +961,7 @@ public static partial class Pom
 					Convert.ToInt32(str.Substring(2, 2), 16) / 255f,
 					Convert.ToInt32(str.Substring(4, 2), 16) / 255f);
 		}
-
+		/// <inheritdoc/>
 		public override string ToString(object value)
 		{
 			Color color = (Color)value;
@@ -899,7 +969,7 @@ public static partial class Pom
 					Mathf.RoundToInt(color.g * 255).ToString("X2"),
 					Mathf.RoundToInt(color.b * 255).ToString("X2")});
 		}
-
+		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
 			ManagedData data,
@@ -909,7 +979,7 @@ public static partial class Pom
 			if (newValue.Length != 6) throw new ArgumentException();
 			data.SetValue(key, this.FromString(newValue));
 		}
-
+		/// <inheritdoc/>
 		public override string? DisplayValueForNode(
 			PositionedDevUINode node,
 			ManagedData data)
@@ -928,6 +998,7 @@ public static partial class Pom
 				return null;
 			}
 		}
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			switch (this.control)
@@ -940,7 +1011,7 @@ public static partial class Pom
 				return 0;
 			}
 		}
-
+		/// <inheritdoc/>
 		public override float SizeOfDisplayname()
 		{
 			switch (this.control)
@@ -951,7 +1022,7 @@ public static partial class Pom
 				return base.SizeOfDisplayname();
 			}
 		}
-
+		/// <inheritdoc/>
 		public override Vector2 SizeOfPanelUiMinusName()
 		{
 			switch (control)
@@ -965,7 +1036,7 @@ public static partial class Pom
 			}
 
 		}
-
+		/// <inheritdoc/>
 		public override PositionedDevUINode? MakeControlPanelNode(
 			ManagedData managedData,
 			ManagedControlPanel panel,
@@ -985,6 +1056,7 @@ public static partial class Pom
 			}
 			return null;
 		}
+		/// <inheritdoc/>
 		public float FactorOf(
 			PositionedDevUINode node,
 			ManagedData data)
@@ -996,7 +1068,7 @@ public static partial class Pom
 			return color.b;
 
 		}
-
+		/// <inheritdoc/>
 		public void NewFactor(
 			PositionedDevUINode node,
 			ManagedData data,
@@ -1041,19 +1113,48 @@ public static partial class Pom
 		}
 	}
 
+	/// <summary>
+	/// A ManagedField that controls a Vector2, while relating to another Vector2 in some way
+	/// </summary>
 	public class DrivenVector2Field : Vector2Field
 	{
+		/// <summary>
+		/// Field name/key of the driving field
+		/// </summary>
 		private readonly string keyOfOther;
+		/// <summary>
+		/// Chosen control type
+		/// </summary>
 		private readonly DrivenControlType drivenControlType;
 
+		/// <summary>
+		/// How the vector2 driven handle should look like
+		/// </summary>
 		public enum DrivenControlType
 		{
+			/// <summary>
+			/// Handle is a line from other to this
+			/// </summary>
 			relativeLine,
+			/// <summary>
+			/// Handle is a line pointing from object center perpendicular to other
+			/// </summary>
 			perpendicularLine,
+			/// <summary>
+			/// Handle is an ellipse defined by the other and this radius vectors
+			/// </summary>
 			perpendicularOval,
+			/// <summary>
+			/// Handle is a rectangle between other and this as corners
+			/// </summary>
 			rectangle,
 		}
-
+		/// <param name="keyofSelf"></param>
+		/// <param name="keyOfOther"></param>
+		/// <param name="defaultValue"></param>
+		/// <param name="controlType"></param>
+		/// <param name="label"></param>
+		/// <returns></returns>
 		public DrivenVector2Field(
 			string keyofSelf,
 			string keyOfOther,
@@ -1068,7 +1169,7 @@ public static partial class Pom
 			this.keyOfOther = keyOfOther;
 			this.drivenControlType = controlType;
 		}
-
+		/// <inheritdoc/>
 		public override DevUINode? MakeAditionalNodes(ManagedData managedData, ManagedRepresentation managedRepresentation)
 		{
 			switch (drivenControlType)
@@ -1083,22 +1184,53 @@ public static partial class Pom
 				return null;
 			}
 		}
-
+		/// <summary>
+		/// Special control for drivenvectorfield
+		/// </summary>
 		public class DrivenVectorControl : PositionedDevUINode
 		{
+			/// <summary>
+			/// Drivenv2field this control belongs to
+			/// </summary>
 			protected readonly DrivenVector2Field control;
+			/// <summary>
+			/// Data of associated placedobkect
+			/// </summary>
 			protected readonly ManagedData data;
+			/// <summary>
+			/// Chosen control type
+			/// </summary>
 			protected readonly DrivenControlType controlType;
+			/// <summary>
+			/// Handle of other (?)
+			/// </summary>
 			protected Handle handleB;
+			/// <summary>
+			/// Circle srite (may be absent)
+			/// </summary>
 			protected FSprite? circleSprite;
+			/// <summary>
+			/// Second line sprite (may be absent)
+			/// </summary>
 			protected FSprite? lineBSprite;
 			private int[]? rect;
 
-			public DrivenVectorControl(DrivenVector2Field control,
-						   ManagedData data,
-						   PositionedDevUINode repr,
-						   DrivenControlType controlType,
-						   string label) : base(repr.owner, control.key, repr, Vector2.zero)
+			/// <param name="control">Associated DrivenVector2Field</param>
+			/// <param name="data">Associated placedobject data</param>
+			/// <param name="repr">Associated Placedobject representation</param>
+			/// <param name="controlType">Chosen control type</param>
+			/// <param name="label">Optional label to be displayed next to handle</param>
+			/// <returns></returns>
+			public DrivenVectorControl(
+				DrivenVector2Field control,
+				ManagedData data,
+				PositionedDevUINode repr,
+				DrivenControlType controlType,
+				string label) : base(
+					repr.owner,
+					control.key,
+					repr,
+					Vector2.zero)
 			{
 				circleSprite = null;
 				lineBSprite = null;
@@ -1144,7 +1276,7 @@ public static partial class Pom
 					break;
 				}
 			}
-
+			/// <inheritdoc/>
 			public override void Refresh()
 			{
 				base.Refresh();
