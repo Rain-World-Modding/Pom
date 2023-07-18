@@ -55,11 +55,14 @@ public static partial class Pom
 	/// </summary>
 	public class FloatField : ManagedFieldWithPanel, IInterpolablePanelField, IIterablePanelField
 	{
-		
-		#pragma warning disable 1591
+		/// <summary>
+		/// Minimum value this float field can take
+		/// </summary>
 		protected readonly float min;
+		/// <summary>
+		/// Maximum value this float field can take
+		/// </summary>
 		protected readonly float max;
-		#pragma warning restore 1591
 		/// <summary>
 		/// Minimal step the value can take. Every value change is rounded down to min + multiples of this
 		/// </summary>

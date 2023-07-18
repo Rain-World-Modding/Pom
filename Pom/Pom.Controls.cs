@@ -8,17 +8,51 @@ public static partial class Pom
 	// An undocumented mess. Have a look around, find what suits you, maybe implement your own.
 	// in commit d2dad8768371565bb9b538263ac0b0ac595913b7 there was a slider-button used for text before text input became a thing
 	// an arrows-text combo would also be amazing for enums and ints wink wink
-
+	/// <summary>
+	/// Managed handle controlling a single Vector2 value. Used for ALL vector2 representation types.
+	/// </summary>
 	public class ManagedVectorHandle : Handle // All-in-one super handle
 	{
+		/// <summary>
+		/// Field definition
+		/// </summary>
 		protected readonly Vector2Field field;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
 		protected readonly ManagedData data;
+		/// <summary>
+		/// Chosen representation type
+		/// </summary>
 		protected readonly Vector2Field.VectorReprType reprType;
+		/// <summary>
+		/// Sprite index of the line (if it's below 0, the line does not exist)
+		/// </summary>
 		protected readonly int line = -1;
+		/// <summary>
+		/// Sprite index of the circle (if it's below 0, the circle does not exist)
+		/// </summary>
 		protected readonly int circle = -1;
+		/// <summary>
+		/// Sprite indices of rect (if it's null, the rect does not exist). Length is 5, ind. 0-3 are bounding lines, 4 is fill
+		/// </summary>
 		protected readonly int[]? rect;
-
-		public ManagedVectorHandle(Vector2Field field, ManagedData managedData, ManagedRepresentation repr, Vector2Field.VectorReprType reprType) : base(repr.owner, field.key, repr, managedData.GetValue<Vector2>(field.key))
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="field">Field definition</param>
+		/// <param name="managedData">Data of the associated placedobject</param>
+		/// <param name="repr">Representation object</param>
+		/// <param name="reprType">Chosen representation type</param>
+		public ManagedVectorHandle(
+			Vector2Field field,
+			ManagedData managedData,
+			ManagedRepresentation repr,
+			Vector2Field.VectorReprType reprType) : base(
+				repr.owner,
+				field.key,
+				repr,
+				managedData.GetValue<Vector2>(field.key))
 		{
 			this.field = field;
 			this.data = managedData;
@@ -55,13 +89,13 @@ public static partial class Pom
 				break;
 			}
 		}
-
+		/// <inheritdoc/>
 		public override void Move(Vector2 newPos)
 		{
 			data.SetValue<Vector2>(field.key, newPos);
 			base.Move(newPos); // calls refresh
 		}
-
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			base.Refresh();
@@ -103,7 +137,7 @@ public static partial class Pom
 				this.fSprites[rect[4]].scaleY = size.y;// + size.y.Sign();
 			}
 		}
-
+		/// <inheritdoc/>
 		public override void SetColor(Color col)
 		{
 			base.SetColor(col);
@@ -125,15 +159,38 @@ public static partial class Pom
 			}
 		}
 	}
-
+	/// <summary>
+	/// A managed handle controlling an IntVector2 value. Used for ALL IntVector representation types.
+	/// </summary>
 	public class ManagedIntHandle : Handle // All-in-one super handle 2
 	{
+		/// <summary>
+		/// Field definition.
+		/// </summary>
 		protected readonly IntVector2Field field;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
 		protected readonly ManagedData data;
+		/// <summary>
+		/// Chosen representation type.
+		/// </summary>
 		protected readonly IntVector2Field.IntVectorReprType reprType;
-		protected readonly int pixel = -1;
+		/// <summary>
+		/// Sprite index of the pixel (?????) (if below 0, pixel sprite doesn't exist)
+		/// </summary>
+		protected readonly int pixel = -1; //todo: check wtf it actually draws
+		/// <summary>
+		/// Sprite indices of the bounding rect (if null, doesn't exist). Length is 5, indices 0-3 are lines, 4 is fill
+		/// </summary>
 		protected readonly int[]? rect;
-
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="field">Field definition</param>
+		/// <param name="managedData">Data of the associated placedobject</param>
+		/// <param name="repr">Representation object</param>
+		/// <param name="reprType">Chosen representation type</param>
 		public ManagedIntHandle(
 			IntVector2Field field,
 			ManagedData managedData,
@@ -190,7 +247,7 @@ public static partial class Pom
 				break;
 			}
 		}
-
+		/// <inheritdoc/>
 		public override void Move(Vector2 newPos)
 		{
 			// absolute so we're aligned with room tiles
@@ -224,7 +281,7 @@ public static partial class Pom
 			data.SetValue<RWCustom.IntVector2>(field.key, ownIntPos);
 			base.Move(newPos); // calls refresh
 		}
-
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			base.Refresh();
@@ -278,7 +335,7 @@ public static partial class Pom
 				this.fSprites[rect[4]].scaleY = size.y;// + size.y.Sign();
 			}
 		}
-
+		/// <inheritdoc/>
 		public override void SetColor(Color col)
 		{
 			base.SetColor(col);
@@ -296,24 +353,40 @@ public static partial class Pom
 			}
 		}
 	}
-
+	/// <summary>
+	/// A multipurpose slider that can control data defined by any ManagedField that implements 
+	/// <see cref="global::Pom.Pom.IInterpolablePanelField"/>
+	/// </summary>
 	public class ManagedSlider : Slider
 	{
+		/// <summary>
+		/// Definition of the field this slider is related to
+		/// </summary>
 		protected readonly ManagedFieldWithPanel field;
+		/// <summary>
+		/// <see cref="field"/>, but cast to the interface type
+		/// </summary>
 		protected readonly IInterpolablePanelField interpolable;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
 		protected readonly ManagedData data;
-
-		public ManagedSlider(ManagedFieldWithPanel field,
-					ManagedData data,
-					DevUINode parent,
-					float sizeOfDisplayname) : base(
-						parent.owner,
-						field.key,
-						parent,
-						Vector2.zero,
-						sizeOfDisplayname > 0 ? field.displayName : "",
-						false,
-						sizeOfDisplayname)
+		/// <param name="field">Field definition</param>
+		/// <param name="data">Data of the associated placedobject</param>
+		/// <param name="parent">Parent DevUI node</param>
+		/// <param name="sizeOfDisplayname">Width of name tag, can be 0</param>
+		public ManagedSlider(
+			ManagedFieldWithPanel field,
+			ManagedData data,
+			DevUINode parent,
+			float sizeOfDisplayname) : base(
+				parent.owner,
+				field.key,
+				parent,
+				Vector2.zero,
+				sizeOfDisplayname > 0 ? field.displayName : "",
+				false,
+				sizeOfDisplayname)
 		{
 			this.field = field;
 			this.interpolable = (field as IInterpolablePanelField)!;
@@ -329,14 +402,14 @@ public static partial class Pom
 			// hacky hack for nubpos
 			this.titleWidth = sizeOfDisplayname + numberLabel.size.x - 16f;
 		}
-
+		/// <inheritdoc/>
 		public override void NubDragged(float nubPos)
 		{
 			interpolable!.NewFactor(this, data, nubPos);
 			// this.managedControlPanel.managedRepresentation.Refresh(); // is this relevant ?
 			this.Refresh();
 		}
-
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			base.Refresh();
@@ -345,13 +418,32 @@ public static partial class Pom
 			base.RefreshNubPos(value);
 		}
 	}
-
+	/// <summary>
+	/// A multipurpose button that can control data defined by any ManagedField that implements 
+	/// <see cref="global::Pom.Pom.IIterablePanelField"/>
+	/// </summary>
 	public class ManagedButton : PositionedDevUINode, IDevUISignals
 	{
+		/// <summary>
+		/// Contained button
+		/// </summary>
 		protected readonly Button button;
+		/// <summary>
+		/// Field definition
+		/// </summary>
 		protected readonly ManagedFieldWithPanel field;
+		/// <summary>
+		/// <see cref="field"/> but cast to interface type
+		/// </summary>
 		protected readonly IIterablePanelField iterable;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
 		protected readonly ManagedData data;
+		/// <param name="field">Field definition</param>
+		/// <param name="data">Data of the associated placedobject</param>
+		/// <param name="panel">Containing panel</param>
+		/// <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
 		public ManagedButton(
 			ManagedFieldWithPanel field,
 			ManagedData data,
@@ -370,26 +462,44 @@ public static partial class Pom
 			this.subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0f, 0f), sizeOfDisplayname, field.displayName));
 			this.subNodes.Add(this.button = new Button(owner, "Button", this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data)));
 		}
-
+		/// <inheritdoc/>
 		public virtual void Signal(DevUISignalType type, DevUINode sender, string message) // from button
 		{
 			iterable.Next(this, data);
 			this.Refresh();
 		}
-
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			this.button.Text = field.DisplayValueForNode(this, data);
 			base.Refresh();
 		}
 	}
-
+	/// <summary>
+	/// Multipurpose arrow selector that can control data defined by any ManagedField that implements 
+	/// <see cref="global::Pom.Pom.IIterablePanelField"/>
+	/// </summary>
 	public class ManagedArrowSelector : IntegerControl
 	{
+		/// <summary>
+		/// Field definition
+		/// </summary>
 		protected readonly ManagedFieldWithPanel field;
+		/// <summary>
+		/// <see cref="field"/> but cast to interface type
+		/// </summary>
 		protected readonly IIterablePanelField iterable;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
 		protected readonly ManagedData data;
-
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="field">Field definition</param>
+		/// <param name="managedData">Data of the associated placedobject</param>
+		/// <param name="panel">Containing panel</param>
+		/// <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
 		public ManagedArrowSelector(ManagedFieldWithPanel field,
 			ManagedData managedData,
 			ManagedControlPanel panel,
@@ -420,7 +530,7 @@ public static partial class Pom
 			ArrowButton arrowR = (this.subNodes[3] as ArrowButton)!;
 			arrowR.pos.x = numberLabel.pos.x + numberLabel.size.x + 4f;
 		}
-
+		/// <inheritdoc/>
 		public override void Increment(int change)
 		{
 			if (change == 1)
@@ -434,32 +544,49 @@ public static partial class Pom
 
 			this.Refresh();
 		}
-
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			NumberLabelText = field.DisplayValueForNode(this, data);
 			base.Refresh();
 		}
 	}
-
+	/// <summary>
+	/// String input field. Can be used by things like 
+	/// <see cref="global::Pom.Pom.StringField"/> or <see cref="global::Pom.Pom.ColorField"/>
+	/// </summary>
 	public class ManagedStringControl : PositionedDevUINode
 	{
+		/// <summary>
+		/// Currently focused string control. Can be any devui node, including not from POM assembly. As long as it's not null, POM should prevent anything else from taking keyboard input
+		/// </summary>
 		public static DevUINode? activeStringControl = null;
-
+		/// <summary>
+		/// Field definition for this string control
+		/// </summary>
 		protected readonly ManagedFieldWithPanel field;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
 		protected readonly ManagedData data;
+		/// <summary>
+		/// Whether this was clicked last update 
+		/// </summary>
 		protected bool clickedLastUpdate = false;
 
+		/// <param name="field">Field definition</param>
+		/// <param name="data">Data of the associated placedobject</param>
+		/// <param name="panel">Containing panel</param>
+		/// <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
 		public ManagedStringControl(
 			ManagedFieldWithPanel field,
 			ManagedData data,
 			DevUINode panel,
-			float sizeOfDisplayname)
-				: base(
-					  panel.owner,
-					  "ManagedStringControl",
-					  panel,
-					  Vector2.zero)
+			float sizeOfDisplayname) : base(
+				panel.owner,
+				"ManagedStringControl",
+				panel,
+				Vector2.zero)
 		{
 			_text = null!;
 			this.field = field;
@@ -477,6 +604,10 @@ public static partial class Pom
 		}
 
 		private string _text;
+		/// <summary>
+		/// Text value of the instance. 
+		/// Changing this only changes the label, does not call <see cref="global::Pom.Pom.ManagedData.SetValue"/>.
+		/// </summary>
 		protected virtual string Text
 		{
 			get
@@ -489,14 +620,14 @@ public static partial class Pom
 				subNodes[1].fLabels[0].text = value;
 			}
 		}
-
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			// No data refresh until the transaction is complete :/
 			// TrySet happens on input and focus loss
 			base.Refresh();
 		}
-
+		/// <inheritdoc/>
 		public override void Update()
 		{
 			if (owner.mouseClick && !clickedLastUpdate)
@@ -550,7 +681,10 @@ public static partial class Pom
 				}
 			}
 		}
-
+		/// <summary>
+		/// Attempts to parse field value from given text and set it into manageddata. Recolors control depending on the result.
+		/// </summary>
+		/// <param name="newValue">Current text</param>
 		protected virtual void TrySetValue(string newValue, bool endTransaction)
 		{
 			try
@@ -560,6 +694,7 @@ public static partial class Pom
 			}
 			catch (Exception)
 			{
+				//todo: add error telegraph in logs?
 				subNodes[1].fLabels[0].color = Color.red; // negative fedback
 			}
 			if (endTransaction)
