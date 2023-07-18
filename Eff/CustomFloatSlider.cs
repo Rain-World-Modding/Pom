@@ -32,7 +32,7 @@ internal class CustomFloatSlider : Slider
 		base.Refresh();
 		if (Data.cache is null || Data.field is null)
 		{
-			plog.LogError(Data);
+			LogError(Data);
 			return;
 		}
 		this.NumberText = Data.cache.Value.ToString();

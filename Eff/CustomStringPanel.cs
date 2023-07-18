@@ -86,7 +86,7 @@ internal class CustomStringPanel : PositionedDevUINode
 		WriteCached();
 		activeStringControl = null;
 		_labelValue.fLabels[0].color = Color.black;
-		plog.LogDebug("Setting new string value from label contents");
+		LogDebug("Setting new string value from label contents");
 	}
 
 	private void WriteCached()

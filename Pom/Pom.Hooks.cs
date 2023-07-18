@@ -48,13 +48,13 @@ public static partial class Pom
 		}
 		catch (Exception ex)
 		{
-			plog.LogError($"Error adding sorter ilhook {ex}");
+			LogError($"Error adding sorter ilhook {ex}");
 		}
 		//PlacedObjectsExample();
 	}
 	private static void IL_ObjectsPage_AssemblePages(MonoMod.Cil.ILContext il)
 	{
-		plog.LogDebug("ILHook body start");
+		LogDebug("ILHook body start");
 		MonoMod.Cil.ILCursor c = new(il);
 		c.GotoNext(MonoMod.Cil.MoveType.Before,
 			//x => x.MatchLdcI4(0),
@@ -63,7 +63,7 @@ public static partial class Pom
 			x => x.MatchLdloc(1),
 			x => x.MatchNewarr<PlacedObject.Type>()
 			);//TryFindNext(out )
-		plog.LogDebug($"Found inj point, emitting");
+		LogDebug($"Found inj point, emitting");
 		//c.Remove();
 		c.Emit(OpCodes.Pop);
 		c.Emit(OpCodes.Ldloc_0);
@@ -72,7 +72,7 @@ public static partial class Pom
 		//c.Index += 1;
 		c.EmitDelegate((Dictionary<ObjCategory, List<PlacedObject.Type>> dict) =>
 		{
-			plog.LogDebug("Sorter ilhook go");
+			LogDebug("Sorter ilhook go");
 			foreach (var kvp in dict)
 			{
 				var cat = kvp.Key;
@@ -80,7 +80,7 @@ public static partial class Pom
 				if (!__sortCategorySettings.TryGetValue(cat, out CategorySortKind doSort)) doSort = __sortByDefault;
 				if (doSort is CategorySortKind.Default)
 				{
-					plog.LogDebug($"Sorting of {cat} not required");
+					LogDebug($"Sorting of {cat} not required");
 					continue;
 				}
 				System.Comparison<PlacedObject.Type> sorter = doSort switch
@@ -96,11 +96,11 @@ public static partial class Pom
 					_ => throw new ArgumentException($"ERROR: INVALID {nameof(CategorySortKind)} VALUE {doSort}")
 				};
 				list.Sort(sorter);
-				plog.LogDebug($"sorting of {cat} completed ({list.Count} items)");
+				LogDebug($"sorting of {cat} completed ({list.Count} items)");
 			}
 		});
 		c.Emit(OpCodes.Ldc_I4_0);
-		plog.LogDebug("emit complete");
+		LogDebug("emit complete");
 		//plog.LogDebug(il.ToString());
 	}
 
@@ -108,7 +108,7 @@ public static partial class Pom
 	{
 		if (__objectCategories.TryGetValue(type.value, out ObjectsPage.DevObjectCategories cat))
 		{
-			plog.LogDebug($"Sorting {type} into {cat}");
+			LogDebug($"Sorting {type} into {cat}");
 			return cat;
 		}
 		return orig(self, type);

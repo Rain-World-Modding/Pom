@@ -65,12 +65,12 @@ public sealed class EffectExtraData
 			EffectField fielddef = kvp.Value;
 			if (!rawData.TryGetValue(fieldname, out string? fieldstringvalue))
 			{
-				plog.LogWarning($"Missing data entry for {fieldname}. Possible version mismatch");
+				LogWarning($"Missing data entry for {fieldname}. Possible version mismatch");
 				fieldstringvalue = fielddef.DefaultValue?.ToString();
 			};
 			fieldstringvalue ??= "";
-			plog.LogDebug(fielddef);
-			plog.LogDebug(fieldstringvalue);
+			LogDebug(fielddef);
+			LogDebug(fieldstringvalue);
 
 			switch (fielddef)
 			{
@@ -100,7 +100,7 @@ public sealed class EffectExtraData
 			}
 			default:
 			{
-				plog.LogWarning($"Eff: Invalid default data setup for field {fieldname} : {fielddef} : {fielddef.DefaultValue}. Discarding");
+				LogWarning($"Eff: Invalid default data setup for field {fieldname} : {fielddef} : {fielddef.DefaultValue}. Discarding");
 				//_strings[fieldname] = (field, new(fieldstringvalue, (newval) => rawData[fieldname] = newval));
 				break;
 			}

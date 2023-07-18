@@ -113,7 +113,7 @@ public static class Examples
 		{
 			base.Update(eu);
 			if (room.game.clock % 100 == 0)
-				plog.LogMessage("SillyObject vf1.x is " + ((ManagedData)placedObject.data).GetValue<Vector2>("vf1").x); // This is how you access those fields you created when using ManagedData directly.
+				LogMessage("SillyObject vf1.x is " + ((ManagedData)placedObject.data).GetValue<Vector2>("vf1").x); // This is how you access those fields you created when using ManagedData directly.
 		}
 	}
 
@@ -175,7 +175,7 @@ public static class Examples
 						otherPlaces.Add(pobj);
 				}
 
-				plog.LogMessage("CuriousObject started and found " + otherPlaces.Count + " location");
+				LogMessage("CuriousObject started and found " + otherPlaces.Count + " location");
 			}
 			// IDrawable stuff
 			public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer? newContatiner)

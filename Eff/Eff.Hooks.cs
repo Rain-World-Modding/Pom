@@ -7,7 +7,7 @@ public static partial class Eff
 {
 	internal static void __AddHooks()
 	{
-		plog.LogWarning("Eff init");
+		LogWarning("Eff init");
 		// On.RainWorldGame.ctor += __ClearAttachedData;
 		On.RoomSettings.RoomEffect.FromString += __ParseExtraData;
 		On.RoomSettings.RoomEffect.ToString += __SaveExtraData;
@@ -16,7 +16,7 @@ public static partial class Eff
 			orig(self, procID);
 			if (self.currentMainLoop is not RainWorldGame && !self.sideProcesses.Any((proc) => proc is RainWorldGame))
 			{
-				plog.LogWarning("Clearing attached data");
+				LogWarning("Clearing attached data");
 				attachedData.Clear();
 			}
 		};
@@ -33,7 +33,7 @@ public static partial class Eff
 				}
 				if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 				{
-					plog.LogDebug($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
+					LogDebug($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
 					continue;
 				}
 				try
@@ -42,18 +42,18 @@ public static partial class Eff
 				}
 				catch (Exception ex)
 				{
-					plog.LogWarning($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
+					LogWarning($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
 				}
 				try
 				{
 					UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized);
 					if (uad is null) continue;
-					plog.LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
+					LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
 					self.AddObject(uad);
 				}
 				catch (Exception ex)
 				{
-					plog.LogWarning($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
+					LogWarning($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
 				}
 			}
 		};
@@ -68,7 +68,7 @@ public static partial class Eff
 		}
 		if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 		{
-			plog.LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {attachedData.Count}, {def}");
+			LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {attachedData.Count}, {def}");
 			return;
 		}
 
@@ -77,7 +77,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(FloatField field, Cached<float> cache) value = (field, cache);
-			plog.LogDebug($"Adding slider for {value}");
+			LogDebug($"Adding slider for {value}");
 			var item = new CustomFloatSlider(owner, $"{key}_Slider", self, shift, $"{key}: ", value, effect);
 			self.subNodes.Add(item);
 		}
@@ -85,7 +85,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(IntField field, Cached<int> cache) value = (field, cache);
-			plog.LogDebug($"Adding int buttons for {value}");
+			LogDebug($"Adding int buttons for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.Value.ToString()); //buttons need it
@@ -117,7 +117,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(BoolField field, Cached<bool> cache) value = (field, cache);
-			plog.LogDebug($"Adding bool button for {value}");
+			LogDebug($"Adding bool button for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
@@ -134,7 +134,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(StringField field, Cached<string> cache) value = (field, cache);
-			plog.LogDebug($"Adding string panel for {value}");
+			LogDebug($"Adding string panel for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
@@ -167,7 +167,7 @@ public static partial class Eff
 	private static void __ClearAttachedData(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
 	{
 		orig(self, manager);
-		plog.LogWarning("Clearing attached data");
+		LogWarning("Clearing attached data");
 		attachedData.Clear();
 	}
 
@@ -175,13 +175,13 @@ public static partial class Eff
 	{
 		orig(self, text);
 		effectDefinitions.TryGetValue(self.type.ToString(), out EffectDefinition? def);
-		plog.LogWarning($"Deserializing {self.type}, {self.GetHashCode()}, {def}");
-		plog.LogWarning((self.unrecognizedAttributes?.Length ?? 0).ToString() ?? "EMPTY ATTRIBUTES");
+		LogWarning($"Deserializing {self.type}, {self.GetHashCode()}, {def}");
+		LogWarning((self.unrecognizedAttributes?.Length ?? 0).ToString() ?? "EMPTY ATTRIBUTES");
 		self.unrecognizedAttributes ??= new string[0];
 
 		EffectExtraData newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
 		attachedData[self.GetHashCode()] = newdata;
-		plog.LogWarning(attachedData[self.GetHashCode()]);
+		LogWarning(attachedData[self.GetHashCode()]);
 	}
 
 	private static string __SaveExtraData(On.RoomSettings.RoomEffect.orig_ToString orig, RoomSettings.RoomEffect self)
@@ -191,7 +191,7 @@ public static partial class Eff
 		// plog.LogWarning($"Serializing {self.type}");
 		if (!attachedData.TryGetValue(self.GetHashCode(), out EffectExtraData data))
 		{
-			plog.LogWarning("Could not find EffectExtraData, aborting");
+			LogWarning("Could not find EffectExtraData, aborting");
 			goto done;
 		}
 		foreach (var kvp in data.RawData)
@@ -200,7 +200,7 @@ public static partial class Eff
 			string fieldval = kvp.Value ?? "";
 			//not discarding unknown data
 			//if (!data.RawData.TryGetValue(fieldkey, out string fieldval)) fieldval = fielddef.ToString() ?? "";
-			plog.LogWarning($"serializing {fieldkey} : {fieldval} (value {fieldval})");
+			LogWarning($"serializing {fieldkey} : {fieldval} (value {fieldval})");
 			attributes.Add($"{__EscapeString(fieldkey)}:{__EscapeString(fieldval)}");
 		}
 		self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();

@@ -13,7 +13,7 @@ public static partial class Eff
 		}
 		catch (Exception ex)
 		{
-			plog.LogFatal(ex);
+			LogFatal(ex);
 		}
 	}
 
@@ -52,12 +52,12 @@ public static partial class Eff
 			int splitindex = attr.IndexOf(':');
 			if (splitindex < 0)
 			{
-				plog.LogError($"Eff: Unrecognized attribute needs a name! {attr} skipping");
+				LogError($"Eff: Unrecognized attribute needs a name! {attr} skipping");
 				continue;
 			}
 			var name = __UnescapeString(attr.Substring(0, splitindex));
 			var value = __UnescapeString(attr.Substring(splitindex + 1));
-			plog.LogWarning($"Deserialized named property {name} : {value}");
+			LogWarning($"Deserialized named property {name} : {value}");
 			result[name] = value;
 			attr = null; //remove from array
 		}

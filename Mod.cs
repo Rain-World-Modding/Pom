@@ -1,5 +1,6 @@
 ﻿global using static PomCore.Mod;
 global using static PomCore.Utils;
+global using static PomCore.Logfix;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using Mono.Cecil.Cil;
@@ -18,13 +19,19 @@ namespace PomCore;
 [BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.7")]
 public class Mod : BepInEx.BaseUnityPlugin
 {
-	internal static Mod instance = null!;
-	internal static BepInEx.Logging.ManualLogSource plog => instance.Logger; //new BepInEx.Logging.ManualLogSource("POM");//instance.Logger;
+	//internal static Mod instance = null!;
+	//internal static BepInEx.Logging.ManualLogSource plog => instance.Logger; //new BepInEx.Logging.ManualLogSource("POM");//instance.Logger;
 	public void OnEnable()
 	{
 		try
 		{
-			instance = this;
+			LogDebug = Logger.LogDebug;
+			LogInfo = Logger.LogInfo;
+			LogMessage = Logger.LogMessage;
+			LogWarning = Logger.LogWarning;
+			LogError = Logger.LogError;
+			LogFatal = Logger.LogFatal;
+			//instance = this;
 			new Eff.EffectDefinitionBuilder("testeffect")
 
 					.AddField(new Eff.IntField("intfield", 0, 10, 5))
@@ -42,7 +49,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 		}
 		catch (Exception ex)
 		{
-			plog.LogFatal(ex);
+			LogFatal(ex);
 		}
 		try
 		{
@@ -50,7 +57,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 		}
 		catch (System.Exception ex)
 		{
-			plog.LogError($"Could not register Unrecognized fix ILHook : {ex}");
+			LogError($"Could not register Unrecognized fix ILHook : {ex}");
 		}
 	}
 

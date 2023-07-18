@@ -95,7 +95,7 @@ public static partial class Pom
 	{
 		if (type.Index < 0)
 		{
-			plog.LogWarning($"Tried creating a category override for {type} but it is not registered! skipping");
+			LogWarning($"Tried creating a category override for {type} but it is not registered! skipping");
 			return;
 		}
 		__objectCategories.Add(type.value, new(category, true));

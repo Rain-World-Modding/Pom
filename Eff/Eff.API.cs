@@ -32,12 +32,12 @@ public static partial class Eff
 			}
 			else
 			{
-				plog.LogWarning($"Definition for {name} has not been registered; nothing to unregister.");
+				LogWarning($"Definition for {name} has not been registered; nothing to unregister.");
 			}
 		}
 		catch (Exception ex)
 		{
-			plog.LogError($"Could not unregister effect {name} : {ex}");
+			LogError($"Could not unregister effect {name} : {ex}");
 		}
 
 
