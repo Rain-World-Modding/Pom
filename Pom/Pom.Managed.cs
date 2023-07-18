@@ -17,15 +17,31 @@ public static partial class Pom
 	/// </summary>
 	public class ManagedObjectType
 	{
-		protected PlacedObject.Type? placedType;
-		protected readonly string name;
-		protected readonly Type? objectType;
-		protected readonly Type? dataType;
-		protected readonly Type? reprType;
-		protected readonly bool singleInstance;
 		/// <summary>
-		/// Creates a ManagedObjectType responsible for creating your placedobject instance, data and repr
+		/// ExtEnum entry of this custom placed object
 		/// </summary>
+		protected PlacedObject.Type? placedType;
+		/// <summary>
+		/// Name of the object (why is it here?)
+		/// </summary>
+		protected readonly string name;
+		/// <summary>
+		/// Type of the UpdatableAndDeletable to be created. If it is null, nothing is created.
+		/// </summary>
+		protected readonly Type? objectType;
+		/// <summary>
+		/// Type of the <see cref="global::Pom.Pom.ManagedData"/> child carrying custom data (can be ManagedData itself)
+		/// </summary>
+		protected readonly Type? dataType; //todo: document what happens when it's null
+		/// <summary>
+		/// Type of <see cref="global::Pom.Pom.ManagedRepresentation"/> that will handle creation of control panels 
+		/// and handles (usually <see cref="global::Pom.Pom.ManagedRepresentation"/> itself)
+		/// </summary>
+		protected readonly Type? reprType; //todo: document what happens when it's null
+		/// <summary>
+		/// Whether only one object is allowed per room
+		/// </summary>
+		protected readonly bool singleInstance;
 		/// <param name="name">The enum-name this manager responds for. Do NOT use EnumExt_MyEnum.MyObject.ToString() because on mod-loading enumextender might not have run yet and your enums aren't extended.</param>
 		/// <param name="objectType">The Type of your UpdateableAndDeletable object. Must have a constructor like (Room room, PlacedObject pObj) or (PlacedObject pObj, Room room), (PlacedObject pObj) or (Room room).</param>
 		/// <param name="dataType">The Type of your PlacedObject.Data. Must have a constructor like (PlacedObject pObj).</param>
@@ -63,7 +79,7 @@ public static partial class Pom
 		}
 
 		/// <summary>
-		/// Called from Room.Loaded hook
+		/// Called from Room.Loaded hook. Returns UAD to be added into the room (null if nothing should be added)
 		/// </summary>
 		public virtual UpdatableAndDeletable? MakeObject(PlacedObject placedObject, Room room)
 		{
@@ -119,7 +135,7 @@ public static partial class Pom
 		}
 
 		/// <summary>
-		/// Called from ObjectsPage.CreateObjRep hook
+		/// Called from ObjectsPage.CreateObjRep hook. Returns the custom representation that should then create panels and handles. Can return null
 		/// </summary>
 		public virtual PlacedObjectRepresentation? MakeRepresentation(PlacedObject pObj, ObjectsPage objPage)
 		{
@@ -140,13 +156,23 @@ public static partial class Pom
 	}
 
 	/// <summary>
-	/// Class for managing a wraped <see cref="UpdatableAndDeletable"/> object
-	/// Uses the fully managed data and representation types <see cref="ManagedData"/> and <see cref="ManagedRepresentation"/>
+	/// Class for managing a wraped <see cref="UpdatableAndDeletable"/> object. 
+	/// Uses the fully managed data and representation types 
+	/// <see cref="ManagedData"/> and <see cref="ManagedRepresentation"/>
 	/// </summary>
 	public class FullyManagedObjectType : ManagedObjectType
 	{
+		/// <summary>
+		/// All fields defined for this object
+		/// </summary>
 		protected readonly ManagedField[] managedFields;
 
+		/// <param name="name">Name of the object</param>
+		/// <param name="category">category the object should be in (null if unsorted)</param>
+		/// <param name="objectType">Type of <see cref="global::UpdatableAndDeletable"/> to be created (null if none)</param>
+		/// <param name="managedFields">Array containing all the data fields this object has</param>
+		/// <param name="singleInstance">Whether only one is allowed per room</param>
+		/// <returns></returns>
 		public FullyManagedObjectType(
 			string? name,
 			string? category,
@@ -162,12 +188,12 @@ public static partial class Pom
 		{
 			this.managedFields = managedFields;
 		}
-
+		/// <inheritdoc/>
 		public override PlacedObject.Data MakeEmptyData(PlacedObject pObj)
 		{
 			return new ManagedData(pObj, managedFields);
 		}
-
+		/// <inheritdoc/>
 		public override PlacedObjectRepresentation MakeRepresentation(PlacedObject pObj, ObjectsPage objPage)
 		{
 			return new ManagedRepresentation(GetObjectType(), objPage, pObj);
@@ -182,10 +208,20 @@ public static partial class Pom
 	[AttributeUsage(AttributeTargets.Field)]
 	public abstract class ManagedField : Attribute
 	{
+		/// <summary>
+		/// Name of the field
+		/// </summary>
 		public readonly string key;
+		/// <summary>
+		/// Default value of the field
+		/// </summary>
 		protected object defaultValue; // Removed reaonly, now one can be clever with defaults that apply to the next object being placed and such.
+		/// <summary>
+		/// public wrapper for <see cref="defaultValue"/>
+		/// </summary>
 		public virtual object DefaultValue => defaultValue; // I SUSPECT one day someone will run into a situation with enums where the default value doesn't exist at initialization. Enumextend moment. Lets be nice to that poor soul.
-
+		/// <param name="key">Name of the field</param>
+		/// <param name="defaultValue">Default value</param>
 		protected ManagedField(
 			string key,
 			object defaultValue)
@@ -220,8 +256,11 @@ public static partial class Pom
 		}
 
 		// Stop inheriting crap :/
+		/// <inheritdoc/>
 		public sealed override bool IsDefaultAttribute() { return base.IsDefaultAttribute(); }
+		/// <inheritdoc/>
 		public sealed override bool Match(object obj) { return base.Match(obj); }
+		/// <inheritdoc/>
 		public sealed override object TypeId => base.TypeId;
 	}
 
@@ -230,9 +269,18 @@ public static partial class Pom
 	/// </summary>
 	public abstract class ManagedFieldWithPanel : ManagedField
 	{
+		/// <summary>
+		/// Selected control type
+		/// </summary>
 		protected readonly ControlType control;
+		/// <summary>
+		/// How the field's name should appear in devui
+		/// </summary>
 		public readonly string displayName;
-
+		/// <param name="key">Field name</param>
+		/// <param name="defaultValue">Default value</param>
+		/// <param name="control">Chosen control type</param>
+		/// <param name="displayName">How the field's name should appear in devui</param>
 		protected ManagedFieldWithPanel(
 			string key,
 			object defaultValue,
@@ -244,13 +292,30 @@ public static partial class Pom
 			this.control = control;
 			this.displayName = displayName ?? key;
 		}
-
+		/// <summary>
+		/// <see cref="global::Pom.Pom.ManagedFieldWithPanel"/>'s possible controls
+		/// </summary>
 		public enum ControlType
 		{
+			/// <summary>
+			/// Control does not appear
+			/// </summary>
 			none,
+			/// <summary>
+			/// Value is controlled with a slider
+			/// </summary>
 			slider,
+			/// <summary>
+			/// Value is controlled with increment/decrement arrow buttons
+			/// </summary>
 			arrows,
+			/// <summary>
+			/// Value is cycled using a single button
+			/// </summary>
 			button,
+			/// <summary>
+			/// Value is controlled with a textbox
+			/// </summary>
 			text
 		}
 
@@ -353,19 +418,34 @@ public static partial class Pom
 	/// </summary>
 	public class ManagedData : PlacedObject.Data
 	{
+		/// <summary>
+		/// Fields defined for this object's type
+		/// </summary>
 		public readonly ManagedField[] fields;
+		/// <summary>
+		/// All fields that are bound to actual class fields
+		/// </summary>
 		protected readonly Dictionary<string, FieldInfo> fieldInfosByKey;
+		/// <summary>
+		/// All values that are bound to ManagedField objects passed to ManagedData constructor
+		/// </summary>
 		protected readonly Dictionary<string, ManagedField> fieldsByKey;
+		/// <summary>
+		/// All stored values
+		/// </summary>
 		protected readonly Dictionary<string, object> valuesByKey;
 
 		/// <summary>
-		/// Attribute for tying a field to a <see cref="ManagedField"/> that cannot be properly initialized as Attribute such as <see cref="Vector2Field"/> and <see cref="EnumField"/>.
+		/// Attribute for tying a field to a <see cref="ManagedField"/> that cannot be properly initialized as Attribute such as <see cref="Vector2Field"/> and <see cref="global::Pom.Pom.EnumField{E}"/>. Mostly obsolete.
 		/// </summary>
 		[AttributeUsage(AttributeTargets.Field)]
 		protected class BackedByField : Attribute
 		{
+			/// <summary>
+			/// Name of the data field
+			/// </summary>
 			public string key;
-
+			/// <param name="key">Name of the data field</param>
 			public BackedByField(string key)
 			{
 				this.key = key;
@@ -434,8 +514,13 @@ public static partial class Pom
 				}
 			}
 		}
-
+		/// <summary>
+		/// Position of the controls panel
+		/// </summary>
 		public Vector2 panelPos;
+		/// <summary>
+		/// Whether this data object needs a control panel
+		/// </summary>
 		public virtual bool NeedsControlPanel { get; protected set; }
 		/// <summary>
 		/// For classes that inherit this to know where their data begins. Create something similar for your class if you intend it to be inherited further ;)
@@ -523,9 +608,21 @@ public static partial class Pom
 	/// </summary>
 	public class ManagedRepresentation : PlacedObjectRepresentation
 	{
+		/// <summary>
+		/// ExtEnum entry of associated placedobject
+		/// </summary>
 		protected readonly PlacedObject.Type placedType;
+		/// <summary>
+		/// Currently unused key-keyed collection of control nodes
+		/// </summary>
 		public readonly Dictionary<string, DevUINode> managedNodes; // Unused for now, but seems convenient for specialization
-		protected ManagedControlPanel? panel; // Unused for now, but seems convenient for specialization
+		/// <summary>
+		/// Currently unused reference to own control panel
+		/// </summary>
+		protected ManagedControlPanel? panel;
+		/// <param name="placedType">ExtEnum entry of associated placedobject</param>
+		/// <param name="objPage">Objects page of associated placedobject</param>
+		/// <param name="pObj">Associated placedobject</param>
 		public ManagedRepresentation(
 			PlacedObject.Type placedType,
 			ObjectsPage objPage,
@@ -541,7 +638,9 @@ public static partial class Pom
 			this.managedNodes = new Dictionary<string, DevUINode>();
 			MakeControls();
 		}
-
+		/// <summary>
+		/// Creates devui controls for all the fields. Called from the constructor
+		/// </summary>
 		protected virtual void MakeControls()
 		{
 			ManagedData data = (ManagedData)pObj.data;
@@ -602,12 +701,36 @@ public static partial class Pom
 	/// </summary>
 	public class ManagedControlPanel : Panel
 	{
+		/// <summary>
+		/// Associated Representation
+		/// </summary>
 		protected readonly ManagedRepresentation managedRepresentation;
-		public Dictionary<string, DevUINode> managedNodes; // Added from ManagedRepresentation. Unused for now, but seems convenient for specialization
+		/// <summary>
+		/// Mirror of <see cref="global::Pom.Pom.ManagedRepresentation.managedNodes"/>
+		/// </summary>
+		public Dictionary<string, DevUINode> managedNodes; 
+		/// <summary>
+		/// Mirror of <see cref="global::Pom.Pom.ManagedRepresentation.managedFields"/>... Hold on, that doesn't exist o_O
+		/// </summary>
 		public Dictionary<string, ManagedFieldWithPanel> managedFields; // Added from ManagedRepresentation. Unused for now, but seems convenient for specialization
+		/// <summary>
+		/// Connector line sprite index
+		/// </summary>
 		protected readonly int lineSprt;
-
-		public ManagedControlPanel(DevUI owner, string IDstring, ManagedRepresentation parentNode, Vector2 pos, Vector2 size, string title) : base(owner, IDstring, parentNode, pos, size, title)
+		
+		public ManagedControlPanel(
+			DevUI owner,
+			string IDstring,
+			ManagedRepresentation parentNode,
+			Vector2 pos,
+			Vector2 size,
+			string title) : base(
+				owner,
+				IDstring,
+				parentNode,
+				pos,
+				size,
+				title)
 		{
 			managedRepresentation = parentNode;
 			managedNodes = new Dictionary<string, DevUINode>();
@@ -617,6 +740,7 @@ public static partial class Pom
 			owner.placedObjectsContainer.AddChild(this.fSprites[this.lineSprt = this.fSprites.Count - 1]);
 			this.fSprites[lineSprt].anchorY = 0f;
 		}
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			base.Refresh();
