@@ -1,6 +1,7 @@
 ﻿using DevInterface;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using UnityEngine;
 
 using ObjCategory = DevInterface.ObjectsPage.DevObjectCategories;
 
@@ -36,7 +37,7 @@ public static partial class Pom
 		if (__hooked) return;
 		__hooked = true;
 		On.DevInterface.ObjectsPage.DevObjectGetCategoryFromPlacedType += ObjectsPage_Sort;
-		On.DevInterface.PositionedDevUINode.Move += Vector2ArrayField.OnPositionedDevUINodeMove;
+		On.DevInterface.PositionedDevUINode.Move += OnPositionedDevUINodeMove;
 		On.PlacedObject.GenerateEmptyData += PlacedObject_GenerateEmptyData_Patch;
 		On.Room.Loaded += Room_Loaded_Patch;
 		On.DevInterface.ObjectsPage.CreateObjRep += ObjectsPage_CreateObjRep_Patch;
@@ -84,11 +85,14 @@ public static partial class Pom
 				}
 				System.Comparison<PlacedObject.Type> sorter = doSort switch
 				{
-					CategorySortKind.Alphabetical => static (ot1, ot2) => {
+					CategorySortKind.Alphabetical => static (ot1, ot2) =>
+					{
 						if (ot1 == PlacedObject.Type.None && ot2 == PlacedObject.Type.None) return 0;
 						if (ot1 == PlacedObject.Type.None) return 1;
 						if (ot2 == PlacedObject.Type.None) return -1;
-						else return StringComparer.InvariantCulture.Compare(ot1?.value, ot2?.value);},
+						else return StringComparer.InvariantCulture.Compare(ot1?.value, ot2?.value);
+					}
+					,
 					_ => throw new ArgumentException($"ERROR: INVALID {nameof(CategorySortKind)} VALUE {doSort}")
 				};
 				list.Sort(sorter);
@@ -161,4 +165,19 @@ public static partial class Pom
 		}
 	}
 
+	internal static void OnPositionedDevUINodeMove(
+				On.DevInterface.PositionedDevUINode.orig_Move orig,
+				PositionedDevUINode self,
+				Vector2 newpos)
+	{
+		orig(self, newpos);
+		if (self.parentNode is Vector2ArrayField.Vector2ArrayHandle v2ah)
+		{
+			Vector2[] vectors = v2ah.Data.GetValue<Vector2[]>(v2ah.Field.key)!;
+			int index = int.Parse(self.IDstring.Split('_')[1]);
+			if (index == 0) return;
+			vectors[index] = newpos;
+			v2ah.Data.SetValue(v2ah.Field.key, vectors);
+		}
+	}
 }

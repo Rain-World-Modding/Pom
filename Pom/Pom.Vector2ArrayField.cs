@@ -11,7 +11,13 @@ public static partial class Pom
 	/// </summary>
 	public class Vector2ArrayField : ManagedField
 	{
+		/// <summary>
+		/// Chosen representation type
+		/// </summary>
 		public Vector2ArrayRepresentationType RepresentationType;
+		/// <summary>
+		/// Number of vector2 nodes
+		/// </summary>
 		public int NodeCount;
 		public bool IncludeParent;
 
@@ -43,7 +49,7 @@ public static partial class Pom
 		/// <param name="nodeCount">The number of <see cref="Vector2"/>s that the field stores</param>
 		/// <param name="includeParent">Sets if the field should use the parent as the first node</param>
 		/// <param name="representationType">The type of the representation that should be created.</param>
-		/// <param name="nodes">Default nodes that are assigned. Node ordering is bottom nodes left to right, then top nodes right to left. Nodes are passed as pairs of floats: x0, y0, x1, y1 etc</param>
+		/// <param name="nodeElements">Default nodes that are assigned. Node ordering is bottom nodes left to right, then top nodes right to left. Nodes are passed as pairs of floats: x0, y0, x1, y1 etc</param>
 		public Vector2ArrayField(
 			string key,
 			int nodeCount,
@@ -58,13 +64,13 @@ public static partial class Pom
 		{
 
 		}
-
+		/// <inheritdoc/>
 		public override string ToString(object value)
 		{
 			Vector2[] vectors = (Vector2[])value;
 			return string.Join("^", vectors.Select(v => $"{v.x};{v.y}").ToArray());
 		}
-
+		/// <inheritdoc/>
 		public override object FromString(string str)
 		{
 			List<Vector2> positions = new List<Vector2>();
@@ -84,26 +90,58 @@ public static partial class Pom
 			Array.Copy(vector2s, result, vector2s.Length < nodeCount ? vector2s.Length : nodeCount);
 			return result;
 		}
-
+		/// <inheritdoc/>
 		public override DevUINode MakeAditionalNodes(ManagedData managedData, ManagedRepresentation managedRepresentation)
 		{
 			return new Vector2ArrayHandle(this, managedData, managedRepresentation);
 		}
-
+		/// <summary>
+		/// How the handle should look like
+		/// </summary>
 		public enum Vector2ArrayRepresentationType
 		{
+			/// <summary>
+			/// Handle is an open-ended chain
+			/// </summary>
 			Chain,
+			/// <summary>
+			/// Handle is a polygon (start and end connected)
+			/// </summary>
 			Polygon
 		}
-
+		/// <summary>
+		/// Special handle for vector2arrayfield
+		/// </summary>
 		public class Vector2ArrayHandle : PositionedDevUINode
 		{
+			/// <summary>
+			/// Associated field
+			/// </summary>
 			public Vector2ArrayField Field;
+			/// <summary>
+			/// Associated placedobject's data
+			/// </summary>
 			public ManagedData Data;
+			/// <summary>
+			/// First node
+			/// </summary>
 			public PositionedDevUINode First;
+			/// <summary>
+			/// List of line subnode indices
+			/// </summary>
 			public List<int> Lines = new List<int>();
 
-			public Vector2ArrayHandle(Vector2ArrayField field, ManagedData data, ManagedRepresentation representation) : base(representation.owner, field.key, representation, data.GetValue<Vector2[]>(field.key)[0])
+			/// <param name="field">Field definition</param>
+			/// <param name="data">Associated placedobject's data</param>
+			/// <param name="representation">Associated placedobject's representation</param>
+			public Vector2ArrayHandle(
+				Vector2ArrayField field,
+				ManagedData data,
+				ManagedRepresentation representation) : base(
+					representation.owner,
+					field.key,
+					representation,
+					(data.GetValue<Vector2[]>(field.key) ?? new Vector2[] { default })[0])
 			{
 				Field = field;
 				Data = data;
@@ -138,7 +176,7 @@ public static partial class Pom
 					Lines.Add(currLine);
 				}
 			}
-
+			/// <inheritdoc/>
 			public override void Move(Vector2 newPos)
 			{
 				First.Move(newPos);
@@ -147,7 +185,7 @@ public static partial class Pom
 				Data.SetValue(Field.key, vArr);
 				base.Move(newPos);
 			}
-
+			/// <inheritdoc/>
 			public override void Refresh()
 			{
 				base.Refresh();
@@ -176,19 +214,6 @@ public static partial class Pom
 					lineSprite.scaleY = (start.absPos - First.absPos).magnitude;
 					lineSprite.rotation = Custom.VecToDeg(First.absPos - start.absPos);
 				}
-			}
-		}
-
-		public static void OnPositionedDevUINodeMove(On.DevInterface.PositionedDevUINode.orig_Move orig, PositionedDevUINode self, Vector2 newpos)
-		{
-			orig(self, newpos);
-			if (self.parentNode is Vector2ArrayHandle v2ah)
-			{
-				Vector2[] vectors = v2ah.Data.GetValue<Vector2[]>(v2ah.Field.key)!;
-				int index = int.Parse(self.IDstring.Split('_')[1]);
-				if (index == 0) return;
-				vectors[index] = newpos;
-				v2ah.Data.SetValue(v2ah.Field.key, vectors);
 			}
 		}
 
