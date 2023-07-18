@@ -8,11 +8,24 @@ namespace Pom;
 public static partial class Pom
 {
 	/// <summary>
-	/// An interface for a <see cref="ManagedFieldWithPanel"/> that can be controlled through a <see cref="ManagedSlider"/>.
+	/// An interface for a <see cref="ManagedFieldWithPanel"/> that can be controlled through a <see cref="ManagedSlider"/> 
+	/// (one or multiple, see <see cref="global::Pom.Pom.ColorField"/> for multiple).
 	/// </summary>
 	public interface IInterpolablePanelField // sliders
 	{
+		/// <summary>
+		/// Used by <see cref="global::Pom.Pom.ManagedSlider.Refresh"/> to determine where to put the nub when it is not being dragged.
+		/// </summary>
+		/// <param name="node">The exact slider being used</param>
+		/// <param name="data">ManagedData corresponding to object being processed</param>
+		/// <returns>A value between 0 and 1 indicating where the slider's nub should be between its ends</returns>
 		float FactorOf(PositionedDevUINode node, ManagedData data);
+		/// <summary>
+		/// Used when <see cref="global::Pom.Pom.ManagedSlider.NubDragged"/> needs to tell the object where the nub ends up.
+		/// </summary>
+		/// <param name="node">The exact slider being used</param>
+		/// <param name="data">ManagedData corresponding to object being processed</param>
+		/// <param name="factor">Value between 0 and 1 indicating where between the slider's ends the nub was released</param>
 		void NewFactor(PositionedDevUINode node, ManagedData data, float factor);
 	}
 
@@ -21,7 +34,19 @@ public static partial class Pom
 	/// </summary>
 	public interface IIterablePanelField // buttons, arrows
 	{
+		/// <summary>
+		/// Used by <see cref="global::Pom.Pom.ManagedButton.Signal"/> and <see cref="global::Pom.Pom.ManagedArrowSelector.Increment"/>
+		/// to signal that the value of this ManagedField should be cycled to the next entry/position/value
+		/// </summary>
+		/// <param name="node">The exact button or arrowselector being used</param>
+		/// <param name="data">ManagedData corresponding to object being processed</param>
 		void Next(PositionedDevUINode node, ManagedData data);
+		/// <summary>
+		/// Used by <see cref="global::Pom.Pom.ManagedArrowSelector.Increment"/>
+		/// to signal that the value of this ManagedField should be cycled to the previous entry/position/value
+		/// </summary>
+		/// <param name="node">The exact ArrowSelector being used</param>
+		/// <param name="data">ManagedData corresponding to object being processed</param>
 		void Prev(PositionedDevUINode node, ManagedData data);
 	}
 
@@ -30,8 +55,14 @@ public static partial class Pom
 	/// </summary>
 	public class FloatField : ManagedFieldWithPanel, IInterpolablePanelField, IIterablePanelField
 	{
+		
+		#pragma warning disable 1591
 		protected readonly float min;
 		protected readonly float max;
+		#pragma warning restore 1591
+		/// <summary>
+		/// Minimal step the value can take. Every value change is rounded down to min + multiples of this
+		/// </summary>
 		protected readonly float increment;
 
 		/// <summary>
