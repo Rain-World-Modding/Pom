@@ -1,4 +1,5 @@
 ﻿global using static PomCore.Mod;
+global using static PomCore.Utils;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using Mono.Cecil.Cil;

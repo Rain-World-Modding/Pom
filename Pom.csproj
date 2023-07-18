@@ -14,14 +14,14 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DebugType>Portable</DebugType>
 		<TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-		<WarningsAsErrors>$(WarningsAsErrors);NU1605;Nullable;</WarningsAsErrors>
+		<WarningsAsErrors>$(WarningsAsErrors);NU1605;</WarningsAsErrors>
 		<DefineConstants>$(DefineConstants)TRACE;RK;REMIX</DefineConstants>
 	</PropertyGroup>
 	<!-- Release configuration. Build for release. -->
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>Portable</DebugType>
 		<TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-		<WarningsAsErrors>$(WarningsAsErrors);NU1605;Nullable;</WarningsAsErrors>
+		<WarningsAsErrors>$(WarningsAsErrors);NU1605;</WarningsAsErrors>
 		<DefineConstants>$(DefineConstants)TRACE;RK;REMIX</DefineConstants>
 	</PropertyGroup>
 	<!-- Lib includes. -->
@@ -144,6 +144,8 @@
 		<Copy SourceFiles="$(OutDir)Pom.dll" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
 		<Copy SourceFiles="$(OutDir)Pom.pdb" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+			RetryDelayMilliseconds="300" />
+		<Copy SourceFiles="$(OutDir)Pom.xml" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
 		<!-- <Copy
 			SourceFiles="@(_CopyItems)"
