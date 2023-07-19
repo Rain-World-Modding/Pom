@@ -32,7 +32,7 @@ internal static class Logfix
 			Log(level, $"[BUFFERED : {when}] {data}");
 		}
 		__discardedLogMessageCount = 0;
-		//todo: flush buffered lines
+		
 	}
 	private static void __DefaultImpl_Log(BepInEx.Logging.LogLevel level, object data)
 	{

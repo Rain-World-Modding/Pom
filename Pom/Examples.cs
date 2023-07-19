@@ -232,7 +232,7 @@ public static class Examples
 			public float redcolor;
 
 			[StringField("mystring", "aaaaaaaa", "My String")]
-			public string mystring;
+			public string mystring = "aaaaaaaa";
 
 			// For certain types it's not possible to use the Attribute notation, and you'll have to pass the field to the constructor
 			// but you can still link a field in your object to the managed field and they will stay in sync.
@@ -245,7 +245,7 @@ public static class Examples
 
 			// Until there is a better implementation, you'll have to do this for Vector2Field, IntVector2Field, EnumField and ColorField.
 			[BackedByField("msid")]
-			public SoundID mySound;
+			public SoundID mySound = SoundID.Bat_Afraid_Flying_Sounds;
 #pragma warning restore 0649
 
 			private static ManagedField[] customFields = new ManagedField[] {
