@@ -32,6 +32,56 @@ public sealed class EffectDefinitionBuilder
 		return this;
 	}
 	/// <summary>
+	/// Registers a new integer field.
+	/// </summary>
+	/// <param name="name">Name of the field.</param>
+	/// <param name="minValue">Minimal value of the integer.</param>
+	/// <param name="maxValue">Maximum value of the integer.</param>
+	/// <param name="defaultValue">Default value of the integer.</param>
+	/// <returns>Itself.</returns>
+	public EffectDefinitionBuilder AddIntField(
+		string name,
+		int minValue,
+		int maxValue,
+		int defaultValue)
+		=> AddField(new IntField(name, minValue, maxValue, defaultValue));
+	/// <summary>
+	/// Registers a new float field.
+	/// </summary>
+	/// <param name="name">Name of the field.</param>
+	/// <param name="minValue">Minimum value of the float.</param>
+	/// <param name="maxValue">Maximum value of the float.</param>
+	/// <param name="step">Increments the value is allowed to move by.</param>
+	/// <param name="defaultValue">Default value of the float.</param>
+	/// <returns>Itself.</returns>
+	public EffectDefinitionBuilder AddFloatField(
+		string name,
+		float minValue,
+		float maxValue,
+		float step,
+		float defaultValue)
+		=> AddField(new FloatField(name, minValue, maxValue, step, defaultValue));
+	/// <summary>
+	/// Registers a new boolean field.
+	/// </summary>
+	/// <param name="name">Field name.</param>
+	/// <param name="defaultValue">Default value.</param>
+	/// <returns>Itself.</returns>
+	public EffectDefinitionBuilder AddBoolField(
+		string name,
+		bool defaultValue) 
+		=> AddField(new BoolField(name, defaultValue));
+	/// <summary>
+	/// Registers a new string field.
+	/// </summary>
+	/// <param name="name">Field name.</param>
+	/// <param name="defaultValue">Default value.</param>
+	/// <returns>Itself.</returns>
+	public EffectDefinitionBuilder AddStringField(
+		string name,
+		string defaultValue)
+		=> AddField(new StringField(name, defaultValue));
+	/// <summary>
 	/// Adds a new field to the definition. If there was another with the same name, it gets replaces.
 	/// </summary>
 	/// <param name="field">New field.</param>
