@@ -10,7 +10,7 @@ public static partial class Eff
 	{
 		//if (effectDefinitions.ContainsKey())
 		var type = new RoomSettings.RoomEffect.Type(definition.Name, true);
-		if (!effectDefinitions.TryAdd(type.ToString(), definition))
+		if (!__effectDefinitions.TryAdd(type.ToString(), definition))
 		{
 			throw new System.ArgumentException(
 				$"There is already an effect definition for {type.ToString()}; cannot register twice. " +
@@ -25,8 +25,7 @@ public static partial class Eff
 	{
 		try
 		{
-
-			if (effectDefinitions.Remove(name))
+			if (__effectDefinitions.Remove(name))
 			{
 				RoomSettings.RoomEffect.Type.values.RemoveEntry(name);
 			}
@@ -39,7 +38,21 @@ public static partial class Eff
 		{
 			LogError($"Could not unregister effect {name} : {ex}");
 		}
-
-
 	}
+	/// <summary>
+	/// Attempts to fetch definition for a given effect type.
+	/// </summary>
+	/// <param name="effectType">Effect type.</param>
+	/// <param name="result">Contains operation result by the time method exits. Null if not found.</param>
+	/// <returns>Whether am effect definition was found.</returns>
+	public static bool TryGetEffectDefinition(RoomSettings.RoomEffect.Type effectType, out EffectDefinition? result)
+		=> TryGetEffectDefinition(effectType.value, out result);
+	/// <summary>
+	/// Attempts to fetch definition for effect type with a given name.
+	/// </summary>
+	/// <param name="effectType">Effect type in form of a string (ExtEnum.value).</param>
+	/// <param name="result">Contains operation result by the time method exits. Null if not found.</param>
+	/// <returns>Whether am effect definition was found.</returns>
+	private static bool TryGetEffectDefinition(string effectType, out EffectDefinition? result)
+		=> __effectDefinitions.TryGetValue(effectType, out result);
 }

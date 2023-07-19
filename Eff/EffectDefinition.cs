@@ -17,6 +17,5 @@ public sealed record EffectDefinition(
 	System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
 	)
 {
-	
 	internal static EffectDefinition @default = new(null, "DefaultEffectDef", null, null, new(new Dictionary<string, EffectField>()));
 }

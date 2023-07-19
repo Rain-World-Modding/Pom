@@ -17,7 +17,7 @@ public static partial class Eff
 			if (self.currentMainLoop is not RainWorldGame && !self.sideProcesses.Any((proc) => proc is RainWorldGame))
 			{
 				LogWarning("Clearing attached data");
-				attachedData.Clear();
+				__attachedData.Clear();
 			}
 		};
 		On.DevInterface.EffectPanel.ctor += __ConstructEffectPanel;
@@ -27,11 +27,11 @@ public static partial class Eff
 			orig(self);
 			foreach (RoomSettings.RoomEffect effect in self.roomSettings.effects)
 			{
-				if (!effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
+				if (!__effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
 				{
 					continue;
 				}
-				if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
+				if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 				{
 					LogDebug($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
 					continue;
@@ -62,13 +62,13 @@ public static partial class Eff
 	private static void __ConstructEffectPanel(On.DevInterface.EffectPanel.orig_ctor orig, EffectPanel self, DevUI owner, DevUINode parent, Vector2 pos, RoomSettings.RoomEffect effect)
 	{
 		orig(self, owner, parent, pos, effect);
-		if (!effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
+		if (!__effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
 		{
 			return;
 		}
-		if (!attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
+		if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 		{
-			LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {attachedData.Count}, {def}");
+			LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {__attachedData.Count}, {def}");
 			return;
 		}
 
@@ -168,20 +168,20 @@ public static partial class Eff
 	{
 		orig(self, manager);
 		LogWarning("Clearing attached data");
-		attachedData.Clear();
+		__attachedData.Clear();
 	}
 
 	private static void __ParseExtraData(On.RoomSettings.RoomEffect.orig_FromString orig, RoomSettings.RoomEffect self, string[] text)
 	{
 		orig(self, text);
-		effectDefinitions.TryGetValue(self.type.ToString(), out EffectDefinition? def);
+		__effectDefinitions.TryGetValue(self.type.ToString(), out EffectDefinition? def);
 		LogWarning($"Deserializing {self.type}, {self.GetHashCode()}, {def}");
 		LogWarning((self.unrecognizedAttributes?.Length ?? 0).ToString() ?? "EMPTY ATTRIBUTES");
 		self.unrecognizedAttributes ??= new string[0];
 
 		EffectExtraData newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
-		attachedData[self.GetHashCode()] = newdata;
-		LogWarning(attachedData[self.GetHashCode()]);
+		__attachedData[self.GetHashCode()] = newdata;
+		LogWarning(__attachedData[self.GetHashCode()]);
 	}
 
 	private static string __SaveExtraData(On.RoomSettings.RoomEffect.orig_ToString orig, RoomSettings.RoomEffect self)
@@ -189,7 +189,7 @@ public static partial class Eff
 		List<string> attributes = new();
 		attributes.AddRange(self.unrecognizedAttributes ?? new string[0]);
 		// plog.LogWarning($"Serializing {self.type}");
-		if (!attachedData.TryGetValue(self.GetHashCode(), out EffectExtraData data))
+		if (!__attachedData.TryGetValue(self.GetHashCode(), out EffectExtraData data))
 		{
 			LogWarning("Could not find EffectExtraData, aborting");
 			goto done;

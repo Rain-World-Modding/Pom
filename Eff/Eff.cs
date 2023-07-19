@@ -28,8 +28,8 @@ public static partial class Eff
 	internal const float INT_BUTTON_WIDTH = 20f;
 	internal const float INT_VALUELABEL_WIDTH = 60f;
 	internal const float BOOL_BUTTON_WIDTH = 50f;
-	internal readonly static Dictionary<int, EffectExtraData> attachedData = new();
-	internal readonly static Dictionary<string, EffectDefinition> effectDefinitions = new();
+	internal readonly static Dictionary<int, EffectExtraData> __attachedData = new();
+	internal readonly static Dictionary<string, EffectDefinition> __effectDefinitions = new();
 	internal readonly static List<KeyValuePair<string, string>> __escapeSequences = new()
 	{
 		new("-", "%1"),
