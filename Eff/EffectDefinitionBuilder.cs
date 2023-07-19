@@ -39,6 +39,7 @@ public sealed class EffectDefinitionBuilder
 	public EffectDefinitionBuilder AddField(EffectField field)
 	{
 		ThrowIfBuilt();
+		__ValidateDefaultValue(field.Dt, field.DefaultValue);
 		_fields[field.Name] = field;
 		return this;
 	}
@@ -58,7 +59,8 @@ public sealed class EffectDefinitionBuilder
 	/// </summary>
 	/// <param name="initializer"></param>
 	/// <returns></returns>
-	public EffectDefinitionBuilder SetEffectInitializer(EffectInitializer initializer) {
+	public EffectDefinitionBuilder SetEffectInitializer(EffectInitializer initializer)
+	{
 		ThrowIfBuilt();
 		_initializer = initializer;
 		return this;
@@ -66,7 +68,8 @@ public sealed class EffectDefinitionBuilder
 	/// <summary>
 	/// Registers effect definition and closes this instance from further use.
 	/// </summary>
-	public void Register() {
+	public void Register()
+	{
 		Eff.RegisterEffectDefinition(this._Build());
 	}
 	/// <summary>
@@ -94,5 +97,20 @@ public sealed class EffectDefinitionBuilder
 	private void ThrowIfBuilt()
 	{
 		if (_built) throw new ObjectDisposedException(this.ToString(), "This EffectDefinitionBuilder has already been used");
+	}
+	private static void __ValidateDefaultValue(DataType t, object? value)
+	{
+		Type? needed = t switch
+		{
+			DataType.Int => typeof(int),
+			DataType.Float => typeof(float),
+			DataType.Bool => typeof(bool),
+			DataType.String => typeof(string),
+			_ => null
+		};
+		if (needed != value?.GetType())
+		{
+			throw new ArgumentException($"Invalid default argument value {value} for {t}");
+		}
 	}
 }

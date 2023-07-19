@@ -19,22 +19,4 @@ public sealed record EffectDefinition(
 {
 	
 	internal static EffectDefinition @default = new(null, "DefaultEffectDef", null, null, new(new Dictionary<string, EffectField>()));
-
-	private static void __ValidateDefaultValue(DataType t, object? value)
-	{
-		Type? needed = t switch
-		{
-			DataType.Int => typeof(int),
-			DataType.Float => typeof(float),
-			DataType.Bool => typeof(bool),
-			DataType.String => typeof(string),
-			_ => null
-		};
-		if (needed != value?.GetType())
-		{
-			throw new ArgumentException($"Invalid default argument value {value} for {t}");
-		}
-	}
-
-
 }
