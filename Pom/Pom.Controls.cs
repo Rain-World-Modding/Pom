@@ -692,9 +692,9 @@ public static partial class Pom
 				field.ParseFromText(this, data, newValue);
 				subNodes[1].fLabels[0].color = new Color(0.1f, 0.4f, 0.2f); // positive feedback
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				//todo: add error telegraph in logs?
+				LogWarning($"Failed to parse field from text: {ex}");
 				subNodes[1].fLabels[0].color = Color.red; // negative fedback
 			}
 			if (endTransaction)
