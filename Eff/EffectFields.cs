@@ -31,7 +31,7 @@ public sealed record FloatField(string Name, float Min, float Max, float Step, f
 /// </summary>
 /// <param name="Name">Name of the field</param>
 /// <param name="DefaultBool">Default value</param>
-public sealed record BoolField(string Name, bool DefaultBool) : EffectField(Name, DataType.Float, DefaultBool);
+public sealed record BoolField(string Name, bool DefaultBool) : EffectField(Name, DataType.Bool, DefaultBool);
 /// <summary>
 /// A field containing a string
 /// </summary>
