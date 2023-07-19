@@ -23,6 +23,7 @@ internal class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
 		if (!setupRan)
 		{
 			LogWarning($"Example effect go in room {room.abstractRoom.name}");
+			setupRan = true;
 		}
 		base.Update(eu);
 		float acceleration_intensity = this.EffectData.GetFloat("floatfield");
