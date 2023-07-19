@@ -40,7 +40,10 @@ public sealed class EffectDefinitionBuilder
 	{
 		ThrowIfBuilt();
 		__ValidateDefaultValue(field.Dt, field.DefaultValue);
-		_fields[field.Name] = field;
+		if (!_fields.TryAdd(field.Name, field))
+		{
+			throw new ArgumentException($"There is already a field {field.Name} defined on effect definition builder {this._name}, cannot define twice.");
+		}
 		return this;
 	}
 	/// <summary>

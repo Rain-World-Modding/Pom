@@ -14,7 +14,7 @@ public static partial class Eff
 		{
 			throw new System.ArgumentException(
 				$"There is already an effect definition for {type.ToString()}; cannot register twice. " +
-				"If you wish to replace your definition for whatever reason, call RemoveEffectDefinition.");
+				"If you wish to replace your definition for whatever reason, call RemoveEffectDefinition first.");
 		}
 	}
 	/// <summary>
