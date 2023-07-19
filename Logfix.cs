@@ -8,6 +8,7 @@ internal static class Logfix
 	internal static LevelLogCallback LogWarning = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Warning, data);
 	internal static LevelLogCallback LogError = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Error, data);
 	internal static LevelLogCallback LogFatal = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Fatal, data);
+    internal static GeneralLogCallback Log = __DefaultImpl_Log;
 	private static void __DefaultImpl_Log(BepInEx.Logging.LogLevel level, object data)
 	{
 		LevelLogCallback action = level switch

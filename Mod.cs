@@ -31,6 +31,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 			LogWarning = Logger.LogWarning;
 			LogError = Logger.LogError;
 			LogFatal = Logger.LogFatal;
+			Log = Logger.Log;
 			//instance = this;
 			new Eff.EffectDefinitionBuilder("testeffect")
 
