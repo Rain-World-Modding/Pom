@@ -15,23 +15,14 @@ using MonoMod.Cil;
 
 
 namespace PomCore;
-
 [BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.7")]
 public class Mod : BepInEx.BaseUnityPlugin
 {
-	//internal static Mod instance = null!;
-	//internal static BepInEx.Logging.ManualLogSource plog => instance.Logger; //new BepInEx.Logging.ManualLogSource("POM");//instance.Logger;
 	public void OnEnable()
 	{
 		try
 		{
-			LogDebug = Logger.LogDebug;
-			LogInfo = Logger.LogInfo;
-			LogMessage = Logger.LogMessage;
-			LogWarning = Logger.LogWarning;
-			LogError = Logger.LogError;
-			LogFatal = Logger.LogFatal;
-			Log = Logger.Log;
+			Logfix.__SwitchToBepinexLogger(Logger);
 			//instance = this;
 			new Eff.EffectDefinitionBuilder("testeffect")
 
