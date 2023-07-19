@@ -6,18 +6,22 @@ using MonoMod.Utils;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 
-// This is ManagedPlacedObjects mini-framework, written by henpemaz
-// and ported to Downpour by Thalber. 
-// It is licensed under Creative Commons 0 and is designed
-// to be "stackable" at runtime with multiple instances of POM
-// in multiple mods. It is not recommended to do that anymore, but
-// you still can if you really want to.
+
 
 
 namespace PomCore;
+/// <summary>
+/// This is ManagedPlacedObjects mini-framework, written by henpemaz
+/// and ported to Downpour by Thalber. 
+/// It is licensed under Creative Commons 0 and is designed
+/// to be "stackable" at runtime with multiple instances of POM
+/// in multiple mods. It is not recommended to do that anymore, but
+/// you still can if you really want to.
+/// </summary>
 [BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.7")]
 public class Mod : BepInEx.BaseUnityPlugin
 {
+	/// <inheritdoc/>
 	public void OnEnable()
 	{
 		try
@@ -25,19 +29,18 @@ public class Mod : BepInEx.BaseUnityPlugin
 			Logfix.__SwitchToBepinexLogger(Logger);
 			//instance = this;
 			new Eff.EffectDefinitionBuilder("testeffect")
-
-					.AddField(new Eff.IntField("intfield", 0, 10, 5))
-					.AddField(new Eff.FloatField("floatfield", 0f, 10f, 0.1f, 1f))
-					// .AddField(new Eff.FloatField("testfield22", 0f, 10f, 0.1f, 1f))
-					// .AddField(new Eff.FloatField("testfield23", 0f, 10f, 5f, 1f))
-					.AddField(new Eff.BoolField("boolfield", true))
-					.AddField(new Eff.StringField("stringfield", "example_string%-%"))
-					.SetUADFactory((room, data, firstTimeRealized) => new Eff.ExampleEffectUAD(data))
-					.Register();
-			// Eff.Eff.RegisterEffectDefinition
-			// (
-
-			// );
+				.AddIntField("intfield", 0, 10, 5)
+				.AddFloatField("floatfield", 0f, 10f, 0.1f, 1f)
+				.AddBoolField("boolfield", true)
+				.AddStringField("stringfield", "example_string%-%")
+				//.AddField(new Eff.IntField("intfield", 0, 10, 5))
+				//.AddField(new Eff.FloatField("floatfield", 0f, 10f, 0.1f, 1f))
+				// .AddField(new Eff.FloatField("testfield22", 0f, 10f, 0.1f, 1f))
+				// .AddField(new Eff.FloatField("testfield23", 0f, 10f, 5f, 1f))
+				//.AddField(new Eff.BoolField("boolfield", true))
+				//.AddField(new Eff.StringField("stringfield", "example_string%-%"))
+				.SetUADFactory((room, data, firstTimeRealized) => new Eff.ExampleEffectUAD(data))
+				.Register();
 		}
 		catch (Exception ex)
 		{
@@ -45,7 +48,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 		}
 		try
 		{
-			IL.SaveUtils.PopulateUnrecognizedStringAttrs += IL_FixUnrecognizedAttrs;
+			IL.SaveUtils.PopulateUnrecognizedStringAttrs += __IL_FixUnrecognizedAttrs;
 		}
 		catch (System.Exception ex)
 		{
@@ -53,7 +56,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 		}
 	}
 
-	public static void IL_FixUnrecognizedAttrs(MonoMod.Cil.ILContext il)
+	internal static void __IL_FixUnrecognizedAttrs(MonoMod.Cil.ILContext il)
 	{
 		MonoMod.Cil.ILCursor c = new(il);
 		if (c.TryGotoNext(MonoMod.Cil.MoveType.After,
@@ -75,7 +78,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 			throw new Exception("Could not find injection point; presumed an identical hook is already in place");
 		}
 	}
-
+	/// <inheritdoc/>
 	public void OnDisable()
 	{
 		Pom.Pom.DisposeStaticInputHooks();
