@@ -55,4 +55,6 @@ public static partial class Eff
 	/// <returns>Whether am effect definition was found.</returns>
 	private static bool TryGetEffectDefinition(string effectType, out EffectDefinition? result)
 		=> __effectDefinitions.TryGetValue(effectType, out result);
+	private static bool TryGetExtraData(RoomSettings.RoomEffect effect, out EffectExtraData? result)
+		=> __attachedData.TryGetValue(effect.GetHashCode(), out result);
 }
