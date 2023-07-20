@@ -41,7 +41,14 @@ public static partial class Pom
 		On.PlacedObject.GenerateEmptyData += PlacedObject_GenerateEmptyData_Patch;
 		On.Room.Loaded += Room_Loaded_Patch;
 		On.DevInterface.ObjectsPage.CreateObjRep += ObjectsPage_CreateObjRep_Patch;
-		ApplyInputHooks();
+		try
+		{
+			ApplyInputHooks();
+		}
+		catch (Exception ex)
+		{
+			LogError($"Error adding input hooks {ex}");
+		}
 		try
 		{
 			IL.DevInterface.ObjectsPage.AssembleObjectPages += IL_ObjectsPage_AssemblePages;
