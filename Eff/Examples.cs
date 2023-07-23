@@ -2,6 +2,28 @@ using UnityEngine;
 
 namespace Eff;
 
+internal static class Examples
+{
+	internal static void __RegisterExamples()
+	{
+		try
+		{
+			new EffectDefinitionBuilder("testeffect")
+				.AddIntField("intfield", 0, 10, 5)
+				.AddFloatField("floatfield", 0f, 10f, 0.1f, 1f)
+				.AddBoolField("boolfield", true)
+				.AddStringField("stringfield", "example_string%-%")
+				.SetUADFactory((room, data, firstTimeRealized) => new ExampleEffectUAD(data))
+				.SetCategory("POMEffects Examples")
+				.Register();
+		}
+		catch (Exception ex)
+		{
+
+		}
+	}
+}
+
 internal class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
 {
 	//private FnOnce init;

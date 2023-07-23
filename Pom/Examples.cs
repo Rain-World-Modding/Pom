@@ -33,7 +33,7 @@ public static class Examples
 		{
 		}
 	}
-	internal static void RegisterExamples()
+	internal static void __RegisterExamples()
 	{
 		//__sortCategorySettings.Add(new("POM examples", true), CategorySortKind.Alphabetical);
 		//__sortCategorySettings.Add(new("RegionKit", true), CategorySortKind.Alphabetical);

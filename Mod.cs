@@ -28,13 +28,8 @@ public class Mod : BepInEx.BaseUnityPlugin
 		{
 			Logfix.__SwitchToBepinexLogger(Logger);
 			//instance = this;
-			new Eff.EffectDefinitionBuilder("testeffect")
-				.AddIntField("intfield", 0, 10, 5)
-				.AddFloatField("floatfield", 0f, 10f, 0.1f, 1f)
-				.AddBoolField("boolfield", true)
-				.AddStringField("stringfield", "example_string%-%")
-				.SetUADFactory((room, data, firstTimeRealized) => new Eff.ExampleEffectUAD(data))
-				.Register();
+			Eff.Examples.__RegisterExamples();
+			Pom.Examples.__RegisterExamples();
 		}
 		catch (Exception ex)
 		{
