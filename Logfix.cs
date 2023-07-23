@@ -5,13 +5,13 @@ internal static class Logfix
 	private const int MAX_BUFFERED_LINES = 4096;
 	private static Queue<BufferedLogMessage> __bufferedLogMessages = new(MAX_BUFFERED_LINES);
 	private static int __discardedLogMessageCount = 0;
-	internal static LevelLogCallback LogDebug = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Debug, data);
-	internal static LevelLogCallback LogInfo = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Info, data);
-	internal static LevelLogCallback LogMessage = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Message, data);
-	internal static LevelLogCallback LogWarning = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Warning, data);
-	internal static LevelLogCallback LogError = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Error, data);
-	internal static LevelLogCallback LogFatal = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Fatal, data);
-	internal static GeneralLogCallback Log = __DefaultImpl_Log;
+	internal static LevelLogCallback LogDebug { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Debug, data);
+	internal static LevelLogCallback LogInfo { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Info, data);
+	internal static LevelLogCallback LogMessage { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Message, data);
+	internal static LevelLogCallback LogWarning { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Warning, data);
+	internal static LevelLogCallback LogError { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Error, data);
+	internal static LevelLogCallback LogFatal { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Fatal, data);
+	internal static GeneralLogCallback Log { get; private set; } = __DefaultImpl_Log;
 
 	internal static void __SwitchToBepinexLogger(BepInEx.Logging.ManualLogSource logger)
 	{
@@ -27,12 +27,13 @@ internal static class Logfix
 			return;
 		}
 		LogWarning($"Detected buffered log lines! Count: {__bufferedLogMessages.Count}, max {MAX_BUFFERED_LINES}, discarded {__discardedLogMessageCount}");
-		while (__bufferedLogMessages.TryDequeue(out BufferedLogMessage result)) {
+		while (__bufferedLogMessages.TryDequeue(out BufferedLogMessage result))
+		{
 			(BepInEx.Logging.LogLevel level, string data, DateTime when) = result;
 			Log(level, $"[BUFFERED : {when}] {data}");
 		}
 		__discardedLogMessageCount = 0;
-		
+
 	}
 	private static void __DefaultImpl_Log(BepInEx.Logging.LogLevel level, object data)
 	{
