@@ -7,56 +7,70 @@ public static partial class Eff
 {
 	internal static void __AddHooks()
 	{
+		const System.Reflection.BindingFlags ALLCTX = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
 		LogWarning("Eff init");
 		// On.RainWorldGame.ctor += __ClearAttachedData;
 		On.RoomSettings.RoomEffect.FromString += __ParseExtraData;
 		On.RoomSettings.RoomEffect.ToString += __SaveExtraData;
-		On.ProcessManager.PostSwitchMainProcess += (orig, self, procID) =>
-		{
-			orig(self, procID);
-			if (self.currentMainLoop is not RainWorldGame && !self.sideProcesses.Any((proc) => proc is RainWorldGame))
-			{
-				LogWarning("Clearing attached data");
-				__attachedData.Clear();
-			}
-		};
+		On.ProcessManager.PostSwitchMainProcess += __ClearAttachedData;
 		On.DevInterface.EffectPanel.ctor += __ConstructEffectPanel;
-		On.Room.Loaded += (orig, self) =>
+		On.Room.Loaded += __SpawnEffectObjects;
+		new MonoMod.RuntimeDetour.Hook(
+			typeof(Slider).GetMethod($"get_SliderStartCoord", ALLCTX | System.Reflection.BindingFlags.Instance),
+			typeof(Eff).GetMethod(nameof(__OverrideSliderStartCoord), ALLCTX | System.Reflection.BindingFlags.Static));
+	}
+	private static float __OverrideSliderStartCoord(Func<Slider, float> orig, Slider self)
+	{
+		float res = orig(self);
+		if (self is CustomFloatSlider cfs) res += CUSTOM_SLIDER_EXTRA_NUMBER_SPACE;
+		return res;
+	}
+
+	private static void __SpawnEffectObjects(On.Room.orig_Loaded orig, Room self)
+	{
+		bool firstTimeRealized = self.abstractRoom.firstTimeRealized;
+		orig(self);
+		foreach (RoomSettings.RoomEffect effect in self.roomSettings.effects)
 		{
-			bool firstTimeRealized = self.abstractRoom.firstTimeRealized;
-			orig(self);
-			foreach (RoomSettings.RoomEffect effect in self.roomSettings.effects)
+			if (!__effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
 			{
-				if (!__effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
-				{
-					continue;
-				}
-				if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
-				{
-					LogDebug($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
-					continue;
-				}
-				try
-				{
-					def.EffectInitializer?.Invoke(self, data, firstTimeRealized);
-				}
-				catch (Exception ex)
-				{
-					LogWarning($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
-				}
-				try
-				{
-					UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized);
-					if (uad is null) continue;
-					LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
-					self.AddObject(uad);
-				}
-				catch (Exception ex)
-				{
-					LogWarning($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
-				}
+				continue;
 			}
-		};
+			if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
+			{
+				LogDebug($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
+				continue;
+			}
+			try
+			{
+				def.EffectInitializer?.Invoke(self, data, firstTimeRealized);
+			}
+			catch (Exception ex)
+			{
+				LogWarning($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
+			}
+			try
+			{
+				UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized);
+				if (uad is null) continue;
+				LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
+				self.AddObject(uad);
+			}
+			catch (Exception ex)
+			{
+				LogWarning($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
+			}
+		}
+	}
+
+	private static void __ClearAttachedData(On.ProcessManager.orig_PostSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID procID)
+	{
+		orig(self, procID);
+		if (self.currentMainLoop is not RainWorldGame && !self.sideProcesses.Any((proc) => proc is RainWorldGame))
+		{
+			LogWarning("Clearing attached data");
+			__attachedData.Clear();
+		}
 	}
 
 	private static void __ConstructEffectPanel(On.DevInterface.EffectPanel.orig_ctor orig, EffectPanel self, DevUI owner, DevUINode parent, Vector2 pos, RoomSettings.RoomEffect effect)

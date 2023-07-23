@@ -21,6 +21,7 @@ public static partial class Eff
 	{
 		__AddHooks();
 	}
+	internal const float CUSTOM_SLIDER_EXTRA_NUMBER_SPACE = 20f;
 	internal const float DEVUI_TITLE_WIDTH = 80f;
 	internal const float V_SPACING = 5f;
 	internal const float H_SPACING = 5f;

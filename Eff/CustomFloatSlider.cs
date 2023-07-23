@@ -4,6 +4,9 @@ using DevInterface;
 namespace Eff;
 internal class CustomFloatSlider : Slider
 {
+	private float _numTextW;
+	public (FloatField field, Cached<float> cache) Data { get; }
+	public RoomSettings.RoomEffect Effect { get; }
 	public CustomFloatSlider(
 		DevUI owner,
 		string IDstring,
@@ -22,10 +25,10 @@ internal class CustomFloatSlider : Slider
 	{
 		Effect = effect;
 		Data = data;
+		DevUILabel numLabel = (DevUILabel)this.subNodes[1];
+		_numTextW = numLabel.fSprites[0].scaleX + Eff.CUSTOM_SLIDER_EXTRA_NUMBER_SPACE;
 	}
 
-	public (FloatField field, Cached<float> cache) Data { get; }
-	public RoomSettings.RoomEffect Effect { get; }
 
 	public override void Refresh()
 	{
@@ -35,7 +38,9 @@ internal class CustomFloatSlider : Slider
 			LogError(Data);
 			return;
 		}
-		this.NumberText = Data.cache.Value.ToString();
+		DevUILabel numLabel = (DevUILabel)this.subNodes[1];
+		numLabel.fSprites[0].scaleX = _numTextW;
+		this.NumberText = Data.cache.Value.ToString("N2");
 		float amount = Mathf.InverseLerp(Data.field.Min, Data.field.Max, Data.cache.Value);
 		RefreshNubPos(amount);
 	}
@@ -47,7 +52,7 @@ internal class CustomFloatSlider : Slider
 			return;
 		}
 		float unroundedVal = Mathf.Lerp(Data.field.Min, Data.field.Max, nubPos);
-		this.Data.cache.Value = unroundedVal - unroundedVal % this.Data.field.Step;
+		this.Data.cache.Value = unroundedVal;
 		this.Refresh();
 		//base.NubDragged(nubPos);
 	}
