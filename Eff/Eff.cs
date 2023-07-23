@@ -21,7 +21,7 @@ public static partial class Eff
 	{
 		__AddHooks();
 	}
-	internal const float DEVUI_TITLE_WIDTH = 110f;
+	internal const float DEVUI_TITLE_WIDTH = 80f;
 	internal const float V_SPACING = 5f;
 	internal const float H_SPACING = 5f;
 	internal const float ROW_HEIGHT = 18f;
@@ -34,14 +34,16 @@ public static partial class Eff
 	{
 		new("-", "%1"),
 		new( ",","%2" ),
-		new (":", "%3"),
+		new(":", "%3"),
+		new("\n", "%4"),
+		new("\r", "%5"),
 		new("%","%0"), // this goes last, very important
 	};
 	internal static string __EscapeString(string s)
 		=> __escapeSequences.Aggregate(s, (s, kvp) => s.Replace(kvp.Key, kvp.Value));
 	internal static string __UnescapeString(string s)
 		=> System.Linq.Enumerable.Reverse(__escapeSequences).Aggregate(s, (s, kvp) => s.Replace(kvp.Value, kvp.Key));
-	
+
 	private static Dictionary<string, string> __ExtractRawExtraData(this RoomSettings.RoomEffect effect)
 	{
 		//List<int> popIndices = new();
