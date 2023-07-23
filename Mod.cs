@@ -33,12 +33,6 @@ public class Mod : BepInEx.BaseUnityPlugin
 				.AddFloatField("floatfield", 0f, 10f, 0.1f, 1f)
 				.AddBoolField("boolfield", true)
 				.AddStringField("stringfield", "example_string%-%")
-				//.AddField(new Eff.IntField("intfield", 0, 10, 5))
-				//.AddField(new Eff.FloatField("floatfield", 0f, 10f, 0.1f, 1f))
-				// .AddField(new Eff.FloatField("testfield22", 0f, 10f, 0.1f, 1f))
-				// .AddField(new Eff.FloatField("testfield23", 0f, 10f, 5f, 1f))
-				//.AddField(new Eff.BoolField("boolfield", true))
-				//.AddField(new Eff.StringField("stringfield", "example_string%-%"))
 				.SetUADFactory((room, data, firstTimeRealized) => new Eff.ExampleEffectUAD(data))
 				.Register();
 		}
@@ -70,8 +64,6 @@ public class Mod : BepInEx.BaseUnityPlugin
 			c.Prev.OpCode = OpCodes.Pop;
 			c.Prev.Operand = null;
 			c.Emit(OpCodes.Pop);
-
-			//plog.LogDebug(il.ToString());
 		}
 		else
 		{
