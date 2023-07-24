@@ -1,4 +1,4 @@
-namespace Eff;
+namespace EffExt;
 /// <summary>
 /// Factory callbacks that are used to create an UpdatableAndDeletable for a given effect.
 /// </summary>

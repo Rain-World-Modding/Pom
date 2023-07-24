@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Eff;
+namespace EffExt;
 
 internal static class Examples
 {

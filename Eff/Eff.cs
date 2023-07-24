@@ -1,4 +1,4 @@
-namespace Eff;
+namespace EffExt;
 
 /// <summary>
 /// Functionality for extending effects with additional settings.

@@ -1,4 +1,4 @@
-namespace Eff;
+namespace EffExt;
 
 /// <summary>
 /// Contains a value (<see cref="Value"/>) and a callback (<see cref="OnValueChange"/>).

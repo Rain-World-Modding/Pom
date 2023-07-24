@@ -1,4 +1,4 @@
-namespace Eff;
+namespace EffExt;
 
 /// <summary>
 /// Custom data description for a room effect.

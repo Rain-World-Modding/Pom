@@ -1,4 +1,4 @@
-namespace Eff;
+namespace EffExt;
 
 public static partial class Eff
 {

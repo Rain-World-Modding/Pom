@@ -3,7 +3,7 @@ using UnityEngine;
 
 using static Pom.Pom.ManagedStringControl;
 
-namespace Eff;
+namespace EffExt;
 
 internal class CustomStringPanel : PositionedDevUINode
 {

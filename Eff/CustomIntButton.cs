@@ -1,7 +1,7 @@
 using DevInterface;
 using UnityEngine;
 
-namespace Eff;
+namespace EffExt;
 
 internal class CustomIntButton : DevInterface.Button
 {

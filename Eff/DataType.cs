@@ -1,4 +1,4 @@
-namespace Eff;
+namespace EffExt;
 
 /// <summary>
 /// Type of data in the effect field.

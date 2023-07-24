@@ -1,4 +1,4 @@
-namespace Eff;
+namespace EffExt;
 
 /// <summary>
 /// Carries additional data that is attached to a given instance of <see cref="global::RoomSettings.RoomEffect"/>.

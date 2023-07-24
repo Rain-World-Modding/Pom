@@ -1,7 +1,7 @@
 using UnityEngine;
 using DevInterface;
 
-namespace Eff;
+namespace EffExt;
 internal class CustomFloatSlider : Slider
 {
 	private float _numTextW;

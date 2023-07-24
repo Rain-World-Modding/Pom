@@ -3,7 +3,7 @@ using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 
-namespace Eff;
+namespace EffExt;
 
 public static partial class Eff
 {

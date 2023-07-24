@@ -28,7 +28,7 @@ public class Mod : BepInEx.BaseUnityPlugin
 		{
 			Logfix.__SwitchToBepinexLogger(Logger);
 			//instance = this;
-			Eff.Examples.__RegisterExamples();
+			EffExt.Examples.__RegisterExamples();
 			Pom.Examples.__RegisterExamples();
 		}
 		catch (Exception ex)
