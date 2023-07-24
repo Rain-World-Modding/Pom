@@ -16,6 +16,10 @@ public static partial class Eff
 				$"There is already an effect definition for {type.ToString()}; cannot register twice. " +
 				"If you wish to replace your definition for whatever reason, call RemoveEffectDefinition first.");
 		}
+		if (definition.Category is DevInterface.RoomSettingsPage.DevEffectsCategories cat)
+		{
+			__effectCategories[definition.Name] = cat;
+		}
 	}
 	/// <summary>
 	/// Removes an existing effect definition

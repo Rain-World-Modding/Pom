@@ -1,5 +1,7 @@
-using UnityEngine;
 using DevInterface;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
+using UnityEngine;
 
 namespace Eff;
 
@@ -18,6 +20,8 @@ public static partial class Eff
 		new MonoMod.RuntimeDetour.Hook(
 			typeof(Slider).GetMethod($"get_SliderStartCoord", ALLCTX | System.Reflection.BindingFlags.Instance),
 			typeof(Eff).GetMethod(nameof(__OverrideSliderStartCoord), ALLCTX | System.Reflection.BindingFlags.Static));
+		IL.DevInterface.RoomSettingsPage.AssembleEffectsPages += __IL_SortEffectEntries;
+		On.DevInterface.RoomSettingsPage.DevEffectGetCategoryFromEffectType += __EffectsPage_Sort;
 	}
 	private static float __OverrideSliderStartCoord(Func<Slider, float> orig, Slider self)
 	{
@@ -220,5 +224,79 @@ public static partial class Eff
 		self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
 	done:
 		return orig(self);
+	}
+	private static DevInterface.RoomSettingsPage.DevEffectsCategories __EffectsPage_Sort(On.DevInterface.RoomSettingsPage.orig_DevEffectGetCategoryFromEffectType orig, DevInterface.RoomSettingsPage self, RoomSettings.RoomEffect.Type type)
+	{
+		if (__effectCategories.TryGetValue(type.value, out var cat))
+		{
+			LogDebug($"Sorting {type} into {cat}");
+			return cat;
+		}
+		return orig(self, type);
+	}
+	private static void __IL_SortEffectEntries(MonoMod.Cil.ILContext il)
+	{
+		LogDebug("Effects ILHook body start");
+		MonoMod.Cil.ILCursor c = new(il);
+		c.GotoNext(MonoMod.Cil.MoveType.Before,
+			//x => x.MatchLdcI4(0),
+			x => x.MatchStloc(2),
+			x => x.MatchLdarg(0),
+			x => x.MatchLdloc(1),
+			x => x.MatchNewarr<RoomSettings.RoomEffect.Type>()
+			);//TryFindNext(out )
+		LogDebug($"Found inj point, emitting");
+		//c.Remove();
+		c.Emit(OpCodes.Pop);
+		c.Emit(OpCodes.Ldloc_0);
+		//c.Index -= 1;
+		//var newLabel = c.MarkLabel();
+		//c.Index += 1;
+		c.EmitDelegate((Dictionary<DevInterface.RoomSettingsPage.DevEffectsCategories, List<PlacedObject.Type>> dict) =>
+		{
+			LogDebug("Sorter ilhook go");
+			foreach (var kvp in dict)
+			{
+				var cat = kvp.Key;
+				var list = kvp.Value;
+				if (!__sortCategorySettings.TryGetValue(cat, out CategorySortKind doSort)) doSort = __sortByDefault;
+				if (doSort is CategorySortKind.Default)
+				{
+					LogDebug($"Sorting of {cat} not required");
+					continue;
+				}
+				System.Comparison<PlacedObject.Type> sorter = doSort switch
+				{
+					CategorySortKind.Alphabetical => static (ot1, ot2) =>
+					{
+						if (ot1 == PlacedObject.Type.None && ot2 == PlacedObject.Type.None) return 0;
+						if (ot1 == PlacedObject.Type.None) return 1;
+						if (ot2 == PlacedObject.Type.None) return -1;
+						else return StringComparer.InvariantCulture.Compare(ot1?.value, ot2?.value);
+					}
+					,
+					_ => throw new ArgumentException($"ERROR: INVALID {nameof(CategorySortKind)} VALUE {doSort}")
+				};
+				list.Sort(sorter);
+				LogDebug($"sorting of {cat} completed ({list.Count} items)");
+			}
+		});
+		c.Emit(OpCodes.Ldc_I4_0);
+		LogDebug("emit complete");
+		//plog.LogDebug(il.ToString());
+	}
+	/// <summary>
+	/// How to sort object entries inside a devtools object category
+	/// </summary>
+	public enum CategorySortKind
+	{
+		/// <summary>
+		/// No sorting, items in the order they were registered
+		/// </summary>
+		Default,
+		/// <summary>
+		/// Alphabetical sorting (invariant culture)
+		/// </summary>
+		Alphabetical,
 	}
 }

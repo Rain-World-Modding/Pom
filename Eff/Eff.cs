@@ -31,6 +31,9 @@ public static partial class Eff
 	internal const float BOOL_BUTTON_WIDTH = 50f;
 	internal readonly static Dictionary<int, EffectExtraData> __attachedData = new();
 	internal readonly static Dictionary<string, EffectDefinition> __effectDefinitions = new();
+	internal static Dictionary<string, DevInterface.RoomSettingsPage.DevEffectsCategories> __effectCategories = new();
+	internal static Dictionary<DevInterface.RoomSettingsPage.DevEffectsCategories, CategorySortKind> __sortCategorySettings = new();
+	internal static CategorySortKind __sortByDefault = CategorySortKind.Default;
 	internal readonly static List<KeyValuePair<string, string>> __escapeSequences = new()
 	{
 		new("-", "%1"),

@@ -14,7 +14,7 @@ internal static class Examples
 				.AddBoolField("boolfield", true, "A bool")
 				.AddStringField("stringfield", "example_string%-%", "A string")
 				.SetUADFactory((room, data, firstTimeRealized) => new ExampleEffectUAD(data))
-				.SetCategory("POMEffects Examples")
+				.SetCategory("POMEffectsExamples")
 				.Register();
 		}
 		catch (Exception ex)
