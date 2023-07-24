@@ -38,13 +38,15 @@ public sealed class EffectDefinitionBuilder
 	/// <param name="minValue">Minimal value of the integer.</param>
 	/// <param name="maxValue">Maximum value of the integer.</param>
 	/// <param name="defaultValue">Default value of the integer.</param>
+	/// <param name="displayName">How the field's name appears in DevUI.</param>
 	/// <returns>Itself.</returns>
 	public EffectDefinitionBuilder AddIntField(
 		string name,
 		int minValue,
 		int maxValue,
-		int defaultValue)
-		=> AddField(new IntField(name, minValue, maxValue, defaultValue));
+		int defaultValue,
+		string? displayName = null)
+		=> AddField(new EIntField(name, minValue, maxValue, defaultValue, displayName));
 	/// <summary>
 	/// Registers a new float field.
 	/// </summary>
@@ -53,34 +55,40 @@ public sealed class EffectDefinitionBuilder
 	/// <param name="maxValue">Maximum value of the float.</param>
 	/// <param name="step">Increments the value is allowed to move by.</param>
 	/// <param name="defaultValue">Default value of the float.</param>
+	/// <param name="displayName">How the field's name appears in DevUI.</param>
 	/// <returns>Itself.</returns>
 	public EffectDefinitionBuilder AddFloatField(
 		string name,
 		float minValue,
 		float maxValue,
 		float step,
-		float defaultValue)
-		=> AddField(new FloatField(name, minValue, maxValue, step, defaultValue));
+		float defaultValue,
+		string? displayName = null)
+		=> AddField(new EFloatField(name, minValue, maxValue, step, defaultValue, displayName));
 	/// <summary>
 	/// Registers a new boolean field.
 	/// </summary>
 	/// <param name="name">Field name.</param>
 	/// <param name="defaultValue">Default value.</param>
+	/// <param name="displayName">How the field's name appears in DevUI.</param>
 	/// <returns>Itself.</returns>
 	public EffectDefinitionBuilder AddBoolField(
 		string name,
-		bool defaultValue) 
-		=> AddField(new BoolField(name, defaultValue));
+		bool defaultValue,
+		string? displayName = null) 
+		=> AddField(new EBoolField(name, defaultValue, displayName));
 	/// <summary>
 	/// Registers a new string field.
 	/// </summary>
 	/// <param name="name">Field name.</param>
 	/// <param name="defaultValue">Default value.</param>
+	/// <param name="displayName">How the field's name appears in DevUI.</param>
 	/// <returns>Itself.</returns>
 	public EffectDefinitionBuilder AddStringField(
 		string name,
-		string defaultValue)
-		=> AddField(new StringField(name, defaultValue));
+		string defaultValue,
+		string? displayName = null)
+		=> AddField(new EStringField(name, defaultValue, displayName));
 	/// <summary>
 	/// Adds a new field to the definition. If there was another with the same name, it gets replaces.
 	/// </summary>

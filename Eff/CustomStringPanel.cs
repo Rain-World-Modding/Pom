@@ -9,7 +9,7 @@ internal class CustomStringPanel : PositionedDevUINode
 {
 	private bool _clickedLastUpdate;
 	private DevUILabel _labelValue;
-	public (StringField field, Cached<string> cache) Data { get; }
+	public (EStringField field, Cached<string> cache) Data { get; }
 	public RoomSettings.RoomEffect Effect { get; }
 
 	public CustomStringPanel(
@@ -18,7 +18,7 @@ internal class CustomStringPanel : PositionedDevUINode
 		DevUINode parentNode,
 		Vector2 pos,
 		float width,
-		(StringField field, Cached<string> cache) data,
+		(EStringField field, Cached<string> cache) data,
 		RoomSettings.RoomEffect effect
 		) : base(
 			owner,

@@ -6,7 +6,7 @@ namespace Eff;
 internal class CustomIntButton : DevInterface.Button
 {
 	public BType Btype { get; }
-	public (IntField field, Cached<int> cache) Data { get; }
+	public (EIntField field, Cached<int> cache) Data { get; }
 	public RoomSettings.RoomEffect Effect { get; }
 
 	private readonly DevUILabel _valueLabel;
@@ -17,7 +17,7 @@ internal class CustomIntButton : DevInterface.Button
 		DevUINode parentNode,
 		Vector2 pos,
 		BType Btype,
-		(IntField field, Cached<int> cache) data,
+		(EIntField field, Cached<int> cache) data,
 		DevUILabel valueLabel,
 		RoomSettings.RoomEffect effect
 		) : base(

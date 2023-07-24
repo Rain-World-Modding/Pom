@@ -9,26 +9,24 @@ internal static class Examples
 		try
 		{
 			new EffectDefinitionBuilder("testeffect")
-				.AddIntField("intfield", 0, 10, 5)
-				.AddFloatField("floatfield", 0f, 10f, 0.1f, 1f)
-				.AddBoolField("boolfield", true)
-				.AddStringField("stringfield", "example_string%-%")
+				.AddIntField("intfield", 0, 10, 5, "An integer")
+				.AddFloatField("floatfield", 0f, 10f, 0.1f, 1f, "A float")
+				.AddBoolField("boolfield", true, "A bool")
+				.AddStringField("stringfield", "example_string%-%", "A string")
 				.SetUADFactory((room, data, firstTimeRealized) => new ExampleEffectUAD(data))
 				.SetCategory("POMEffects Examples")
 				.Register();
 		}
 		catch (Exception ex)
 		{
-
+			LogWarning($"Error on eff examples init {ex}");
 		}
 	}
 }
 
 internal class ExampleEffectUAD : UpdatableAndDeletable, IDrawable
 {
-	//private FnOnce init;
 	private bool setupRan;
-	//private Cached<float> acceleration_intensity;
 	private Vector2 pos;
 	private Vector2 vel;
 	private Vector2 acceleration;

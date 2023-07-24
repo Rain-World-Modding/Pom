@@ -18,22 +18,22 @@ public sealed class EffectExtraData
 	/// </summary>
 	public EffectDefinition Definition { get; private set; }
 
-	internal Dictionary<string, (IntField fieldDef, Cached<int> valueCache)> _ints = new();
+	internal Dictionary<string, (EIntField fieldDef, Cached<int> valueCache)> _ints = new();
 	// /// <summary>
 	// /// All integer fields for this effect.
 	// /// </summary>
 	// public System.Collections.ObjectModel.ReadOnlyDictionary<string, (IntField fieldDef, Cached<int> valueCache)> Ints { get; }
-	internal Dictionary<string, (FloatField fieldDef, Cached<float> valueCache)> _floats = new();
+	internal Dictionary<string, (EFloatField fieldDef, Cached<float> valueCache)> _floats = new();
 	// /// <summary>
 	// /// All float fields for this effect.
 	// /// </summary>
 	// public System.Collections.ObjectModel.ReadOnlyDictionary<string, (FloatField fieldDef, Cached<float> valueCache)> Floats { get; }
-	internal Dictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> _bools = new();
+	internal Dictionary<string, (EBoolField fieldDef, Cached<bool> valueCache)> _bools = new();
 	// /// <summary>
 	// /// All boolean fields for this effect.
 	// /// </summary>
 	// public System.Collections.ObjectModel.ReadOnlyDictionary<string, (BoolField fieldDef, Cached<bool> valueCache)> Bools { get; }
-	internal Dictionary<string, (StringField fieldDef, Cached<string> valueCache)> _strings = new();
+	internal Dictionary<string, (EStringField fieldDef, Cached<string> valueCache)> _strings = new();
 	// /// <summary>
 	// /// All string fields for this effect.
 	// /// </summary>
@@ -74,25 +74,25 @@ public sealed class EffectExtraData
 
 			switch (fielddef)
 			{
-			case (IntField field):
+			case (EIntField field):
 			{
 				if (!int.TryParse(fieldstringvalue, out var result)) result = field.DefaultInt;
 				_ints[fieldname] = (field, new(result, (newval) => rawData[fieldname] = newval.ToString()));
 				break;
 			}
-			case (FloatField field):
+			case (EFloatField field):
 			{
 				if (!float.TryParse(fieldstringvalue, out var result)) result = field.DefaultFloat;
 				_floats[fieldname] = (field, new(result, (newval) => rawData[fieldname] = newval.ToString()));
 				break;
 			}
-			case (BoolField field):
+			case (EBoolField field):
 			{
 				if (!bool.TryParse(fieldstringvalue, out var result)) result = field.DefaultBool;
 				_bools[fieldname] = (field, new(result, (newval) => rawData[fieldname] = newval.ToString()));
 				break;
 			}
-			case (StringField field):
+			case (EStringField field):
 			{
 				//todo: escapes
 				_strings[fieldname] = (field, new(fieldstringvalue, (newval) => rawData[fieldname] = newval ?? field.DefaultString ?? ""));
@@ -115,7 +115,7 @@ public sealed class EffectExtraData
 	/// <returns>Resulting value.</returns>
 	public int GetInt(string key)
 	{
-		if (!_ints.TryGetValue(key, out (IntField fieldDef, Cached<int> valueCache) data))
+		if (!_ints.TryGetValue(key, out (EIntField fieldDef, Cached<int> valueCache) data))
 		{
 			throw new KeyNotFoundException($"{EffectType} has not been given a field called {key}");
 		}
@@ -128,7 +128,7 @@ public sealed class EffectExtraData
 	/// <returns>Resulting value.</returns>
 	public float GetFloat(string key)
 	{
-		if (!_floats.TryGetValue(key, out (FloatField fieldDef, Cached<float> valueCache) data))
+		if (!_floats.TryGetValue(key, out (EFloatField fieldDef, Cached<float> valueCache) data))
 		{
 			throw new KeyNotFoundException($"{EffectType} has not been given a field called {key}");
 		}
@@ -167,7 +167,7 @@ public sealed class EffectExtraData
 	/// <param name="value">Value to be set</param>
 	public void Set(string key, int value)
 	{
-		if (!_ints.TryGetValue(key, out (IntField fieldDef, Cached<int> valueCache) data))
+		if (!_ints.TryGetValue(key, out (EIntField fieldDef, Cached<int> valueCache) data))
 		{
 			throw new KeyNotFoundException($"{EffectType} has not been given a field called {key}");
 		}
@@ -180,7 +180,7 @@ public sealed class EffectExtraData
 	/// <param name="value">Value to be set</param>
 	public void Set(string key, float value)
 	{
-		if (!_floats.TryGetValue(key, out (FloatField fieldDef, Cached<float> valueCache) data))
+		if (!_floats.TryGetValue(key, out (EFloatField fieldDef, Cached<float> valueCache) data))
 		{
 			throw new KeyNotFoundException($"{EffectType} has not been given a field called {key}");
 		}

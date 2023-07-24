@@ -82,7 +82,7 @@ public static partial class Eff
 		}
 		if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 		{
-			LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {__attachedData.Count}, {def}");
+			//LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {__attachedData.Count}, {def}");
 			return;
 		}
 
@@ -90,18 +90,18 @@ public static partial class Eff
 		foreach ((var key, (var field, var cache)) in data._floats)
 		{
 			StretchBounds();
-			(FloatField field, Cached<float> cache) value = (field, cache);
+			(EFloatField field, Cached<float> cache) value = (field, cache);
 			LogDebug($"Adding slider for {value}");
-			var item = new CustomFloatSlider(owner, $"{key}_Slider", self, shift, $"{key}: ", value, effect);
+			var item = new CustomFloatSlider(owner, $"{key}_Slider", self, shift, $"{field._ActualDisplayName} ", value, effect);
 			self.subNodes.Add(item);
 		}
 		foreach ((var key, (var field, var cache)) in data._ints)
 		{
 			StretchBounds();
-			(IntField field, Cached<int> cache) value = (field, cache);
+			(EIntField field, Cached<int> cache) value = (field, cache);
 			LogDebug($"Adding int buttons for {value}");
 			Vector2 inRowShift = shift;
-			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
+			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field._ActualDisplayName);
 			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.Value.ToString()); //buttons need it
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
 			CustomIntButton buttonDec = new(
@@ -130,10 +130,10 @@ public static partial class Eff
 		foreach ((var key, (var field, var cache)) in data._bools)
 		{
 			StretchBounds();
-			(BoolField field, Cached<bool> cache) value = (field, cache);
+			(EBoolField field, Cached<bool> cache) value = (field, cache);
 			LogDebug($"Adding bool button for {value}");
 			Vector2 inRowShift = shift;
-			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
+			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field._ActualDisplayName);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
 			CustomBoolButton buttonValue = new(
 				owner,
@@ -147,10 +147,10 @@ public static partial class Eff
 		foreach ((var key, (var field, var cache)) in data._strings)
 		{
 			StretchBounds();
-			(StringField field, Cached<string> cache) value = (field, cache);
+			(EStringField field, Cached<string> cache) value = (field, cache);
 			LogDebug($"Adding string panel for {value}");
 			Vector2 inRowShift = shift;
-			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field.Name);
+			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field._ActualDisplayName);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
 			CustomStringPanel panelValue = new(
 				owner,

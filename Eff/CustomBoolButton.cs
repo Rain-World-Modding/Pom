@@ -5,7 +5,7 @@ namespace Eff;
 
 internal class CustomBoolButton : DevInterface.Button
 {
-    public (BoolField field, Cached<bool> cache) Data { get; }
+    public (EBoolField field, Cached<bool> cache) Data { get; }
 	public RoomSettings.RoomEffect Effect { get; }
 
 	public CustomBoolButton(
@@ -13,7 +13,7 @@ internal class CustomBoolButton : DevInterface.Button
 		string IDstring,
 		DevUINode parentNode,
 		Vector2 pos,
-		(BoolField field, Cached<bool> cache) data,
+		(EBoolField field, Cached<bool> cache) data,
 		RoomSettings.RoomEffect effect
 		) : base(
 			owner,

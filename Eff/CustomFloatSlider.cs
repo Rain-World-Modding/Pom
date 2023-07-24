@@ -5,7 +5,7 @@ namespace Eff;
 internal class CustomFloatSlider : Slider
 {
 	private float _numTextW;
-	public (FloatField field, Cached<float> cache) Data { get; }
+	public (EFloatField field, Cached<float> cache) Data { get; }
 	public RoomSettings.RoomEffect Effect { get; }
 	public CustomFloatSlider(
 		DevUI owner,
@@ -13,7 +13,7 @@ internal class CustomFloatSlider : Slider
 		DevUINode parentNode,
 		Vector2 pos,
 		string title,
-		(FloatField field, Cached<float> cache) data,
+		(EFloatField field, Cached<float> cache) data,
 		RoomSettings.RoomEffect effect) : base(
 			owner,
 			IDstring,
