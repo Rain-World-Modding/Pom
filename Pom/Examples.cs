@@ -94,7 +94,7 @@ public static class Examples
 		RegisterManagedObject(curiousObjectLocation);
 		// Could also be done with RegisterEmptyObjectType("CuriousObjectLocation", null, null);
 		//Pom.__objectCategories.Add(EnumExt_ManagedPlacedObjects.CuriousObject.value, new("POM examples", true));
-		Pom.__objectCategories.Add(EnumExt_ManagedPlacedObjects.CuriousObjectLocation.value, new("POM examples", true));
+		//Pom.__objectCategories.Add(EnumExt_ManagedPlacedObjects.CuriousObjectLocation.value, new("POM examples", true));
 	}
 
 	// Juuuuust an object, yet, we can place it. Data and UI are generated automatically
