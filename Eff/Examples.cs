@@ -42,7 +42,7 @@ internal class ExampleEffectUAD : UpdatableAndDeletable
 		int drawableCount = EffectData.GetInt("intfield");
 		if (!_setupRan)
 		{
-			LogWarning($"Example effect go in room {room.abstractRoom.name}");
+			LogWarning($"Example effect go in room {room.abstractRoom.name} : {this.EffectData.GetString("stringfield")}");
 			_setupRan = true;
 		}
 		if (drawableCount != _drawables.Length)
