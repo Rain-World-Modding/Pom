@@ -64,19 +64,14 @@ public static partial class Pom
 		LogDebug("ILHook body start");
 		MonoMod.Cil.ILCursor c = new(il);
 		c.GotoNext(MonoMod.Cil.MoveType.Before,
-			//x => x.MatchLdcI4(0),
 			x => x.MatchStloc(2),
 			x => x.MatchLdarg(0),
 			x => x.MatchLdloc(1),
 			x => x.MatchNewarr<PlacedObject.Type>()
-			);//TryFindNext(out )
+			);
 		LogDebug($"Found inj point, emitting");
-		//c.Remove();
 		c.Emit(OpCodes.Pop);
 		c.Emit(OpCodes.Ldloc_0);
-		//c.Index -= 1;
-		//var newLabel = c.MarkLabel();
-		//c.Index += 1;
 		c.EmitDelegate((Dictionary<ObjCategory, List<PlacedObject.Type>> dict) =>
 		{
 			LogDebug("Sorter ilhook go");
@@ -108,7 +103,6 @@ public static partial class Pom
 		});
 		c.Emit(OpCodes.Ldc_I4_0);
 		LogDebug("emit complete");
-		//plog.LogDebug(il.ToString());
 	}
 
 	private static ObjCategory ObjectsPage_Sort(On.DevInterface.ObjectsPage.orig_DevObjectGetCategoryFromPlacedType orig, DevInterface.ObjectsPage self, PlacedObject.Type type)

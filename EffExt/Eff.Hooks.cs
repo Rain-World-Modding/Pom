@@ -10,7 +10,7 @@ public static partial class Eff
 	internal static void __AddHooks()
 	{
 		const System.Reflection.BindingFlags ALLCTX = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
-		LogWarning("Eff init");
+		LogTrace("Eff init");
 		// On.RainWorldGame.ctor += __ClearAttachedData;
 		On.RoomSettings.RoomEffect.FromString += __ParseExtraData;
 		On.RoomSettings.RoomEffect.ToString += __SaveExtraData;
@@ -42,7 +42,7 @@ public static partial class Eff
 			}
 			if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 			{
-				LogDebug($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
+				LogTrace($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
 				continue;
 			}
 			try
@@ -51,18 +51,18 @@ public static partial class Eff
 			}
 			catch (Exception ex)
 			{
-				LogWarning($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
+				LogTrace($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
 			}
 			try
 			{
 				UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized);
 				if (uad is null) continue;
-				LogDebug($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
+				LogTrace($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
 				self.AddObject(uad);
 			}
 			catch (Exception ex)
 			{
-				LogWarning($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
+				LogTrace($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
 			}
 		}
 	}
@@ -72,7 +72,7 @@ public static partial class Eff
 		orig(self, procID);
 		if (self.currentMainLoop is not RainWorldGame && !self.sideProcesses.Any((proc) => proc is RainWorldGame))
 		{
-			LogWarning("Clearing attached data");
+			LogTrace("Clearing attached data");
 			__attachedData.Clear();
 		}
 	}
@@ -86,7 +86,7 @@ public static partial class Eff
 		}
 		if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
 		{
-			//LogDebug($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {__attachedData.Count}, {def}");
+			LogTrace($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {__attachedData.Count}, {def}");
 			return;
 		}
 
@@ -95,7 +95,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(EFloatField field, Cached<float> cache) value = (field, cache);
-			LogDebug($"Adding slider for {value}");
+			LogTrace($"Adding slider for {value}");
 			var item = new CustomFloatSlider(owner, $"{key}_Slider", self, shift, $"{field._ActualDisplayName} ", value, effect);
 			self.subNodes.Add(item);
 		}
@@ -103,7 +103,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(EIntField field, Cached<int> cache) value = (field, cache);
-			LogDebug($"Adding int buttons for {value}");
+			LogTrace($"Adding int buttons for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field._ActualDisplayName);
 			DevUILabel labelValue = new(owner, $"{key}_ValueLabel", self, inRowShift, INT_VALUELABEL_WIDTH, cache.Value.ToString()); //buttons need it
@@ -135,7 +135,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(EBoolField field, Cached<bool> cache) value = (field, cache);
-			LogDebug($"Adding bool button for {value}");
+			LogTrace($"Adding bool button for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field._ActualDisplayName);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
@@ -152,7 +152,7 @@ public static partial class Eff
 		{
 			StretchBounds();
 			(EStringField field, Cached<string> cache) value = (field, cache);
-			LogDebug($"Adding string panel for {value}");
+			LogTrace($"Adding string panel for {value}");
 			Vector2 inRowShift = shift;
 			DevUILabel labelName = new(owner, $"{key}_Fieldname", self, inRowShift, DEVUI_TITLE_WIDTH, field._ActualDisplayName);
 			inRowShift.x += DEVUI_TITLE_WIDTH + H_SPACING;
@@ -185,7 +185,7 @@ public static partial class Eff
 	private static void __ClearAttachedData(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
 	{
 		orig(self, manager);
-		LogWarning("Clearing attached data");
+		LogTrace("Clearing attached data");
 		__attachedData.Clear();
 	}
 
@@ -193,23 +193,23 @@ public static partial class Eff
 	{
 		orig(self, text);
 		__effectDefinitions.TryGetValue(self.type.ToString(), out EffectDefinition? def);
-		LogWarning($"Deserializing {self.type}, {self.GetHashCode()}, {def}");
-		LogWarning((self.unrecognizedAttributes?.Length ?? 0).ToString() ?? "EMPTY ATTRIBUTES");
+		LogTrace($"Deserializing {self.type}, {self.GetHashCode()}, {def}");
+		LogTrace((self.unrecognizedAttributes?.Length ?? 0).ToString() ?? "EMPTY ATTRIBUTES");
 		self.unrecognizedAttributes ??= new string[0];
 
 		EffectExtraData newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
 		__attachedData[self.GetHashCode()] = newdata;
-		LogWarning(__attachedData[self.GetHashCode()]);
+		LogTrace(__attachedData[self.GetHashCode()]);
 	}
 
 	private static string __SaveExtraData(On.RoomSettings.RoomEffect.orig_ToString orig, RoomSettings.RoomEffect self)
 	{
 		List<string> attributes = new();
 		attributes.AddRange(self.unrecognizedAttributes ?? new string[0]);
-		// plog.LogWarning($"Serializing {self.type}");
+		// plog.LogTrace($"Serializing {self.type}");
 		if (!__attachedData.TryGetValue(self.GetHashCode(), out EffectExtraData data))
 		{
-			LogWarning("Could not find EffectExtraData, aborting");
+			LogTrace("Could not find EffectExtraData, aborting");
 			goto done;
 		}
 		foreach (var kvp in data.RawData)
@@ -218,7 +218,7 @@ public static partial class Eff
 			string fieldval = kvp.Value ?? "";
 			//not discarding unknown data
 			//if (!data.RawData.TryGetValue(fieldkey, out string fieldval)) fieldval = fielddef.ToString() ?? "";
-			LogWarning($"serializing {fieldkey} : {fieldval} (value {fieldval})");
+			LogTrace($"serializing {fieldkey} : {fieldval} (value {fieldval})");
 			attributes.Add($"{__EscapeString(fieldkey)}:{__EscapeString(fieldval)}");
 		}
 		self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
@@ -229,14 +229,14 @@ public static partial class Eff
 	{
 		if (__effectCategories.TryGetValue(type.value, out var cat))
 		{
-			LogDebug($"Sorting {type} into {cat}");
+			LogTrace($"Sorting {type} into {cat}");
 			return cat;
 		}
 		return orig(self, type);
 	}
 	private static void __IL_SortEffectEntries(MonoMod.Cil.ILContext il)
 	{
-		LogDebug("Effects ILHook body start");
+		LogTrace("Effects ILHook body start");
 		MonoMod.Cil.ILCursor c = new(il);
 		c.GotoNext(MonoMod.Cil.MoveType.Before,
 			//x => x.MatchLdcI4(0),
@@ -245,7 +245,7 @@ public static partial class Eff
 			x => x.MatchLdloc(1),
 			x => x.MatchNewarr<RoomSettings.RoomEffect.Type>()
 			);//TryFindNext(out )
-		LogDebug($"Found inj point, emitting");
+		LogTrace($"Found inj point, emitting");
 		//c.Remove();
 		c.Emit(OpCodes.Pop);
 		c.Emit(OpCodes.Ldloc_0);
@@ -254,7 +254,7 @@ public static partial class Eff
 		//c.Index += 1;
 		c.EmitDelegate((Dictionary<DevInterface.RoomSettingsPage.DevEffectsCategories, List<PlacedObject.Type>> dict) =>
 		{
-			LogDebug("Sorter ilhook go");
+			LogTrace("Sorter ilhook go");
 			foreach (var kvp in dict)
 			{
 				var cat = kvp.Key;
@@ -262,7 +262,7 @@ public static partial class Eff
 				if (!__sortCategorySettings.TryGetValue(cat, out CategorySortKind doSort)) doSort = __sortByDefault;
 				if (doSort is CategorySortKind.Default)
 				{
-					LogDebug($"Sorting of {cat} not required");
+					LogTrace($"Sorting of {cat} not required");
 					continue;
 				}
 				System.Comparison<PlacedObject.Type> sorter = doSort switch
@@ -278,12 +278,12 @@ public static partial class Eff
 					_ => throw new ArgumentException($"ERROR: INVALID {nameof(CategorySortKind)} VALUE {doSort}")
 				};
 				list.Sort(sorter);
-				LogDebug($"sorting of {cat} completed ({list.Count} items)");
+				LogTrace($"sorting of {cat} completed ({list.Count} items)");
 			}
 		});
 		c.Emit(OpCodes.Ldc_I4_0);
-		LogDebug("emit complete");
-		//plog.LogDebug(il.ToString());
+		LogTrace("emit complete");
+		//plog.LogTrace(il.ToString());
 	}
 	/// <summary>
 	/// How to sort object entries inside a devtools object category

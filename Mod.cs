@@ -21,11 +21,18 @@ namespace PomCore;
 [BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "2.8")]
 public class Mod : BepInEx.BaseUnityPlugin
 {
+	BepInEx.Configuration.ConfigEntry<bool>? writeTraceConfig;
 	/// <inheritdoc/>
 	public void OnEnable()
 	{
 		try
 		{
+			writeTraceConfig = Config.Bind("main", "writeTrace", false, "Write additional spammy debug lines");
+			__writeTrace = writeTraceConfig.Value;
+			writeTraceConfig.SettingChanged += (sender, args) =>
+			{
+				__writeTrace = writeTraceConfig.Value;
+			};
 			Logfix.__SwitchToBepinexLogger(Logger);
 			//instance = this;
 			EffExt.Examples.__RegisterExamples();

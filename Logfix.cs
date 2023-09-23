@@ -5,6 +5,12 @@ internal static class Logfix
 	private const int MAX_BUFFERED_LINES = 4096;
 	private static Queue<BufferedLogMessage> __bufferedLogMessages = new(MAX_BUFFERED_LINES);
 	private static int __discardedLogMessageCount = 0;
+	internal static bool __writeTrace = true;
+	internal static LevelLogCallback LogTrace { get; private set; } = (data) =>
+	{
+		if (!__writeTrace) return;
+		__DefaultImpl_Log(BepInEx.Logging.LogLevel.Debug, $"[TRACE]:{data}");
+	};
 	internal static LevelLogCallback LogDebug { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Debug, data);
 	internal static LevelLogCallback LogInfo { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Info, data);
 	internal static LevelLogCallback LogMessage { get; private set; } = (data) => __DefaultImpl_Log(BepInEx.Logging.LogLevel.Message, data);
@@ -15,6 +21,11 @@ internal static class Logfix
 
 	internal static void __SwitchToBepinexLogger(BepInEx.Logging.ManualLogSource logger)
 	{
+		LogTrace = (data) =>
+		{
+			if (!__writeTrace) return;
+			LogDebug($"[TRACE]:{data}");
+		};
 		LogDebug = logger.LogDebug;
 		LogInfo = logger.LogInfo;
 		LogMessage = logger.LogMessage;
