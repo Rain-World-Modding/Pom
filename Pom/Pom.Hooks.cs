@@ -133,25 +133,48 @@ public static partial class Pom
 		old.ClearSprites();
 		self.tempNodes.Add(placedObjectRepresentation);
 		self.subNodes.Add(placedObjectRepresentation);
+
+		try
+		{
+			self.owner.room.abstractRoom.firstTimeRealized = true;
+			var obj = manager.MakeObject(pObj, self.owner.room);
+			if (obj != null)
+			{
+				self.owner.room.AddObject(obj);
+			}
+		}
+		finally
+		{
+			self.owner.room.abstractRoom.firstTimeRealized = false;
+		}
 	}
 
 	private static void Room_Loaded_Patch(
 		On.Room.orig_Loaded orig,
 		Room self)
 	{
+		var firstTimeRealized = self.abstractRoom.firstTimeRealized;
 		orig(self);
 		if (self.game is null) return;
-		for (int i = 0; i < self.roomSettings.placedObjects.Count; i++)
+		try
 		{
-			if (self.roomSettings.placedObjects[i].active)
+			self.abstractRoom.firstTimeRealized = firstTimeRealized;
+			for (int i = 0; i < self.roomSettings.placedObjects.Count; i++)
 			{
-				if (GetManagerForType(self.roomSettings.placedObjects[i].type) is ManagedObjectType man)
+				if (self.roomSettings.placedObjects[i].active)
 				{
-					UpdatableAndDeletable? obj = man.MakeObject(self.roomSettings.placedObjects[i], self);
-					if (obj == null) continue;
-					self.AddObject(obj);
+					if (GetManagerForType(self.roomSettings.placedObjects[i].type) is ManagedObjectType man)
+					{
+						UpdatableAndDeletable? obj = man.MakeObject(self.roomSettings.placedObjects[i], self);
+						if (obj == null) continue;
+						self.AddObject(obj);
+					}
 				}
 			}
+		}
+		finally
+		{
+			self.abstractRoom.firstTimeRealized = false;
 		}
 	}
 
