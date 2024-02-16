@@ -38,8 +38,9 @@ internal static class Logfix
 			return;
 		}
 		LogWarning($"Detected buffered log lines! Count: {__bufferedLogMessages.Count}, max {MAX_BUFFERED_LINES}, discarded {__discardedLogMessageCount}");
-		while (__bufferedLogMessages.TryDequeue(out BufferedLogMessage result))
+		while (__bufferedLogMessages.Count > 0)
 		{
+			var result = __bufferedLogMessages.Dequeue();
 			(BepInEx.Logging.LogLevel level, string data, DateTime when) = result;
 			Log(level, $"[BUFFERED : {when}] {data}");
 		}
@@ -60,7 +61,10 @@ internal static class Logfix
 		logAction(__GenerateLogString_Unity(level, data));
 		if (__bufferedLogMessages.Count >= MAX_BUFFERED_LINES)
 		{
-			__bufferedLogMessages.TryDequeue(out _);
+			if (__bufferedLogMessages.Count > 0)
+			{
+				__bufferedLogMessages.Dequeue();
+			}
 			__discardedLogMessageCount++;
 		}
 		__bufferedLogMessages.Enqueue(new(level, __GenerateLogString_Bepinex(level, data), DateTime.Now));
