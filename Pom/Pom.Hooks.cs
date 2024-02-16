@@ -124,7 +124,8 @@ public static partial class Pom
 		orig(self, tp, pObj);
 		if (GetManagerForType(tp) is not ManagedObjectType manager) return;
 
-		if (pObj == null) pObj = self.RoomSettings.placedObjects[self.RoomSettings.placedObjects.Count - 1];
+		var isNew = pObj == null;
+		if (isNew) pObj = self.RoomSettings.placedObjects[self.RoomSettings.placedObjects.Count - 1];
 		DevInterface.PlacedObjectRepresentation? placedObjectRepresentation = manager.MakeRepresentation(pObj, self);
 		if (placedObjectRepresentation == null) return;
 
@@ -134,18 +135,21 @@ public static partial class Pom
 		self.tempNodes.Add(placedObjectRepresentation);
 		self.subNodes.Add(placedObjectRepresentation);
 
-		try
+		if (isNew)
 		{
-			self.owner.room.abstractRoom.firstTimeRealized = true;
-			var obj = manager.MakeObject(pObj, self.owner.room);
-			if (obj != null)
+			try
 			{
-				self.owner.room.AddObject(obj);
+				self.owner.room.abstractRoom.firstTimeRealized = true;
+				var obj = manager.MakeObject(pObj, self.owner.room);
+				if (obj != null)
+				{
+					self.owner.room.AddObject(obj);
+				}
 			}
-		}
-		finally
-		{
-			self.owner.room.abstractRoom.firstTimeRealized = false;
+			finally
+			{
+				self.owner.room.abstractRoom.firstTimeRealized = false;
+			}
 		}
 	}
 
