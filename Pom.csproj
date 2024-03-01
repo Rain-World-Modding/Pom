@@ -134,23 +134,23 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<Target Name="CopyOutput" AfterTargets="Build" Condition="'$(RWMods_POM)'!=''">
-		<!-- <Delete Files="$(RWMods_POM)/assets"/> -->
-		<Delete Files="$(RWMods_POM)/plugins" />
-		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ $(RWMods_POM) ] - @(_CopyItems)"
+	<Target Name="CopyOutput" AfterTargets="Build">
+		<!-- <Delete Files="mod/assets"/> -->
+		<Delete Files="mod/newest/plugins" />
+		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ mod ] - @(_CopyItems)"
 			Importance="high" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).dll" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+		<Copy SourceFiles="$(OutDir)$(ProjectName).dll" DestinationFolder="mod/newest/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).pdb" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+		<Copy SourceFiles="$(OutDir)$(ProjectName).pdb" DestinationFolder="mod/newest/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).xml" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+		<Copy SourceFiles="$(OutDir)$(ProjectName).xml" DestinationFolder="mod/newest/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
 		<!-- <Copy
 			SourceFiles="@(_CopyItems)"
-			DestinationFolder="$(RWMods_POM)/assets/regionkit/%(RecursiveDir)"
+			DestinationFolder="mod/assets/regionkit/%(RecursiveDir)"
 			Retries="3"
 			RetryDelayMilliseconds="300" /> -->
-		<Copy SourceFiles="modinfo.json" DestinationFolder="$(RWMods_POM)" Retries="3"
+		<Copy SourceFiles="modinfo.json" DestinationFolder="mod" Retries="3"
 			RetryDelayMilliseconds="300" />
 	</Target>
 </Project>
