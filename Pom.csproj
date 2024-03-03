@@ -4,7 +4,7 @@
 		<TargetFramework>net48</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<LangVersion>11</LangVersion>
+		<LangVersion>12</LangVersion>
 		<FileVersion>2.9</FileVersion>
 		<AssemblyVersion>2.9</AssemblyVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -22,6 +22,7 @@
 		<TreatWarningsAsErrors>False</TreatWarningsAsErrors>
 		<WarningsAsErrors>$(WarningsAsErrors);NU1605;</WarningsAsErrors>
 		<DefineConstants>$(DefineConstants)TRACE;RK;REMIX</DefineConstants>
+		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<!-- Lib includes. -->
 	<ItemGroup>
@@ -32,9 +33,6 @@
 		<Reference Include="Assembly-CSharp">
 			<HintPath>lib/PUBLIC-Assembly-CSharp.dll</HintPath>
 			<Private>False</Private>
-		</Reference>
-		<Reference Include="Assembly-CSharp-firstpass">
-			<HintPath>lib/Assembly-CSharp-firstpass.dll</HintPath>
 		</Reference>
 		<Reference Include="BepInEx.Harmony">
 			<HintPath>lib/BepInEx.Harmony.dll</HintPath>
@@ -124,8 +122,9 @@
 			<HintPath>lib/Newtonsoft.Json.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="com.rlabrecque.steamworks.net">
-			<HintPath>lib/com.rlabrecque.steamworks.net.dll</HintPath>
+		<Reference Include="Unity.Mathematics">
+			<HintPath>lib/Unity.Mathematics.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
@@ -135,23 +134,23 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<Target Name="CopyOutput" AfterTargets="Build" Condition="'$(RWMods_POM)'!=''">
-		<!-- <Delete Files="$(RWMods_POM)/assets"/> -->
-		<Delete Files="$(RWMods_POM)/plugins" />
-		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ $(RWMods_POM) ] - @(_CopyItems)"
+	<Target Name="CopyOutput" AfterTargets="Build">
+		<!-- <Delete Files="mod/assets"/> -->
+		<Delete Files="mod/newest/plugins" />
+		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ mod ] - @(_CopyItems)"
 			Importance="high" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).dll" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+		<Copy SourceFiles="$(OutDir)$(ProjectName).dll" DestinationFolder="mod/newest/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).pdb" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+		<Copy SourceFiles="$(OutDir)$(ProjectName).pdb" DestinationFolder="mod/newest/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).xml" DestinationFolder="$(RWMods_POM)/plugins" Retries="3"
+		<Copy SourceFiles="$(OutDir)$(ProjectName).xml" DestinationFolder="mod/newest/plugins" Retries="3"
 			RetryDelayMilliseconds="300" />
 		<!-- <Copy
 			SourceFiles="@(_CopyItems)"
-			DestinationFolder="$(RWMods_POM)/assets/regionkit/%(RecursiveDir)"
+			DestinationFolder="mod/assets/regionkit/%(RecursiveDir)"
 			Retries="3"
 			RetryDelayMilliseconds="300" /> -->
-		<Copy SourceFiles="modinfo.json" DestinationFolder="$(RWMods_POM)" Retries="3"
+		<Copy SourceFiles="modinfo.json" DestinationFolder="mod" Retries="3"
 			RetryDelayMilliseconds="300" />
 	</Target>
 </Project>

@@ -42,35 +42,6 @@ public class Mod : BepInEx.BaseUnityPlugin
 		{
 			LogFatal(ex);
 		}
-		try
-		{
-			IL.SaveUtils.PopulateUnrecognizedStringAttrs += __IL_FixUnrecognizedAttrs;
-		}
-		catch (System.Exception ex)
-		{
-			LogError($"Could not register Unrecognized fix ILHook : {ex}");
-		}
-	}
-
-	internal static void __IL_FixUnrecognizedAttrs(MonoMod.Cil.ILContext il)
-	{
-		MonoMod.Cil.ILCursor c = new(il);
-		if (c.TryGotoNext(MonoMod.Cil.MoveType.After,
-			(x) => x.MatchLdarg(1),
-			(x) => x.MatchLdarg(0),
-			(x) => x.MatchLdlen(),
-			(x) => x.MatchConvI4(),
-			(x) => x.MatchBlt(out ILLabel target)
-			))
-		{
-			c.Prev.OpCode = OpCodes.Pop;
-			c.Prev.Operand = null;
-			c.Emit(OpCodes.Pop);
-		}
-		else
-		{
-			throw new Exception("Could not find injection point; presumed an identical hook is already in place");
-		}
 	}
 	/// <inheritdoc/>
 	public void OnDisable()

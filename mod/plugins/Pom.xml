@@ -1,0 +1,2512 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Pom</name>
+    </assembly>
+    <members>
+        <member name="T:EffExt.Cached`1">
+            <summary>
+            Contains a value (<see cref="P:EffExt.Cached`1.Value"/>) and a callback (<see cref="P:EffExt.Cached`1.OnValueChange"/>).
+            The callback is raised when <see cref="P:EffExt.Cached`1.Value"/> is changed to a NEW value.
+            Contained value must be <see cref="T:System.IEquatable`1"/>.
+            </summary>
+            <typeparam name="T">Type of contained value.</typeparam>
+        </member>
+        <member name="P:EffExt.Cached`1.Value">
+            <summary>
+            Contained value. Setter invokes the <see cref="P:EffExt.Cached`1.OnValueChange"/> when new value is different from previous one.
+            </summary>
+            <value></value>
+        </member>
+        <member name="P:EffExt.Cached`1.LastError">
+            <summary>
+            Exception encountered last time there was an attempt to invoke setter <see cref="P:EffExt.Cached`1.OnValueChange"/>, if there was one.
+            </summary>
+        </member>
+        <member name="M:EffExt.Cached`1.#ctor(`0,System.Action{`0})">
+            <summary>
+            Creates a new instance.
+            </summary>
+            <param name="value">Starting value</param>
+            <param name="onValueChange">Action to take when value changes.</param>
+        </member>
+        <member name="P:EffExt.Cached`1.OnValueChange">
+            <summary>
+            The callback that is called each time contained value is changed.
+            </summary>
+            <value></value>
+        </member>
+        <member name="T:EffExt.DataType">
+            <summary>
+            Type of data in the effect field.
+            </summary>
+        </member>
+        <member name="F:EffExt.DataType.Int">
+            <summary>
+            Data is an integer
+            </summary>
+        </member>
+        <member name="F:EffExt.DataType.Float">
+            <summary>
+            Data is a float
+            </summary>
+        </member>
+        <member name="F:EffExt.DataType.Bool">
+            <summary>
+            Data is a boolean
+            </summary>
+        </member>
+        <member name="F:EffExt.DataType.String">
+            <summary>
+            Data is a string
+            </summary>
+        </member>
+        <member name="F:EffExt.DataType.Unknown">
+            <summary>
+            Data is unknown
+            </summary>
+        </member>
+        <member name="T:EffExt.UADFactory">
+            <summary>
+            Factory callbacks that are used to create an UpdatableAndDeletable for a given effect.
+            </summary>
+            <param name="room">Current room</param>
+            <param name="data">Object carrying additional data for your effect's custom fields</param>
+            <param name="firstTimeRealized">Whether it's the first time the room is being realized this session</param>
+            <returns>An UpdatableAndDeletable that should be added to the room. Null if none.</returns>
+        </member>
+        <member name="T:EffExt.EffectInitializer">
+            <summary>
+            Callbacks that are used when you need your effect to do something on initialize, without spawning an UpdatableAndDeletable.
+            </summary>
+            <param name="room">Current room</param>
+            <param name="data">Object carrying additional data for your effect's custom fields</param>
+            <param name="firstTimeRealized">Whether it's the first time the room is being realized this session</param>
+        </member>
+        <member name="T:EffExt.Eff">
+            <summary>
+            Functionality for extending effects with additional settings.
+            </summary>
+        </member>
+        <member name="M:EffExt.Eff.RegisterEffectDefinition(EffExt.EffectDefinition)">
+            <summary>
+            Registers a new effect definition
+            </summary>
+            <param name="definition"></param>
+        </member>
+        <member name="M:EffExt.Eff.RemoveEffectDefinition(System.String)">
+            <summary>
+            Removes an existing effect definition
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:EffExt.Eff.TryGetEffectDefinition(RoomSettings.RoomEffect.Type,EffExt.EffectDefinition@)">
+            <summary>
+            Attempts to fetch definition for a given effect type.
+            </summary>
+            <param name="effectType">Effect type.</param>
+            <param name="result">Contains operation result by the time method exits. Null if not found.</param>
+            <returns>Whether am effect definition was found.</returns>
+        </member>
+        <member name="M:EffExt.Eff.TryGetEffectDefinition(System.String,EffExt.EffectDefinition@)">
+            <summary>
+            Attempts to fetch definition for effect type with a given name.
+            </summary>
+            <param name="effectType">Effect type in form of a string (ExtEnum.value).</param>
+            <param name="result">Contains operation result by the time method exits. Null if not found.</param>
+            <returns>Whether am effect definition was found.</returns>
+        </member>
+        <member name="T:EffExt.Eff.CategorySortKind">
+            <summary>
+            How to sort object entries inside a devtools object category
+            </summary>
+        </member>
+        <member name="F:EffExt.Eff.CategorySortKind.Default">
+            <summary>
+            No sorting, items in the order they were registered
+            </summary>
+        </member>
+        <member name="F:EffExt.Eff.CategorySortKind.Alphabetical">
+            <summary>
+            Alphabetical sorting (invariant culture)
+            </summary>
+        </member>
+        <member name="T:EffExt.EffectDefinition">
+            <summary>
+            Custom data description for a room effect.
+            </summary>
+            <param name="Category">Devtools category where the effect appears. Optional.</param>
+            <param name="Name">Name of the effect. Obligatory.</param>
+            <param name="UADFactory">Callback producing room objects with this effect on room load.</param>
+            <param name="EffectInitializer">Callback that runs on room load but does not produce an object.</param>
+            <param name="Fields">A dictionary view containing all custom fields of this effect.</param>
+            <returns></returns>
+        </member>
+        <member name="M:EffExt.EffectDefinition.#ctor(DevInterface.RoomSettingsPage.DevEffectsCategories,System.String,EffExt.UADFactory,EffExt.EffectInitializer,System.Collections.ObjectModel.ReadOnlyDictionary{System.String,EffExt.EffectField})">
+            <summary>
+            Custom data description for a room effect.
+            </summary>
+            <param name="Category">Devtools category where the effect appears. Optional.</param>
+            <param name="Name">Name of the effect. Obligatory.</param>
+            <param name="UADFactory">Callback producing room objects with this effect on room load.</param>
+            <param name="EffectInitializer">Callback that runs on room load but does not produce an object.</param>
+            <param name="Fields">A dictionary view containing all custom fields of this effect.</param>
+            <returns></returns>
+        </member>
+        <member name="P:EffExt.EffectDefinition.Category">
+            <summary>Devtools category where the effect appears. Optional.</summary>
+        </member>
+        <member name="P:EffExt.EffectDefinition.Name">
+            <summary>Name of the effect. Obligatory.</summary>
+        </member>
+        <member name="P:EffExt.EffectDefinition.UADFactory">
+            <summary>Callback producing room objects with this effect on room load.</summary>
+        </member>
+        <member name="P:EffExt.EffectDefinition.EffectInitializer">
+            <summary>Callback that runs on room load but does not produce an object.</summary>
+        </member>
+        <member name="P:EffExt.EffectDefinition.Fields">
+            <summary>A dictionary view containing all custom fields of this effect.</summary>
+        </member>
+        <member name="T:EffExt.EffectDefinitionBuilder">
+            <summary>
+            Builder class for creating an effect definition.
+            </summary>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.#ctor(System.String)">
+            <summary>
+            Creates a new blank instance.
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.SetCategory(System.String)">
+            <summary>
+            Sets the future definition's devtools category.
+            </summary>
+            <param name="categoryName">Name of the category.</param>
+            <returns>Itself.</returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.AddIntField(System.String,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            Registers a new integer field.
+            </summary>
+            <param name="name">Name of the field.</param>
+            <param name="minValue">Minimal value of the integer.</param>
+            <param name="maxValue">Maximum value of the integer.</param>
+            <param name="defaultValue">Default value of the integer.</param>
+            <param name="displayName">How the field's name appears in DevUI.</param>
+            <returns>Itself.</returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.AddFloatField(System.String,System.Single,System.Single,System.Single,System.Single,System.String)">
+            <summary>
+            Registers a new float field.
+            </summary>
+            <param name="name">Name of the field.</param>
+            <param name="minValue">Minimum value of the float.</param>
+            <param name="maxValue">Maximum value of the float.</param>
+            <param name="step">Increments the value is allowed to move by.</param>
+            <param name="defaultValue">Default value of the float.</param>
+            <param name="displayName">How the field's name appears in DevUI.</param>
+            <returns>Itself.</returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.AddBoolField(System.String,System.Boolean,System.String)">
+            <summary>
+            Registers a new boolean field.
+            </summary>
+            <param name="name">Field name.</param>
+            <param name="defaultValue">Default value.</param>
+            <param name="displayName">How the field's name appears in DevUI.</param>
+            <returns>Itself.</returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.AddStringField(System.String,System.String,System.String)">
+            <summary>
+            Registers a new string field.
+            </summary>
+            <param name="name">Field name.</param>
+            <param name="defaultValue">Default value.</param>
+            <param name="displayName">How the field's name appears in DevUI.</param>
+            <returns>Itself.</returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.AddField(EffExt.EffectField)">
+            <summary>
+            Adds a new field to the definition. If there was another with the same name, it gets replaces.
+            </summary>
+            <param name="field">New field.</param>
+            <returns>Itself.</returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.SetUADFactory(EffExt.UADFactory)">
+            <summary>
+            Sets a callback that will be used to add UpdatableAndDeletables to rooms where this effect is enabled.
+            </summary>
+            <param name="factory"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.SetEffectInitializer(EffExt.EffectInitializer)">
+            <summary>
+            Sets a callback that runs on room load for this effect but does not produce an object.
+            </summary>
+            <param name="initializer"></param>
+            <returns></returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.Register">
+            <summary>
+            Registers effect definition and closes this instance from further use.
+            </summary>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder._Build">
+            <summary>
+            Creates an EffectDefinition from itself, and prevents itself from being used again.
+            </summary>
+            <returns>The resulting definition.</returns>
+        </member>
+        <member name="M:EffExt.EffectDefinitionBuilder.Dispose">
+            <summary>
+            Prevents the instance from being used again.
+            </summary>
+        </member>
+        <member name="T:EffExt.EffectExtraData">
+            <summary>
+            Carries additional data that is attached to a given instance of <see cref="T:RoomSettings.RoomEffect"/>.
+            </summary>
+        </member>
+        <member name="P:EffExt.EffectExtraData.Effect">
+            <summary>
+            Effect instance this ExtraData is attached to.
+            </summary>
+        </member>
+        <member name="P:EffExt.EffectExtraData.RawData">
+            <summary>
+            Dictionary containing raw string values of all fields. May contain data that has not been bound to a specific effect field (such as when a version change removed a field)
+            </summary>
+        </member>
+        <member name="P:EffExt.EffectExtraData.Definition">
+            <summary>
+            The definition of this effect. Describes what fields it should contain.
+            </summary>
+        </member>
+        <member name="P:EffExt.EffectExtraData.Amount">
+            <summary>
+            Mirrors <see cref="F:RoomSettings.RoomEffect.amount"/>
+            </summary>
+        </member>
+        <member name="P:EffExt.EffectExtraData.EffectType">
+            <summary>
+            Mirrors <see cref="F:RoomSettings.RoomEffect.type"/>
+            </summary>
+        </member>
+        <member name="M:EffExt.EffectExtraData.GetInt(System.String)">
+            <summary>
+            Gets an integer value with a given name. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <returns>Resulting value.</returns>
+        </member>
+        <member name="M:EffExt.EffectExtraData.GetFloat(System.String)">
+            <summary>
+            Gets a float value with a given name. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <returns>Resulting value.</returns>
+        </member>
+        <member name="M:EffExt.EffectExtraData.GetBool(System.String)">
+            <summary>
+            Gets a boolean value with a given name. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <returns>Resulting value.</returns>
+        </member>
+        <member name="M:EffExt.EffectExtraData.GetString(System.String)">
+            <summary>
+            Gets a string value with a given name. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <returns>Resulting value.</returns>
+        </member>
+        <member name="M:EffExt.EffectExtraData.Set(System.String,System.Int32)">
+            <summary>
+            Sets an int with a given key. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <param name="value">Value to be set</param>
+        </member>
+        <member name="M:EffExt.EffectExtraData.Set(System.String,System.Single)">
+            <summary>
+            Sets a float with a given key. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <param name="value">Value to be set</param>
+        </member>
+        <member name="M:EffExt.EffectExtraData.Set(System.String,System.Boolean)">
+            <summary>
+            Sets a bool with a given key. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <param name="value">Value to be set</param>
+        </member>
+        <member name="M:EffExt.EffectExtraData.Set(System.String,System.String)">
+            <summary>
+            Sets a string with a given key. Throws if key is not found.
+            </summary>
+            <param name="key">Name of the field</param>
+            <param name="value">Value to be set</param>
+        </member>
+        <member name="T:EffExt.EffectField">
+            <summary>
+            Base class for effect fields.
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="Dt">Type of data</param>
+            <param name="DefaultValue">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="M:EffExt.EffectField.#ctor(System.String,EffExt.DataType,System.Object,System.String)">
+            <summary>
+            Base class for effect fields.
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="Dt">Type of data</param>
+            <param name="DefaultValue">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="P:EffExt.EffectField.Name">
+            <summary>Name of the field</summary>
+        </member>
+        <member name="P:EffExt.EffectField.Dt">
+            <summary>Type of data</summary>
+        </member>
+        <member name="P:EffExt.EffectField.DefaultValue">
+            <summary>Default value</summary>
+        </member>
+        <member name="P:EffExt.EffectField.DisplayName">
+            <summary>How the field's name should appear to end user. Defaults to Name.</summary>
+        </member>
+        <member name="T:EffExt.EIntField">
+            <summary>
+            A field containing an integer
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="Min">Minimum integer value</param>
+            <param name="Max">Maximum integer value</param>
+            <param name="DefaultInt">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="M:EffExt.EIntField.#ctor(System.String,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            A field containing an integer
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="Min">Minimum integer value</param>
+            <param name="Max">Maximum integer value</param>
+            <param name="DefaultInt">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="P:EffExt.EIntField.Min">
+            <summary>Minimum integer value</summary>
+        </member>
+        <member name="P:EffExt.EIntField.Max">
+            <summary>Maximum integer value</summary>
+        </member>
+        <member name="P:EffExt.EIntField.DefaultInt">
+            <summary>Default value</summary>
+        </member>
+        <member name="T:EffExt.EFloatField">
+            <summary>
+            A field containing a float
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="Min">Minimum value</param>
+            <param name="Max">Maximum value</param>
+            <param name="Step">Increment for the slider</param>
+            <param name="DefaultFloat">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="M:EffExt.EFloatField.#ctor(System.String,System.Single,System.Single,System.Single,System.Single,System.String)">
+            <summary>
+            A field containing a float
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="Min">Minimum value</param>
+            <param name="Max">Maximum value</param>
+            <param name="Step">Increment for the slider</param>
+            <param name="DefaultFloat">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="P:EffExt.EFloatField.Min">
+            <summary>Minimum value</summary>
+        </member>
+        <member name="P:EffExt.EFloatField.Max">
+            <summary>Maximum value</summary>
+        </member>
+        <member name="P:EffExt.EFloatField.Step">
+            <summary>Increment for the slider</summary>
+        </member>
+        <member name="P:EffExt.EFloatField.DefaultFloat">
+            <summary>Default value</summary>
+        </member>
+        <member name="T:EffExt.EBoolField">
+            <summary>
+            A field containing a boolean
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="DefaultBool">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="M:EffExt.EBoolField.#ctor(System.String,System.Boolean,System.String)">
+            <summary>
+            A field containing a boolean
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="DefaultBool">Default value</param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="P:EffExt.EBoolField.DefaultBool">
+            <summary>Default value</summary>
+        </member>
+        <member name="T:EffExt.EStringField">
+            <summary>
+            A field containing a string
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="DefaultString"></param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="M:EffExt.EStringField.#ctor(System.String,System.String,System.String)">
+            <summary>
+            A field containing a string
+            </summary>
+            <param name="Name">Name of the field</param>
+            <param name="DefaultString"></param>
+            <param name="DisplayName">How the field's name should appear to end user. Defaults to Name.</param>
+        </member>
+        <member name="P:EffExt.EStringField.DefaultString">
+            <summary></summary>
+        </member>
+        <member name="T:PomCore.Mod">
+            <summary>
+            This is ManagedPlacedObjects mini-framework, written by henpemaz
+            and ported to Downpour by Thalber. 
+            It is licensed under Creative Commons 0 and is designed
+            to be "stackable" at runtime with multiple instances of POM
+            in multiple mods. It is not recommended to do that anymore, but
+            you still can if you really want to.
+            </summary>
+        </member>
+        <member name="M:PomCore.Mod.OnEnable">
+            <inheritdoc/>
+        </member>
+        <member name="M:PomCore.Mod.OnDisable">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom">
+            <summary>
+            Functionality for registering placed object with rich devtools controls
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.ManagedVectorHandle">
+            <summary>
+            Managed handle controlling a single Vector2 value. Used for ALL vector2 representation types.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedVectorHandle.field">
+            <summary>
+            Field definition
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedVectorHandle.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedVectorHandle.reprType">
+            <summary>
+            Chosen representation type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedVectorHandle.line">
+            <summary>
+            Sprite index of the line (if it's below 0, the line does not exist)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedVectorHandle.circle">
+            <summary>
+            Sprite index of the circle (if it's below 0, the circle does not exist)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedVectorHandle.rect">
+            <summary>
+            Sprite indices of rect (if it's null, the rect does not exist). Length is 5, ind. 0-3 are bounding lines, 4 is fill
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedVectorHandle.#ctor(Pom.Pom.Vector2Field,Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation,Pom.Pom.Vector2Field.VectorReprType)">
+            <summary>
+            
+            </summary>
+            <param name="field">Field definition</param>
+            <param name="managedData">Data of the associated placedobject</param>
+            <param name="repr">Representation object</param>
+            <param name="reprType">Chosen representation type</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedVectorHandle.Move(UnityEngine.Vector2)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedVectorHandle.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedVectorHandle.SetColor(UnityEngine.Color)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedIntHandle">
+            <summary>
+            A managed handle controlling an IntVector2 value. Used for ALL IntVector representation types.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedIntHandle.field">
+            <summary>
+            Field definition.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedIntHandle.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedIntHandle.reprType">
+            <summary>
+            Chosen representation type.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedIntHandle.pixel">
+            <summary>
+            Sprite index of the pixel (?????) (if below 0, pixel sprite doesn't exist)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedIntHandle.rect">
+            <summary>
+            Sprite indices of the bounding rect (if null, doesn't exist). Length is 5, indices 0-3 are lines, 4 is fill
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedIntHandle.#ctor(Pom.Pom.IntVector2Field,Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation,Pom.Pom.IntVector2Field.IntVectorReprType)">
+            <summary>
+            
+            </summary>
+            <param name="field">Field definition</param>
+            <param name="managedData">Data of the associated placedobject</param>
+            <param name="repr">Representation object</param>
+            <param name="reprType">Chosen representation type</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedIntHandle.Move(UnityEngine.Vector2)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedIntHandle.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedIntHandle.SetColor(UnityEngine.Color)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedSlider">
+            <summary>
+            A multipurpose slider that can control data defined by any ManagedField that implements 
+            <see cref="T:Pom.Pom.IInterpolablePanelField"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedSlider.field">
+            <summary>
+            Definition of the field this slider is related to
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedSlider.interpolable">
+            <summary>
+            <see cref="F:Pom.Pom.ManagedSlider.field"/>, but cast to the interface type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedSlider.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedSlider.#ctor(Pom.Pom.ManagedFieldWithPanel,Pom.Pom.ManagedData,DevInterface.DevUINode,System.Single)">
+            <param name="field">Field definition</param>
+            <param name="data">Data of the associated placedobject</param>
+            <param name="parent">Parent DevUI node</param>
+            <param name="sizeOfDisplayname">Width of name tag, can be 0</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedSlider.NubDragged(System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedSlider.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedButton">
+            <summary>
+            A multipurpose button that can control data defined by any ManagedField that implements 
+            <see cref="T:Pom.Pom.IIterablePanelField"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedButton.button">
+            <summary>
+            Contained button
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedButton.field">
+            <summary>
+            Field definition
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedButton.iterable">
+            <summary>
+            <see cref="F:Pom.Pom.ManagedButton.field"/> but cast to interface type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedButton.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedButton.#ctor(Pom.Pom.ManagedFieldWithPanel,Pom.Pom.ManagedData,Pom.Pom.ManagedControlPanel,System.Single)">
+            <param name="field">Field definition</param>
+            <param name="data">Data of the associated placedobject</param>
+            <param name="panel">Containing panel</param>
+            <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedButton.Signal(DevInterface.DevUISignalType,DevInterface.DevUINode,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedButton.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedArrowSelector">
+            <summary>
+            Multipurpose arrow selector that can control data defined by any ManagedField that implements 
+            <see cref="T:Pom.Pom.IIterablePanelField"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedArrowSelector.field">
+            <summary>
+            Field definition
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedArrowSelector.iterable">
+            <summary>
+            <see cref="F:Pom.Pom.ManagedArrowSelector.field"/> but cast to interface type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedArrowSelector.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedArrowSelector.#ctor(Pom.Pom.ManagedFieldWithPanel,Pom.Pom.ManagedData,Pom.Pom.ManagedControlPanel,System.Single)">
+            <summary>
+            
+            </summary>
+            <param name="field">Field definition</param>
+            <param name="managedData">Data of the associated placedobject</param>
+            <param name="panel">Containing panel</param>
+            <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedArrowSelector.Increment(System.Int32)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedArrowSelector.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedStringControl">
+            <summary>
+            String input field. Can be used by things like 
+            <see cref="T:Pom.Pom.StringField"/> or <see cref="T:Pom.Pom.ColorField"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedStringControl.activeStringControl">
+            <summary>
+            Currently focused string control. Can be any devui node, including not from POM assembly. As long as it's not null, POM should prevent anything else from taking keyboard input
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedStringControl.field">
+            <summary>
+            Field definition for this string control
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedStringControl.data">
+            <summary>
+            Data of the associated placedobject
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedStringControl.clickedLastUpdate">
+            <summary>
+            Whether this was clicked last update 
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedStringControl.#ctor(Pom.Pom.ManagedFieldWithPanel,Pom.Pom.ManagedData,DevInterface.DevUINode,System.Single)">
+            <param name="field">Field definition</param>
+            <param name="data">Data of the associated placedobject</param>
+            <param name="panel">Containing panel</param>
+            <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
+        </member>
+        <member name="P:Pom.Pom.ManagedStringControl.Text">
+            <summary>
+            Text value of the instance. 
+            Changing this only changes the label, does not call <see cref="M:Pom.Pom.ManagedData.SetValue``1(System.String,``0)"/>.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedStringControl.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedStringControl.Update">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedStringControl.TrySetValue(System.String,System.Boolean)">
+            <summary>
+            Attempts to parse field value from given text and set it into manageddata. Recolors control depending on the result.
+            </summary>
+            <param name="newValue">Current text</param>
+        </member>
+        <member name="M:Pom.Pom.RegisterManagedObject(Pom.Pom.ManagedObjectType)">
+            <summary>
+            Register a <see cref="T:Pom.Pom.ManagedObjectType"/> or <see cref="T:Pom.Pom.FullyManagedObjectType"/> to handle object, data and repr initialization during room load and devtools hooks
+            </summary>
+            <param name="obj">ManagedObjectType you have constructed to define the object</param>
+        </member>
+        <member name="M:Pom.Pom.RegisterFullyManagedObjectType(Pom.Pom.ManagedField[],System.Type,System.String,System.String)">
+            <summary>
+            Shorthand for registering a <see cref="T:Pom.Pom.FullyManagedObjectType"/>.
+            Wraps an UpdateableAndDeletable into a managed type with managed data and UI.
+            Can also be used with a null type to spawn a Managed data+representation with no object on room.load
+            If the object isn't null its Constructor should take (Room, PlacedObject) or (PlacedObject, Room).
+            </summary>
+            <param name="managedFields">An array containing all fields the object should have</param>
+            <param name="type">An UpdateableAndDeletable</param>
+            <param name="name">Optional enum-name for your object, otherwise infered from type. Can be an enum already created with Enumextend. Do NOT use enum.ToString() on an enumextend'd enum, it wont work during Init() or Load()</param>
+            <param name="category">Category of the object (null if unsorted)</param>
+        </member>
+        <member name="M:Pom.Pom.RegisterEmptyObjectType(System.String,System.String,System.Type,System.Type)">
+            <summary>
+            Shorthand for registering a ManagedObjectType with no actual object.
+            Creates an empty data-holding placed object.
+            Data and Repr must work well together (typically rep tries to cast data to a specific type to use it).
+            Either can be left null, so no data or no specific representation will be created for the placedobject.
+            </summary>
+            <param name="name">Name of the object</param>
+            <param name="category">Category of the object (null if unsorted)</param>
+            <param name="dataType">Type of ManagedData (usually your child class)</param>
+            <param name="reprType">Type of ManagedRepresentation (usually <see cref="T:Pom.Pom.ManagedRepresentation"/>)</param>
+        </member>
+        <member name="M:Pom.Pom.RegisterEmptyObjectType``2(System.String,System.String)">
+            <summary>
+            Same as <see cref="M:Pom.Pom.RegisterEmptyObjectType(System.String,System.String,System.Type,System.Type)"/>, but with generics.
+            </summary>
+            <typeparam name="DATA">Type of ManagedData (usually your child class)</typeparam>
+            <typeparam name="REPR">Type of ManagedRepresentation (usually <see cref="T:Pom.Pom.ManagedRepresentation"/>)</typeparam>
+            <param name="key">Name of the object</param>
+            <param name="category">Category of the object (null if unsorted)</param>
+        </member>
+        <member name="M:Pom.Pom.RegisterManagedObject``3(System.String,System.String,System.Boolean)">
+            <summary>
+            Same as <see cref="M:Pom.Pom.RegisterManagedObject(Pom.Pom.ManagedObjectType)"/>, but with generics.
+            </summary>
+            <typeparam name="UAD">Type of UpdatableAndDeletable</typeparam>
+            <typeparam name="DATA">Type of ManagedData (usually your child class)</typeparam>
+            <typeparam name="REPR">Type of ManagedRepresentation (usually <see cref="T:Pom.Pom.ManagedRepresentation"/>)</typeparam>
+            <param name="key">Name of the object</param>
+            <param name="category">Category of the object (null if unsorted)</param>
+            <param name="singleInstance">Whether only one object is allowed per room</param>
+        </member>
+        <member name="M:Pom.Pom.RegisterCategoryOverride(PlacedObject.Type,System.String)">
+            <summary>
+            Forces a selected PlacedObjectType to be sorted into specific category. Works for non-POM objects. <para/>
+            Note that calling this force-creates the category.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.RegisterSortingOverride(System.String,Pom.Pom.CategorySortKind)">
+            <summary>
+            Selects how an object category should be sorted.<para/>
+            Note that calling this force-creates the category.
+            </summary>
+            <param name="category"></param>
+            <param name="sortBehavior"></param>
+        </member>
+        <member name="T:Pom.Pom.IInterpolablePanelField">
+            <summary>
+            An interface for a <see cref="T:Pom.Pom.ManagedFieldWithPanel"/> that can be controlled through a <see cref="T:Pom.Pom.ManagedSlider"/> 
+            (one or multiple, see <see cref="T:Pom.Pom.ColorField"/> for multiple).
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IInterpolablePanelField.FactorOf(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Used by <see cref="M:Pom.Pom.ManagedSlider.Refresh"/> to determine where to put the nub when it is not being dragged.
+            </summary>
+            <param name="node">The exact slider being used</param>
+            <param name="data">ManagedData corresponding to object being processed</param>
+            <returns>A value between 0 and 1 indicating where the slider's nub should be between its ends</returns>
+        </member>
+        <member name="M:Pom.Pom.IInterpolablePanelField.NewFactor(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.Single)">
+            <summary>
+            Used when <see cref="M:Pom.Pom.ManagedSlider.NubDragged(System.Single)"/> needs to tell the object where the nub ends up.
+            </summary>
+            <param name="node">The exact slider being used</param>
+            <param name="data">ManagedData corresponding to object being processed</param>
+            <param name="factor">Value between 0 and 1 indicating where between the slider's ends the nub was released</param>
+        </member>
+        <member name="T:Pom.Pom.IIterablePanelField">
+            <summary>
+            An interface for a <see cref="T:Pom.Pom.ManagedFieldWithPanel"/> that can be controlled through a <see cref="T:Pom.Pom.ManagedButton"/> or <see cref="T:Pom.Pom.ManagedArrowSelector"/>.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IIterablePanelField.Next(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Used by <see cref="M:Pom.Pom.ManagedButton.Signal(DevInterface.DevUISignalType,DevInterface.DevUINode,System.String)"/> and <see cref="M:Pom.Pom.ManagedArrowSelector.Increment(System.Int32)"/>
+            to signal that the value of this ManagedField should be cycled to the next entry/position/value
+            </summary>
+            <param name="node">The exact button or arrowselector being used</param>
+            <param name="data">ManagedData corresponding to object being processed</param>
+        </member>
+        <member name="M:Pom.Pom.IIterablePanelField.Prev(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Used by <see cref="M:Pom.Pom.ManagedArrowSelector.Increment(System.Int32)"/>
+            to signal that the value of this ManagedField should be cycled to the previous entry/position/value
+            </summary>
+            <param name="node">The exact ArrowSelector being used</param>
+            <param name="data">ManagedData corresponding to object being processed</param>
+        </member>
+        <member name="T:Pom.Pom.FloatField">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:System.Single"/> value.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.FloatField.min">
+            <summary>
+            Minimum value this float field can take
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.FloatField.max">
+            <summary>
+            Maximum value this float field can take
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.FloatField.increment">
+            <summary>
+            Minimal step the value can take. Every value change is rounded down to min + multiples of this
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.FloatField.#ctor(System.String,System.Single,System.Single,System.Single,System.Single,Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:System.Single"/>. Can be used as an Attribute for a field in your data class derived from <see cref="T:Pom.Pom.ManagedData"/>.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="min">the minimum allowed value</param>
+            <param name="max">the maximum allowed value</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="increment">controls digits when displaying the value, also behavior with buttons and arrows</param>
+            <param name="control">the type of UI for this field</param>
+            <param name="displayName">a display name for the panel, defaults to <paramref name="key"/></param>
+        </member>
+        <member name="M:Pom.Pom.FloatField.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.FloatField.NumberOfDecimals">
+            <summary>
+            Returns number of decimals to display after dot
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pom.Pom.FloatField.SizeOfLargestDisplayValue">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.FloatField.DisplayValueForNode(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.FloatField.FactorOf(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.FloatField.NewFactor(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.Single)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.FloatField.Next(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.FloatField.Prev(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.FloatField.ParseFromText(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.BooleanField">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:System.Boolean"/> value.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.BooleanField.#ctor(System.String,System.Boolean,Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:System.Boolean"/>. Can be used as an Attribute for a field in your data class derived from <see cref="T:Pom.Pom.ManagedData"/>.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="control">the type of UI for this field</param>
+            <param name="displayName">a display name for the panel, defaults to <paramref name="key"/></param>
+        </member>
+        <member name="M:Pom.Pom.BooleanField.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.BooleanField.SizeOfLargestDisplayValue">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.BooleanField.FactorOf(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.BooleanField.NewFactor(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.Single)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.BooleanField.Next(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.BooleanField.Prev(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.EnumField`1">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that stores an <see cref="T:System.Enum"/> value.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.EnumField`1._possibleValues">
+            <summary>
+            Array with all values this field can list through. If null by inst time, will get replaced with enum.getvalues
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.EnumField`1._c_enumlen">
+            <summary>
+            Cached number of enum entries
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.#ctor(System.String,`0,`0[],Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores an <see cref="T:System.Enum"/> of the specified type.
+            Can be used as Attribute, thanks generics!
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="possibleValues">the acceptable values for this field, defaults to a deferred call to <see cref="M:System.Enum.GetValues(System.Type)"/> for the type</param>
+            <param name="control">the type of UI for this field</param>
+            <param name="displayName">a display name for the panel, defaults to <paramref name="key"/></param>
+        </member>
+        <member name="P:Pom.Pom.EnumField`1.PossibleValues">
+            <summary>
+            Returns all available values the field should display and cycle through
+            </summary> 
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.SizeOfLargestDisplayValue">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.FactorOf(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.NewFactor(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.Single)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.Next(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.Prev(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.EnumField`1.ParseFromText(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ExtEnumField`1">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that stores an <see cref="T:ExtEnumBase"/> value.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ExtEnumField`1.type">
+            <summary>
+            ExtEnumType of <typeparamref name="XE"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ExtEnumField`1._possibleValues">
+            <summary>
+            Array of all allowed values
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ExtEnumField`1._c_enumver">
+            <summary>
+            Cached ExtEnum version for re-getting possiblevalues if needed
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.#ctor(System.String,`0,`0[],Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores an <see cref="T:ExtEnumBase"/> of the specified type.
+            Cannot be used as Attribute, instead you should pass this object to <see cref="M:Pom.Pom.ManagedData.#ctor(PlacedObject,Pom.Pom.ManagedField[])"/> 
+            and mark your field with the <see cref="T:Pom.Pom.ManagedData.BackedByField"/> attribute, 
+            or use the second constructor.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="possibleValues">the acceptable values for this field, defaults to a deferred call to <see cref="M:System.Enum.GetValues(System.Type)"/> for the type</param>
+            <param name="control">the type of UI for this field</param>
+            <param name="displayName">a display name for the panel, defaults to <paramref name="key"/></param>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.#ctor(System.String,System.String,System.String[],Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores an <see cref="T:ExtEnumBase"/> of the specified type.
+            Can be used as an attribute! Make sure to pass the correct string values, otherwise
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="possibleValues">the acceptable values for this field, defaults to a deferred call to <see cref="M:System.Enum.GetValues(System.Type)"/> for the type</param>
+            <param name="control">the type of UI for this field</param>
+            <param name="displayName">a display name for the panel, defaults to <paramref name="key"/></param>
+        </member>
+        <member name="P:Pom.Pom.ExtEnumField`1.PossibleValues">
+            <summary>
+            Returns all values this field can cycle through
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.SizeOfLargestDisplayValue">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.FactorOf(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.NewFactor(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.Single)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.Next(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.Prev(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ExtEnumField`1.ParseFromText(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.IntegerField">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that stores an <see cref="T:System.Int32"/> value.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntegerField.min">
+            <summary>
+            Minimum value data of this field can take
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntegerField.max">
+            <summary>
+            Maximum value data of this field can take
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.#ctor(System.String,System.Int32,System.Int32,System.Int32,Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores an <see cref="T:System.Int32"/>. Can be used as an Attribute for a field in your data class derived from <see cref="T:Pom.Pom.ManagedData"/>.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="min">the minimum allowed value (inclusive)</param>
+            <param name="max">the maximum allowed value (inclusive)</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="control">the type of UI for this field</param>
+            <param name="displayName">a display name for the panel, defaults to <paramref name="key"/></param>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.SizeOfLargestDisplayValue">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.FactorOf(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.NewFactor(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.Single)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IInterpolablePanelField"/>. Called from UI sliders.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.Next(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.Prev(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Implements <see cref="T:Pom.Pom.IIterablePanelField"/>. Called from UI buttons and arrows.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IntegerField.ParseFromText(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.StringField">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:System.String"/> value.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.StringField.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:System.String"/>. Can be used as an Attribute for a field in your data class derived from <see cref="T:Pom.Pom.ManagedData"/>.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="displayName">a display name for the panel, defaults to <paramref name="key"/></param>
+        </member>
+        <member name="F:Pom.Pom.StringField.replacements">
+            <summary>
+            String escape sequences for saving/loading string data
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.StringField.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.StringField.ToString(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.StringField.SizeOfLargestDisplayValue">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.StringField.DisplayValueForNode(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.StringField.ParseFromText(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.Vector2Field">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> for a <see cref="T:UnityEngine.Vector2"/> value.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2Field.controlType">
+            <summary>
+            Chosen control type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2Field.label">
+            <summary>
+            Label text displayed together with vector handle
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.Vector2Field.#ctor(System.String,UnityEngine.Vector2,Pom.Pom.Vector2Field.VectorReprType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:UnityEngine.Vector2"/>.
+            Cannot be used as Attribute, instead you should pass this object to 
+            <see cref="M:Pom.Pom.ManagedData.#ctor(PlacedObject,Pom.Pom.ManagedField[])"/> 
+            and mark your field with the <see cref="T:Pom.Pom.ManagedData.BackedByField"/> attribute, 
+            or use the second constructor.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="controlType">the type of UI for this field, from <see cref="T:Pom.Pom.Vector2Field.VectorReprType"/></param>
+            <param name="label">Optional label to be displayed next to handle</param>
+        </member>
+        <member name="M:Pom.Pom.Vector2Field.#ctor(System.String,System.Single,System.Single,Pom.Pom.Vector2Field.VectorReprType,System.String)">
+            <summary>
+            Can be used as an Attribute.
+            </summary>
+            <param name="key">Field name</param>
+            <param name="defX">Vector's default X</param>
+            <param name="defY">Vector's default X</param>
+            <param name="reprType">Chosen representation type</param>
+            <param name="label">Label text to be displayed next to handle</param>
+            <returns></returns>
+        </member>
+        <member name="T:Pom.Pom.Vector2Field.VectorReprType">
+            <summary>
+            How the vector handle should look like
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2Field.VectorReprType.none">
+            <summary>
+            No handle
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2Field.VectorReprType.line">
+            <summary>
+            Handle is a line
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2Field.VectorReprType.circle">
+            <summary>
+            handle is a circle
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2Field.VectorReprType.rect">
+            <summary>
+            Handle is a filled rect
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.Vector2Field.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.Vector2Field.ToString(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.Vector2Field.MakeAditionalNodes(Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.IntVector2Field">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> for a <see cref="T:RWCustom.IntVector2"/> value.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntVector2Field.controlType">
+            <summary>
+            Chosen control type
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IntVector2Field.#ctor(System.String,RWCustom.IntVector2,Pom.Pom.IntVector2Field.IntVectorReprType)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:RWCustom.IntVector2"/>.
+            Cannot be used as Attribute, use the other constructor instead you should pass this object to <see cref="M:Pom.Pom.ManagedData.#ctor(PlacedObject,Pom.Pom.ManagedField[])"/> and mark your field with the <see cref="T:Pom.Pom.ManagedData.BackedByField"/> attribute.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultValue">the value a new data object is generated with</param>
+            <param name="controlType">the type of UI for this field, from <see cref="T:Pom.Pom.IntVector2Field.IntVectorReprType"/></param>
+        </member>
+        <member name="M:Pom.Pom.IntVector2Field.#ctor(System.String,System.Int32,System.Int32,Pom.Pom.IntVector2Field.IntVectorReprType)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:RWCustom.IntVector2"/>.
+            Cannot be used as Attribute, use the other constructor instead you should pass this object to <see cref="M:Pom.Pom.ManagedData.#ctor(PlacedObject,Pom.Pom.ManagedField[])"/> and mark your field with the <see cref="T:Pom.Pom.ManagedData.BackedByField"/> attribute.
+            </summary>
+            <param name="key">The key to access field with</param>
+            <param name="defX">Default X value</param>
+            <param name="defY">Default Y value</param>
+            <param name="controlType">The way control should be represented</param>
+        </member>
+        <member name="T:Pom.Pom.IntVector2Field.IntVectorReprType">
+            <summary>
+            Different ways an IntVector2 managedfield can be represented. For all options, the value scale is 1 per tile (20px) 
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntVector2Field.IntVectorReprType.none">
+            <summary>
+            No representation
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntVector2Field.IntVectorReprType.line">
+            <summary>
+            A line, same as Vector2Field
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntVector2Field.IntVectorReprType.tile">
+            <summary>
+            The targeted tile will be highlighted
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntVector2Field.IntVectorReprType.fourdir">
+            <summary>
+            An arrow that can point in 4 cardinal directions
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntVector2Field.IntVectorReprType.eightdir">
+            <summary>
+            An arrow that can point in 8 directions (cardinal and diagonal)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.IntVector2Field.IntVectorReprType.rect">
+            <summary>
+            A rectangle spanning between main handle and intvector2 handle
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.IntVector2Field.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.IntVector2Field.ToString(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.IntVector2Field.MakeAditionalNodes(Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ColorField">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> for a <see cref="T:UnityEngine.Color"/> value.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ColorField.#ctor(System.String,UnityEngine.Color,Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:UnityEngine.Color"/>.
+            Cannot be used as Attribute, use the other constructor, instead you should pass this object to <see cref="M:Pom.Pom.ManagedData.#ctor(PlacedObject,Pom.Pom.ManagedField[])"/> and mark your field with the <see cref="T:Pom.Pom.ManagedData.BackedByField"/> attribute.
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defaultColor">the value a new data object is generated with</param>
+            <param name="controlType">one of <see cref="F:Pom.Pom.ManagedFieldWithPanel.ControlType.text"/> or <see cref="F:Pom.Pom.ManagedFieldWithPanel.ControlType.slider"/></param>
+            <param name="displayName">How the field's name should appear in devui</param>
+        </member>
+        <member name="M:Pom.Pom.ColorField.#ctor(System.String,System.Single,System.Single,System.Single,System.Single,Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.ManagedField"/> that stores a <see cref="T:UnityEngine.Color"/>.
+            Can be used as an attribute
+            </summary>
+            <param name="key">The key to access that field with</param>
+            <param name="defR">Default red channel</param>
+            <param name="defG">Default green channel</param>
+            <param name="defB">Default blue channel</param>
+            <param name="defA">Default alpha channel</param>
+            <param name="controlType">one of <see cref="F:Pom.Pom.ManagedFieldWithPanel.ControlType.text"/> or <see cref="F:Pom.Pom.ManagedFieldWithPanel.ControlType.slider"/></param>
+            <param name="DisplayName">How the field's name should appear in devui</param>
+        </member>
+        <member name="M:Pom.Pom.ColorField.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.ToString(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.ParseFromText(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.DisplayValueForNode(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.SizeOfLargestDisplayValue">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.SizeOfDisplayname">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.SizeOfPanelUiMinusName">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.MakeControlPanelNode(Pom.Pom.ManagedData,Pom.Pom.ManagedControlPanel,System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.FactorOf(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ColorField.NewFactor(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.DrivenVector2Field">
+            <summary>
+            A ManagedField that controls a Vector2, while relating to another Vector2 in some way
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.keyOfOther">
+            <summary>
+            Field name/key of the driving field
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.drivenControlType">
+            <summary>
+            Chosen control type
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.DrivenVector2Field.DrivenControlType">
+            <summary>
+            How the vector2 driven handle should look like
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenControlType.relativeLine">
+            <summary>
+            Handle is a line from other to this
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenControlType.perpendicularLine">
+            <summary>
+            Handle is a line pointing from object center perpendicular to other
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenControlType.perpendicularOval">
+            <summary>
+            Handle is an ellipse defined by the other and this radius vectors
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenControlType.rectangle">
+            <summary>
+            Handle is a rectangle between other and this as corners
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.DrivenVector2Field.#ctor(System.String,System.String,UnityEngine.Vector2,Pom.Pom.DrivenVector2Field.DrivenControlType,System.String)">
+            <param name="keyofSelf"></param>
+            <param name="keyOfOther"></param>
+            <param name="defaultValue"></param>
+            <param name="controlType"></param>
+            <param name="label"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pom.Pom.DrivenVector2Field.MakeAditionalNodes(Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.DrivenVector2Field.DrivenVectorControl">
+            <summary>
+            Special control for drivenvectorfield
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenVectorControl.control">
+            <summary>
+            Drivenv2field this control belongs to
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenVectorControl.data">
+            <summary>
+            Data of associated placedobkect
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenVectorControl.controlType">
+            <summary>
+            Chosen control type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenVectorControl.handleB">
+            <summary>
+            Handle of other (?)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenVectorControl.circleSprite">
+            <summary>
+            Circle srite (may be absent)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.DrivenVector2Field.DrivenVectorControl.lineBSprite">
+            <summary>
+            Second line sprite (may be absent)
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.DrivenVector2Field.DrivenVectorControl.#ctor(Pom.Pom.DrivenVector2Field,Pom.Pom.ManagedData,DevInterface.PositionedDevUINode,Pom.Pom.DrivenVector2Field.DrivenControlType,System.String)">
+            <param name="control">Associated DrivenVector2Field</param>
+            <param name="data">Associated placedobject data</param>
+            <param name="repr">Associated Placedobject representation</param>
+            <param name="controlType">Chosen control type</param>
+            <param name="label">Optional label to be displayed next to handle</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pom.Pom.DrivenVector2Field.DrivenVectorControl.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.CategorySortKind">
+            <summary>
+            How to sort object entries inside a devtools object category
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.CategorySortKind.Default">
+            <summary>
+            No sorting, items in the order they were registered
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.CategorySortKind.Alphabetical">
+            <summary>
+            Alphabetical sorting (invariant culture)
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.Apply">
+            <summary>
+            Applies the necessary hooks for the framework to do its thing.
+            Called when any managed object is registered.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.GetManagerForType(PlacedObject.Type)">
+            <summary>
+            Called from the hooks, finds the manager for the type, if any.
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.ManagedObjectType">
+            <summary>
+            Main class for managed object types.
+            Make-calls CAN return null, causing the object to not be created, or have no data, or use the default handle representation.
+            This class can be used to simply handle the room/devtools hooks.
+            Call <see cref="M:Pom.Pom.RegisterManagedObject(Pom.Pom.ManagedObjectType)"/> to register your manager
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedObjectType.placedType">
+            <summary>
+            ExtEnum entry of this custom placed object
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedObjectType.name">
+            <summary>
+            Name of the object (why is it here?)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedObjectType.objectType">
+            <summary>
+            Type of the UpdatableAndDeletable to be created. If it is null, nothing is created.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedObjectType.dataType">
+            <summary>
+            Type of the <see cref="T:Pom.Pom.ManagedData"/> child carrying custom data (can be ManagedData itself)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedObjectType.reprType">
+            <summary>
+            Type of <see cref="T:Pom.Pom.ManagedRepresentation"/> that will handle creation of control panels 
+            and handles (usually <see cref="T:Pom.Pom.ManagedRepresentation"/> itself)
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedObjectType.singleInstance">
+            <summary>
+            Whether only one object is allowed per room
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedObjectType.#ctor(System.String,System.String,System.Type,System.Type,System.Type,System.Boolean)">
+            <param name="name">The enum-name this manager responds for. Do NOT use EnumExt_MyEnum.MyObject.ToString() because on mod-loading enumextender might not have run yet and your enums aren't extended.</param>
+            <param name="objectType">The Type of your UpdateableAndDeletable object. Must have a constructor like (Room room, PlacedObject pObj) or (PlacedObject pObj, Room room), (PlacedObject pObj) or (Room room).</param>
+            <param name="dataType">The Type of your PlacedObject.Data. Must have a constructor like (PlacedObject pObj).</param>
+            <param name="reprType">The Type of your PlacedObjectRepresentation. Must have a constructor like (DevUI owner, string IDstring, DevUINode parentNode, PlacedObject pObj, string name) or (PlacedObject.Type placedType, ObjectsPage objPage, PlacedObject pObj).</param>
+            <param name="singleInstance">Wether only one of this object should be created per room. Corruption-object that scans for other placedobjects style.</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedObjectType.GetObjectType">
+            <summary>
+            The <see cref="T:PlacedObject.Type"/> this is the manager for.
+            Only call this after rainworld.start call otherwise EnumExtender might not be available.
+            Store a reference to your <see cref="T:Pom.Pom.ManagedObjectType"/> instead of the enum type.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedObjectType.MakeObject(PlacedObject,Room)">
+            <summary>
+            Called from Room.Loaded hook. Returns UAD to be added into the room (null if nothing should be added)
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedObjectType.MakeEmptyData(PlacedObject)">
+            <summary>
+            Called from PlacedObject.GenerateEmptyData hook
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedObjectType.MakeRepresentation(PlacedObject,DevInterface.ObjectsPage)">
+            <summary>
+            Called from ObjectsPage.CreateObjRep hook. Returns the custom representation that should then create panels and handles. Can return null
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.FullyManagedObjectType">
+            <summary>
+            Class for managing a wraped <see cref="T:UpdatableAndDeletable"/> object. 
+            Uses the fully managed data and representation types 
+            <see cref="T:Pom.Pom.ManagedData"/> and <see cref="T:Pom.Pom.ManagedRepresentation"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.FullyManagedObjectType.managedFields">
+            <summary>
+            All fields defined for this object
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.FullyManagedObjectType.#ctor(System.String,System.String,System.Type,Pom.Pom.ManagedField[],System.Boolean)">
+            <param name="name">Name of the object</param>
+            <param name="category">category the object should be in (null if unsorted)</param>
+            <param name="objectType">Type of <see cref="T:UpdatableAndDeletable"/> to be created (null if none)</param>
+            <param name="managedFields">Array containing all the data fields this object has</param>
+            <param name="singleInstance">Whether only one is allowed per room</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pom.Pom.FullyManagedObjectType.MakeEmptyData(PlacedObject)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.FullyManagedObjectType.MakeRepresentation(PlacedObject,DevInterface.ObjectsPage)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedField">
+            <summary>
+            A field to handle serialization and generate UI for your data, for use with <see cref="T:Pom.Pom.ManagedData"/>.
+            A field is merely a recipe/interface, the actual data is stored in the <see cref="T:Pom.Pom.ManagedData"/> data object for each pObj.
+            You can use a field as an <see cref="T:System.Attribute"/> anotating data fields in your class that inherits <see cref="T:Pom.Pom.ManagedData"/> so they stay in sync.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedField.key">
+            <summary>
+            Name of the field
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedField.defaultValue">
+            <summary>
+            Default value of the field
+            </summary>
+        </member>
+        <member name="P:Pom.Pom.ManagedField.DefaultValue">
+            <summary>
+            public wrapper for <see cref="F:Pom.Pom.ManagedField.defaultValue"/>
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedField.#ctor(System.String,System.Object)">
+            <param name="key">Name of the field</param>
+            <param name="defaultValue">Default value</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedField.ToString(System.Object)">
+            <summary>
+            Serialization method called from <see cref="M:Pom.Pom.ManagedData.ToString"/>
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedField.FromString(System.String)">
+            <summary>
+            Deserialization method called from <see cref="M:Pom.Pom.ManagedData.FromString(System.String)"/>. Don't forget to sanitize your data.
+            </summary>
+        </member>
+        <member name="P:Pom.Pom.ManagedField.NeedsControlPanel">
+            <summary>
+            Wether this field spawns a control panel node or not. Inherit <see cref="T:Pom.Pom.ManagedFieldWithPanel"/> for actually creating them.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedField.MakeAditionalNodes(Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation)">
+            <summary>
+            Create an aditional DevUINode for manipulating this field. Inherit a PositionedDevUINode if you need to create several sub-nodes.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedField.IsDefaultAttribute">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.ManagedField.Match(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Pom.Pom.ManagedField.TypeId">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.ManagedFieldWithPanel">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that can generate a control-panel control, for use with <see cref="T:Pom.Pom.ManagedRepresentation"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.control">
+            <summary>
+            Selected control type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.displayName">
+            <summary>
+            How the field's name should appear in devui
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.#ctor(System.String,System.Object,Pom.Pom.ManagedFieldWithPanel.ControlType,System.String)">
+            <param name="key">Field name</param>
+            <param name="defaultValue">Default value</param>
+            <param name="control">Chosen control type</param>
+            <param name="displayName">How the field's name should appear in devui</param>
+        </member>
+        <member name="T:Pom.Pom.ManagedFieldWithPanel.ControlType">
+            <summary>
+            <see cref="T:Pom.Pom.ManagedFieldWithPanel"/>'s possible controls
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.ControlType.none">
+            <summary>
+            Control does not appear
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.ControlType.slider">
+            <summary>
+            Value is controlled with a slider
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.ControlType.arrows">
+            <summary>
+            Value is controlled with increment/decrement arrow buttons
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.ControlType.button">
+            <summary>
+            Value is cycled using a single button
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedFieldWithPanel.ControlType.text">
+            <summary>
+            Value is controlled with a textbox
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.SizeOfPanelUiMinusName">
+            <summary>
+            Used internally for control panel display. 
+            Consumed by <see cref="M:Pom.Pom.ManagedRepresentation.MakeControls"/> to expand the panel and space controls.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.SizeOfLargestDisplayValue">
+            <summary>
+            Used internally for control panel display. Consumed by <see cref="M:Pom.Pom.ManagedFieldWithPanel.SizeOfPanelUiMinusName"/> and final UI nodes.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.SizeOfPanelNode">
+            <summary>
+            Approx size of the UI minus displayname and valuedisplay width. Consumed by <see cref="M:Pom.Pom.ManagedFieldWithPanel.SizeOfPanelUiMinusName"/>.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.SizeOfDisplayname">
+            <summary>
+            Used internally for control panel display.
+            Called from <see cref="M:Pom.Pom.ManagedRepresentation.MakeControls"/>
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.MakeControlPanelNode(Pom.Pom.ManagedData,Pom.Pom.ManagedControlPanel,System.Single)">
+            <summary>
+            Used internally for building the control panel display.
+            Called from <see cref="M:Pom.Pom.ManagedRepresentation.MakeControls"/>
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.DisplayValueForNode(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData)">
+            <summary>
+            Used internally for controls in the panel to display the value of this field as text.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedFieldWithPanel.ParseFromText(DevInterface.PositionedDevUINode,Pom.Pom.ManagedData,System.String)">
+            <summary>
+            Used internally for text input parsing by <see cref="T:Pom.Pom.ManagedStringControl"/>.
+            Should raise an <see cref="T:System.ArgumentException"/> if the value is invalid or can't be parsed (used for visual feedback on text input)
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.ManagedData">
+            <summary>
+            Managed data type, handles managed fields passed through the constuctor and through Attributes.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedData.fields">
+            <summary>
+            Fields defined for this object's type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedData.fieldInfosByKey">
+            <summary>
+            All fields that are bound to actual class fields
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedData.fieldsByKey">
+            <summary>
+            All values that are bound to ManagedField objects passed to ManagedData constructor
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedData.valuesByKey">
+            <summary>
+            All stored values
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.ManagedData.BackedByField">
+            <summary>
+            Attribute for tying a field to a <see cref="T:Pom.Pom.ManagedField"/> that cannot be properly initialized as Attribute such as <see cref="T:Pom.Pom.Vector2Field"/> and <see cref="T:Pom.Pom.EnumField`1"/>. Mostly obsolete.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedData.BackedByField.key">
+            <summary>
+            Name of the data field
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedData.BackedByField.#ctor(System.String)">
+            <param name="key">Name of the data field</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedData.#ctor(PlacedObject,Pom.Pom.ManagedField[])">
+            <summary>
+            Instantiates the managed data object for use with a placed object in the roomSettings.
+            You shouldn't instantiate this on your own, it'll be called by the framework.
+            </summary>
+            <param name="owner">the <see cref="T:PlacedObject"/> this data belongs to</param>
+            <param name="paramFields">the <see cref="T:Pom.Pom.ManagedField"/>s for this data. Upon initialization it'll also scan for any annotated fields.</param>
+        </member>
+        <member name="F:Pom.Pom.ManagedData.panelPos">
+            <summary>
+            Position of the controls panel
+            </summary>
+        </member>
+        <member name="P:Pom.Pom.ManagedData.NeedsControlPanel">
+            <summary>
+            Whether this data object needs a control panel
+            </summary>
+        </member>
+        <member name="P:Pom.Pom.ManagedData.FieldsWhenSerialized">
+            <summary>
+            For classes that inherit this to know where their data begins. Create something similar for your class if you intend it to be inherited further ;)
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedData.GetValue``1(System.String)">
+            <summary>
+            Retrieves the value stored for the field represented by this key.
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedData.SetValue``1(System.String,``0)">
+            <summary>
+            Stores a new value for the field represented by this key. Used mostly by the managed UI. Changes are only saved when the Save button is clicked on the devtools ui
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedData.FromString(System.String)">
+            <summary>
+            Deserialization function called when the placedobject for this data is loaded
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedData.ToString">
+            <summary>
+            Serialization function called when the placedobject for this data is saved with devtools.
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.ManagedRepresentation">
+            <summary>
+            Class that manages the PlacedObjectRepresentation for a <see cref="T:Pom.Pom.ManagedData"/>, 
+            creating controls for any <see cref="T:Pom.Pom.ManagedField"/> that needs them,
+            or panel UI for <see cref="T:Pom.Pom.ManagedFieldWithPanel"/>.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedRepresentation.placedType">
+            <summary>
+            ExtEnum entry of associated placedobject
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedRepresentation.managedNodes">
+            <summary>
+            Currently unused key-keyed collection of control nodes
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedRepresentation.panel">
+            <summary>
+            Currently unused reference to own control panel
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedRepresentation.#ctor(PlacedObject.Type,DevInterface.ObjectsPage,PlacedObject)">
+            <param name="placedType">ExtEnum entry of associated placedobject</param>
+            <param name="objPage">Objects page of associated placedobject</param>
+            <param name="pObj">Associated placedobject</param>
+        </member>
+        <member name="M:Pom.Pom.ManagedRepresentation.MakeControls">
+            <summary>
+            Creates devui controls for all the fields. Called from the constructor
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.ManagedControlPanel">
+            <summary>
+            The panel spawned by <see cref="T:Pom.Pom.ManagedRepresentation"/> if any of its <see cref="T:Pom.Pom.ManagedField"/>s requires panel UI.
+            Doesn't do much on its own besides keeping a white line that connects the panel and the placedobject representation.
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedControlPanel.managedRepresentation">
+            <summary>
+            Associated Representation
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedControlPanel.managedNodes">
+            <summary>
+            Mirror of <see cref="F:Pom.Pom.ManagedRepresentation.managedNodes"/>
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedControlPanel.managedFields">
+            <summary>
+            Mirror of <see cref="!:global::Pom.Pom.ManagedRepresentation.managedFields"/>... Hold on, that doesn't exist o_O
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.ManagedControlPanel.lineSprt">
+            <summary>
+            Connector line sprite index
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.ManagedControlPanel.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.Vector2ArrayField">
+            <summary>
+            A <see cref="T:Pom.Pom.ManagedField"/> that stores an array of <see cref="T:UnityEngine.Vector2"/>s
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.RepresentationType">
+            <summary>
+            Chosen representation type
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.NodeCount">
+            <summary>
+            Number of vector2 nodes
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.#ctor(System.String,System.Int32,System.Boolean,Pom.Pom.Vector2ArrayField.Vector2ArrayRepresentationType,UnityEngine.Vector2[])">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.Vector2ArrayField"/> and assigns the proper values that are used in the handle
+            </summary>
+            <param name="key">The key of the field that should be used in <see cref="M:Pom.Pom.ManagedData.GetValue``1(System.String)"/></param>
+            <param name="nodeCount">The number of <see cref="T:UnityEngine.Vector2"/>s that the field stores</param>
+            <param name="includeParent">Sets if the field should use the parent as the first node</param>
+            <param name="representationType">The type of the representation that should be created.</param>
+            <param name="nodes">Default nodes that are assigned. Node ordering is bottom nodes left to right, then top nodes right to left.</param>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.#ctor(System.String,System.Int32,System.Boolean,Pom.Pom.Vector2ArrayField.Vector2ArrayRepresentationType,System.Single[])">
+            <summary>
+            Creates a <see cref="T:Pom.Pom.Vector2ArrayField"/> and assigns the proper values that are used in the handle
+            </summary>
+            <param name="key">The key of the field that should be used in <see cref="M:Pom.Pom.ManagedData.GetValue``1(System.String)"/></param>
+            <param name="nodeCount">The number of <see cref="T:UnityEngine.Vector2"/>s that the field stores</param>
+            <param name="includeParent">Sets if the field should use the parent as the first node</param>
+            <param name="representationType">The type of the representation that should be created.</param>
+            <param name="nodeElements">Default nodes that are assigned. Node ordering is bottom nodes left to right, then top nodes right to left. Nodes are passed as pairs of floats: x0, y0, x1, y1 etc</param>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.ToString(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.FromString(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.MakeAditionalNodes(Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Pom.Pom.Vector2ArrayField.Vector2ArrayRepresentationType">
+            <summary>
+            How the handle should look like
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.Vector2ArrayRepresentationType.Chain">
+            <summary>
+            Handle is an open-ended chain
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.Vector2ArrayRepresentationType.Polygon">
+            <summary>
+            Handle is a polygon (start and end connected)
+            </summary>
+        </member>
+        <member name="T:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle">
+            <summary>
+            Special handle for vector2arrayfield
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.Field">
+            <summary>
+            Associated field
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.Data">
+            <summary>
+            Associated placedobject's data
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.First">
+            <summary>
+            First node
+            </summary>
+        </member>
+        <member name="F:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.Lines">
+            <summary>
+            List of line subnode indices
+            </summary>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.#ctor(Pom.Pom.Vector2ArrayField,Pom.Pom.ManagedData,Pom.Pom.ManagedRepresentation)">
+            <param name="field">Field definition</param>
+            <param name="data">Associated placedobject's data</param>
+            <param name="representation">Associated placedobject's representation</param>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.Move(UnityEngine.Vector2)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Pom.Pom.Vector2ArrayField.Vector2ArrayHandle.Refresh">
+            <inheritdoc/>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.AllowNullAttribute">
+            <summary>
+            Specifies that null is allowed as an input even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DisallowNullAttribute">
+            <summary>
+            Specifies that null is disallowed as an input even if the corresponding type allows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute">
+            <summary>
+            Applied to a method that will never return under any circumstance.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute">
+            <summary>
+            Specifies that the method will not return if the associated Boolean parameter is passed the specified value.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified parameter value.
+            </summary>
+            <param name="parameterValue">
+            The condition parameter value. Code after the method will be considered unreachable
+            by diagnostics if the argument to the associated parameter matches this value.
+            </param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute.ParameterValue">
+            <summary>
+            Gets the condition parameter value.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullAttribute">
+            <summary>
+            Specifies that an output may be null even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute">
+            <summary>
+            Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified return value condition.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter may be null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property members have not-null values.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with a field or property member.
+            </summary>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes the attribute with the list of field and property members.
+            </summary>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute">
+            <summary>
+            Specifies that the method or property will ensure that the listed field and property
+            members have not-null values when returning with the specified return value condition.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String)">
+            <summary>
+            Initializes the attribute with the specified return value condition and a field or property member.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="member">The field or property member that is promised to be not-null.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.#ctor(System.Boolean,System.String[])">
+            <summary>
+            Initializes the attribute with the specified return value condition and list of field and property members.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+            <param name="members">The list of field and property members that are promised to be not-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.ReturnValue">
+            <summary>
+            Gets the return value condition.
+            </summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
+            <summary>
+            Gets field or property member names.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullAttribute">
+            <summary>
+            Specifies that an output will not be null even if the corresponding type allows it.
+            Specifies that an input argument was not null when the call returns.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute">
+            <summary>
+            Specifies that the output will be non-null if the named parameter is non-null.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the attribute with the associated parameter name.
+            </summary>
+            <param name="parameterName">The associated parameter name. The output will be non-null if the argument to the parameter specified is non-null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute.ParameterName">
+            <summary>
+            Gets the associated parameter name.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute">
+            <summary>
+            Specifies that when a method returns <see cref="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes the attribute with the specified return value condition.
+            </summary>
+            <param name="returnValue">The return value condition. If the method returns this value, the associated parameter will not be null.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.NotNullWhenAttribute.ReturnValue">
+            <summary>Gets the return value condition.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.SetsRequiredMembersAttribute">
+            <summary>
+            Specifies that this constructor sets all required members for the current type,
+            and callers do not need to set any required members themselves.
+            </summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute">
+            <summary>
+            Specifies the syntax used in a string.
+            </summary>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String)">
+            <summary>
+            Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.
+            </summary>
+            <param name="syntax">The syntax identifier.</param>
+        </member>
+        <member name="M:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.#ctor(System.String,System.Object[])">
+            <summary>Initializes the <see cref="T:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/> with the identifier of the syntax used.</summary>
+            <param name="syntax">The syntax identifier.</param>
+            <param name="arguments">Optional arguments associated with the specific syntax employed.</param>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Syntax">
+            <summary>Gets the identifier of the syntax used.</summary>
+        </member>
+        <member name="P:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Arguments">
+            <summary>Optional arguments associated with the specific syntax employed.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.CompositeFormat">
+            <summary>The syntax identifier for strings containing composite formats for string formatting.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateOnlyFormat">
+            <summary>The syntax identifier for strings containing date format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.DateTimeFormat">
+            <summary>The syntax identifier for strings containing date and time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.EnumFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Enum"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.GuidFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.Guid"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Json">
+            <summary>The syntax identifier for strings containing JavaScript Object Notation (JSON).</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.NumericFormat">
+            <summary>The syntax identifier for strings containing numeric format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Regex">
+            <summary>The syntax identifier for strings containing regular expressions.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeOnlyFormat">
+            <summary>The syntax identifier for strings containing time format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.TimeSpanFormat">
+            <summary>The syntax identifier for strings containing <see cref="T:System.TimeSpan"/> format specifiers.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Uri">
+            <summary>The syntax identifier for strings containing URIs.</summary>
+        </member>
+        <member name="F:System.Diagnostics.CodeAnalysis.StringSyntaxAttribute.Xml">
+            <summary>The syntax identifier for strings containing XML.</summary>
+        </member>
+        <member name="T:System.Diagnostics.CodeAnalysis.UnscopedRefAttribute">
+            <summary>
+            Used to indicate a byref escapes and is not scoped.
+            </summary>
+            <remarks>
+            <para>
+            There are several cases where the C# compiler treats a <see langword="ref"/> as implicitly
+            <see langword="scoped"/> - where the compiler does not allow the <see langword="ref"/> to escape the method.
+            </para>
+            <para>
+            For example:
+            <list type="number">
+                <item><see langword="this"/> for <see langword="struct"/> instance methods.</item>
+                <item><see langword="ref"/> parameters that refer to <see langword="ref"/> <see langword="struct"/> types.</item>
+                <item><see langword="out"/> parameters.</item>
+            </list>
+            </para>
+            <para>
+            This attribute is used in those instances where the <see langword="ref"/> should be allowed to escape.
+            </para>
+            <para>
+            Applying this attribute, in any form, has impact on consumers of the applicable API. It is necessary for
+            API authors to understand the lifetime implications of applying this attribute and how it may impact their users.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:System.Index">
+            <summary>Represent a type can be used to index a collection either from the start or the end.</summary>
+            <remarks>
+            Index is used by the C# compiler to support the new index syntax
+            <code>
+            int[] someArray = new int[5] { 1, 2, 3, 4, 5 } ;
+            int lastElement = someArray[^1]; // lastElement = 5
+            </code>
+            </remarks>
+        </member>
+        <member name="M:System.Index.#ctor(System.Int32,System.Boolean)">
+            <summary>Construct an Index using a value and indicating if the index is from the start or from the end.</summary>
+            <param name="value">The index value. it has to be zero or positive number.</param>
+            <param name="fromEnd">Indicating if the index is from the start or from the end.</param>
+            <remarks>
+            If the Index constructed from the end, index value 1 means pointing at the last element and index value 0 means pointing at beyond last element.
+            </remarks>
+        </member>
+        <member name="P:System.Index.Start">
+            <summary>Create an Index pointing at first element.</summary>
+        </member>
+        <member name="P:System.Index.End">
+            <summary>Create an Index pointing at beyond last element.</summary>
+        </member>
+        <member name="M:System.Index.FromStart(System.Int32)">
+            <summary>Create an Index from the start at the position indicated by the value.</summary>
+            <param name="value">The index value from the start.</param>
+        </member>
+        <member name="M:System.Index.FromEnd(System.Int32)">
+            <summary>Create an Index from the end at the position indicated by the value.</summary>
+            <param name="value">The index value from the end.</param>
+        </member>
+        <member name="P:System.Index.Value">
+            <summary>Returns the index value.</summary>
+        </member>
+        <member name="P:System.Index.IsFromEnd">
+            <summary>Indicates whether the index is from the start or the end.</summary>
+        </member>
+        <member name="M:System.Index.GetOffset(System.Int32)">
+            <summary>Calculate the offset from the start using the giving collection length.</summary>
+            <param name="length">The length of the collection that the Index will be used with. length has to be a positive value</param>
+            <remarks>
+            For performance reason, we don't validate the input length parameter and the returned offset value against negative values.
+            we don't validate either the returned offset is greater than the input length.
+            It is expected Index will be used with collections which always have non negative length/count. If the returned offset is negative and
+            then used to index a collection will get out of range exception which will be same affect as the validation.
+            </remarks>
+        </member>
+        <member name="M:System.Index.Equals(System.Object)">
+            <summary>Indicates whether the current Index object is equal to another object of the same type.</summary>
+            <param name="value">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.Equals(System.Index)">
+            <summary>Indicates whether the current Index object is equal to another Index object.</summary>
+            <param name="other">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Index.GetHashCode">
+            <summary>Returns the hash code for this instance.</summary>
+        </member>
+        <member name="M:System.Index.op_Implicit(System.Int32)~System.Index">
+            <summary>Converts integer number to an Index.</summary>
+        </member>
+        <member name="M:System.Index.ToString">
+            <summary>Converts the value of the current Index object to its equivalent string representation.</summary>
+        </member>
+        <member name="T:System.Range">
+            <summary>Represent a range has start and end indexes.</summary>
+            <remarks>
+            Range is used by the C# compiler to support the range syntax.
+            <code>
+            int[] someArray = new int[5] { 1, 2, 3, 4, 5 };
+            int[] subArray1 = someArray[0..2]; // { 1, 2 }
+            int[] subArray2 = someArray[1..^0]; // { 2, 3, 4, 5 }
+            </code>
+            </remarks>
+        </member>
+        <member name="P:System.Range.Start">
+            <summary>Represent the inclusive start index of the Range.</summary>
+        </member>
+        <member name="P:System.Range.End">
+            <summary>Represent the exclusive end index of the Range.</summary>
+        </member>
+        <member name="M:System.Range.#ctor(System.Index,System.Index)">
+            <summary>Construct a Range object using the start and end indexes.</summary>
+            <param name="start">Represent the inclusive start index of the range.</param>
+            <param name="end">Represent the exclusive end index of the range.</param>
+        </member>
+        <member name="M:System.Range.Equals(System.Object)">
+            <summary>Indicates whether the current Range object is equal to another object of the same type.</summary>
+            <param name="value">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Range.Equals(System.Range)">
+            <summary>Indicates whether the current Range object is equal to another Range object.</summary>
+            <param name="other">An object to compare with this object</param>
+        </member>
+        <member name="M:System.Range.GetHashCode">
+            <summary>Returns the hash code for this instance.</summary>
+        </member>
+        <member name="M:System.Range.ToString">
+            <summary>Converts the value of the current Range object to its equivalent string representation.</summary>
+        </member>
+        <member name="M:System.Range.StartAt(System.Index)">
+            <summary>Create a Range object starting from start index to the end of the collection.</summary>
+        </member>
+        <member name="M:System.Range.EndAt(System.Index)">
+            <summary>Create a Range object starting from first element in the collection to the end Index.</summary>
+        </member>
+        <member name="P:System.Range.All">
+            <summary>Create a Range object starting from first element to the end.</summary>
+        </member>
+        <member name="M:System.Range.GetOffsetAndLength(System.Int32)">
+            <summary>Calculate the start offset and length of range object using a collection length.</summary>
+            <param name="length">The length of the collection that the range will be used with. length has to be a positive value.</param>
+            <remarks>
+            For performance reason, we don't validate the input length parameter against negative values.
+            It is expected Range will be used with collections which always have non negative length/count.
+            We validate the range is inside the length scope though.
+            </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute">
+            <summary>
+            Indicates the type of the async method builder that should be used by a language compiler to
+            build the attributed async method or to build the attributed type when used as the return type
+            of an async method.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute.#ctor(System.Type)">
+            <summary>Initializes the <see cref="T:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute"/>.</summary>
+            <param name="builderType">The <see cref="T:System.Type"/> of the associated builder.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.AsyncMethodBuilderAttribute.BuilderType">
+            <summary>Gets the <see cref="T:System.Type"/> of the associated builder.</summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute">
+            <summary>
+            An attribute that allows parameters to receive the expression of other parameters.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/> class.
+            </summary>
+            <param name="parameterName">The condition parameter value.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute.ParameterName">
+            <summary>
+            Gets the parameter name the expression is retrieved from.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute">
+            <summary>
+            Indicates that compiler support for a particular feature is required for the location where this attribute is applied.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the <see cref="T:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute"/> type.
+            </summary>
+            <param name="featureName">The name of the feature to indicate.</param>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName">
+            <summary>
+            The name of the compiler feature.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.IsOptional">
+            <summary>
+            If true, the compiler can choose to allow access to the location where this attribute is applied if it does not understand <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/>.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RefStructs">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the ref structs C# feature.
+            </summary>
+        </member>
+        <member name="F:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.RequiredMembers">
+            <summary>
+            The <see cref="P:System.Runtime.CompilerServices.CompilerFeatureRequiredAttribute.FeatureName"/> used for the required members C# feature.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute">
+            <summary>
+            Indicates which arguments to a method involving an interpolated string handler should be passed to that handler.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="argument">The name of the argument that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="M:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute"/> class.
+            </summary>
+            <param name="arguments">The names of the arguments that should be passed to the handler.</param>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="P:System.Runtime.CompilerServices.InterpolatedStringHandlerArgumentAttribute.Arguments">
+            <summary>
+            Gets the names of the arguments that should be passed to the handler.
+            </summary>
+            <remarks><see langword="null"/> may be used as the name of the receiver in an instance method.</remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.InterpolatedStringHandlerAttribute">
+            <summary>
+            Indicates the attributed type is to be used as an interpolated string handler.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.IsExternalInit">
+            <summary>
+            Reserved to be used by the compiler for tracking metadata.
+            This class should not be used by developers in source code.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.ModuleInitializerAttribute">
+             <summary>
+             Used to indicate to the compiler that a method should be called
+             in its containing module's initializer.
+             </summary>
+             <remarks>
+             When one or more valid methods
+             with this attribute are found in a compilation, the compiler will
+             emit a module initializer which calls each of the attributed methods.
+            
+             Certain requirements are imposed on any method targeted with this attribute:
+             - The method must be `static`.
+             - The method must be an ordinary member method, as opposed to a property accessor, constructor, local function, etc.
+             - The method must be parameterless.
+             - The method must return `void`.
+             - The method must not be generic or be contained in a generic type.
+             - The method's effective accessibility must be `internal` or `public`.
+            
+             The specification for module initializers in the .NET runtime can be found here:
+             https://github.com/dotnet/runtime/blob/main/docs/design/specs/Ecma-335-Augments.md#module-initializer
+             </remarks>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.RequiredMemberAttribute">
+            <summary>
+            Specifies that a type has required members or that a member is required.
+            </summary>
+        </member>
+        <member name="T:System.Runtime.CompilerServices.SkipLocalsInitAttribute">
+            <summary>
+            Used to indicate to the compiler that the <c>.locals init</c> flag should not be set in method headers.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class.
+            </summary>
+        </member>
+        <member name="M:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute"/> class with the specified message.
+            </summary>
+            <param name="message">An optional message associated with this attribute instance.</param>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Message">
+            <summary>
+            Returns the optional message associated with this attribute instance.
+            </summary>
+        </member>
+        <member name="P:System.Runtime.Versioning.RequiresPreviewFeaturesAttribute.Url">
+            <summary>
+            Returns the optional URL associated with this attribute instance.
+            </summary>
+        </member>
+    </members>
+</doc>

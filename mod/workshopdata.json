@@ -1,0 +1,18 @@
+{
+  "Title": "Placed Objects Manager [POM]",
+  "Description": "DevUI extender for placed objects and effects.\u003CLINE\u003ESource code and instructions can be found here: https://github.com/Rain-World-Modding/Pom",
+  "ID": "pom",
+  "Version": "2.9",
+  "TargetGameVersion": "",
+  "Requirements": "",
+  "RequirementNames": "",
+  "Authors": "Henpemaz, Thalber",
+  "Visibility": "Public",
+  "Tags": [
+    "Dependency",
+    "Tools"
+  ],
+  "WorkshopID": 2920439169,
+  "UploadFilesOnly": false,
+  "UploadThumbnail": false
+}

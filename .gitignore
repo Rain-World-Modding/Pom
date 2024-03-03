@@ -399,3 +399,5 @@ FodyWeavers.xsd
 
 # user
 lib/**
+*.dll
+*.xml

@@ -1,0 +1,11 @@
+{
+	"id": "pom",
+	"name": "POM",
+	"version": "2.9",
+	"authors": "Henpemaz, Thalber",
+	"description": "DevUI extender for placed objects and effects.<LINE>Source code and instructions can be found here: https://github.com/Rain-World-Modding/Pom",
+	"requirements": [],
+	"requirements_names": [],
+	"checksum_override_version": false,
+	"tags": ["Dependency", "Tools"]
+}
