@@ -10,6 +10,9 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<RootNamespace></RootNamespace>
 		<DebugType>Portable</DebugType>
+		<IncludeSymbols>False</IncludeSymbols>
+		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
+    	<PathMap>$(AppOutputBase)=RegionKit\</PathMap>
 	</PropertyGroup>
 	<!-- Debug configuration. Build for release. -->
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
