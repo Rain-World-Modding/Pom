@@ -1,4 +1,4 @@
-namespace EffExt;
+﻿namespace EffExt;
 
 /// <summary>
 /// Builder class for creating an effect definition.
@@ -10,7 +10,7 @@ public sealed class EffectDefinitionBuilder
 	private string _name;
 	private UADFactory? _UADFactory;
 	private EffectInitializer? _initializer;
-	private Dictionary<string, EffectField> _fields = new();
+	private OrderedDictionary<string, EffectField> _fields = new();
 
 	/// <summary>
 	/// Creates a new blank instance.

@@ -1,6 +1,7 @@
 ﻿global using static PomCore.Mod;
 global using static PomCore.Utils;
 global using static PomCore.Logfix;
+global using PomCore;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using Mono.Cecil.Cil;

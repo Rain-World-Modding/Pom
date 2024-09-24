@@ -1,4 +1,4 @@
-namespace EffExt;
+﻿namespace EffExt;
 
 /// <summary>
 /// Custom data description for a room effect.
@@ -14,7 +14,7 @@ public sealed record EffectDefinition(
 	string Name,
 	UADFactory? UADFactory,
 	EffectInitializer? EffectInitializer,
-	System.Collections.ObjectModel.ReadOnlyDictionary<string, EffectField> Fields
+	ReadOnlyOrderedDictionary<string, EffectField> Fields
 	)
 {
 	internal static EffectDefinition @default = new(null, "DefaultEffectDef", null, null, new(new Dictionary<string, EffectField>()));
