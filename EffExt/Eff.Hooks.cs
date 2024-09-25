@@ -1,4 +1,4 @@
-using DevInterface;
+﻿using DevInterface;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using UnityEngine;
@@ -15,6 +15,7 @@ public static partial class Eff
 		On.RoomSettings.RoomEffect.FromString += __ParseExtraData;
 		On.RoomSettings.RoomEffect.ToString += __SaveExtraData;
 		On.ProcessManager.PostSwitchMainProcess += __ClearAttachedData;
+		On.RoomSettings.RoomEffect.ctor += __GenerateEmptyData;
 		On.DevInterface.EffectPanel.ctor += __ConstructEffectPanel;
 		On.Room.Loaded += __SpawnEffectObjects;
 		new MonoMod.RuntimeDetour.Hook(
@@ -22,7 +23,46 @@ public static partial class Eff
 			typeof(Eff).GetMethod(nameof(__OverrideSliderStartCoord), ALLCTX | System.Reflection.BindingFlags.Static));
 		IL.DevInterface.RoomSettingsPage.AssembleEffectsPages += __IL_SortEffectEntries;
 		On.DevInterface.RoomSettingsPage.DevEffectGetCategoryFromEffectType += __EffectsPage_Sort;
+		On.DevInterface.RoomSettingsPage.Signal += RoomSettingsPage_Signal;
 	}
+
+	private static void RoomSettingsPage_Signal(On.DevInterface.RoomSettingsPage.orig_Signal orig, RoomSettingsPage self, DevUISignalType type, DevUINode sender, string message)
+	{
+		bool flag = true;
+		if (type == DevUISignalType.Create)
+		{
+			RoomSettings.RoomEffect.Type type2 = new RoomSettings.RoomEffect.Type(message, false);
+			for (int i = 0; i < self.RoomSettings.effects.Count; i++)
+			{
+				if (!self.RoomSettings.effects[i].inherited && self.RoomSettings.effects[i].type == type2)
+				{
+					flag = false;
+				}
+			}
+		}
+		orig(self, type, sender, message);
+
+		if (flag)
+		{
+			LogTrace($"creating effects object for [{self.RoomSettings.effects.Last().type.value}]");
+			SpawnSingleEffectsObject(self.owner.room, self.RoomSettings.effects.Last());
+		}
+	}
+
+	private static void __GenerateEmptyData(On.RoomSettings.RoomEffect.orig_ctor orig, RoomSettings.RoomEffect self, RoomSettings.RoomEffect.Type type, float amount, bool inherited)
+	{
+		orig(self, type, amount, inherited);
+		if (!__effectDefinitions.TryGetValue(type.ToString(), out EffectDefinition def))
+		{
+			return;
+		}
+		self.unrecognizedAttributes ??= new string[0];
+
+		EffectExtraData newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
+		__attachedData[self.GetHashCode()] = newdata;
+		LogTrace(__attachedData[self.GetHashCode()]);
+	}
+
 	private static float __OverrideSliderStartCoord(Func<Slider, float> orig, Slider self)
 	{
 		float res = orig(self);
@@ -36,34 +76,40 @@ public static partial class Eff
 		orig(self);
 		foreach (RoomSettings.RoomEffect effect in self.roomSettings.effects)
 		{
-			if (!__effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
-			{
-				continue;
-			}
-			if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
-			{
-				LogTrace($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
-				continue;
-			}
-			try
-			{
-				def.EffectInitializer?.Invoke(self, data, firstTimeRealized);
-			}
-			catch (Exception ex)
-			{
-				LogTrace($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
-			}
-			try
-			{
-				UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized);
-				if (uad is null) continue;
-				LogTrace($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
-				self.AddObject(uad);
-			}
-			catch (Exception ex)
-			{
-				LogTrace($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
-			}
+			SpawnSingleEffectsObject(self, effect);
+		}
+	}
+
+	private static void SpawnSingleEffectsObject(Room self, RoomSettings.RoomEffect effect)
+	{
+		bool firstTimeRealized = self.abstractRoom.firstTimeRealized;
+		if (!__effectDefinitions.TryGetValue(effect.type.ToString(), out EffectDefinition def))
+		{
+			return;
+		}
+		if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
+		{
+			LogTrace($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
+			return;
+		}
+		try
+		{
+			def.EffectInitializer?.Invoke(self, data, firstTimeRealized);
+		}
+		catch (Exception ex)
+		{
+			LogTrace($"Error running effect-initializer for {def} in room {self.abstractRoom.name} : {ex}");
+		}
+		try
+		{
+			UpdatableAndDeletable? uad = def.UADFactory?.Invoke(self, data, firstTimeRealized);
+			if (uad is null) return;
+			LogTrace($"Created an effect-UAD {uad} in room {self.abstractRoom.name}");
+			self.AddObject(uad);
+		}
+		catch (Exception ex)
+		{
+			LogTrace($"Error running effect-UAD factory for {def} in room {self.abstractRoom.name} : {ex}");
 		}
 	}
 
@@ -204,26 +250,35 @@ public static partial class Eff
 
 	private static string __SaveExtraData(On.RoomSettings.RoomEffect.orig_ToString orig, RoomSettings.RoomEffect self)
 	{
-		List<string> attributes = new();
-		attributes.AddRange(self.unrecognizedAttributes ?? new string[0]);
-		// plog.LogTrace($"Serializing {self.type}");
 		if (!__attachedData.TryGetValue(self.GetHashCode(), out EffectExtraData data))
 		{
 			LogTrace("Could not find EffectExtraData, aborting");
-			goto done;
+			return orig(self);
 		}
-		foreach (var kvp in data.RawData)
+
+		string[] oldAttributes = self.unrecognizedAttributes;
+		try
 		{
-			string fieldkey = kvp.Key;
-			string fieldval = kvp.Value ?? "";
-			//not discarding unknown data
-			//if (!data.RawData.TryGetValue(fieldkey, out string fieldval)) fieldval = fielddef.ToString() ?? "";
-			LogTrace($"serializing {fieldkey} : {fieldval} (value {fieldval})");
-			attributes.Add($"{__EscapeString(fieldkey)}:{__EscapeString(fieldval)}");
+			List<string> attributes = new();
+			attributes.AddRange(self.unrecognizedAttributes ?? new string[0]);
+			// plog.LogTrace($"Serializing {self.type}");
+
+			foreach (var kvp in data.RawData)
+			{
+				string fieldkey = kvp.Key;
+				string fieldval = kvp.Value ?? "";
+				//not discarding unknown data
+				//if (!data.RawData.TryGetValue(fieldkey, out string fieldval)) fieldval = fielddef.ToString() ?? "";
+				LogTrace($"serializing {fieldkey} : {fieldval} (value {fieldval})");
+				attributes.Add($"{__EscapeString(fieldkey)}:{__EscapeString(fieldval)}");
+			}
+			self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
+			return orig(self);
 		}
-		self.unrecognizedAttributes = attributes.Count is 0 ? null : attributes.ToArray();
-	done:
-		return orig(self);
+		finally
+		{
+			self.unrecognizedAttributes = oldAttributes;
+		}
 	}
 	private static DevInterface.RoomSettingsPage.DevEffectsCategories __EffectsPage_Sort(On.DevInterface.RoomSettingsPage.orig_DevEffectGetCategoryFromEffectType orig, DevInterface.RoomSettingsPage self, RoomSettings.RoomEffect.Type type)
 	{
