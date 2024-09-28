@@ -706,4 +706,220 @@ public static partial class Pom
 		}
 	}
 
+
+	/// <summary>
+	/// A button that brings up a panel of all the selectable options
+	/// <see cref="global::Pom.Pom.IListablePanelField"/>
+	/// </summary>
+	public class ManagedPanelButton : PositionedDevUINode, IDevUISignals
+	{
+		/// <summary>
+		/// Contained button
+		/// </summary>
+		protected readonly Button button;
+		/// <summary>
+		/// Field definition
+		/// </summary>
+		protected readonly ManagedFieldWithPanel field;
+		/// <summary>
+		/// <see cref="field"/> but cast to interface type
+		/// </summary>
+		protected readonly IListablePanelField listable;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
+		protected readonly ManagedData data;
+		/// <param name="field">Field definition</param>
+		/// <param name="data">Data of the associated placedobject</param>
+		/// <param name="panel">Containing panel</param>
+		/// <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
+		public ManagedPanelButton(
+			ManagedFieldWithPanel field,
+			ManagedData data,
+			ManagedControlPanel panel,
+			float sizeOfDisplayname) : base(
+				panel.owner,
+				field.key,
+				panel,
+				Vector2.zero)
+
+		{
+			this.field = field;
+			this.listable = (field as IListablePanelField)!;
+			if (listable == null) throw new ArgumentException("Field must implement IListablePanelField");
+			this.data = data;
+			this.subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0f, 0f), sizeOfDisplayname, field.displayName));
+			this.subNodes.Add(this.button = new Button(owner, "Button", this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data)));
+		}
+		/// <inheritdoc/>
+		public virtual void Signal(DevUISignalType type, DevUINode sender, string message) // from button
+		{
+			if (itemSelectPanel != null)
+			{
+				if (IsSubButtonID(sender.IDstring, out var item))
+				{
+					field.ParseFromText(this, data, item);
+				}
+
+				subNodes.Remove(itemSelectPanel);
+				itemSelectPanel.ClearSprites();
+				itemSelectPanel = null;
+			}
+			else
+			{
+				Vector2 setPos = panelPos - absPos;
+				//setPos.x = Mathf.Clamp(setPos.x, 10f, owner.game.rainWorld.screenSize.x - panelSize.x - absPos.x);
+				//setPos.y = Mathf.Clamp(setPos.y, 10f, owner.game.rainWorld.screenSize.y - panelSize.y - absPos.y);
+				itemSelectPanel = new ItemSelectPanel(owner, this, setPos, IDstring + "_Panel", field.key, panelSize, panelButtonWidth, panelColumns);
+				subNodes.Add(itemSelectPanel);
+			}
+			this.Refresh();
+		}
+
+		/// <summary>
+		/// detects if signal is from sub-button and if so, processes the actual item value
+		/// </summary>
+		public bool IsSubButtonID(string IDstring, out string subButtonID)
+		{
+			subButtonID = "";
+			if (itemSelectPanel != null && IDstring.StartsWith(itemSelectPanel.idstring + "Button99289_"))
+			{
+				subButtonID = IDstring.Remove(0, (itemSelectPanel.idstring + "Button99289_").Length);
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <inheritdoc/>
+		public override void Refresh()
+		{
+			this.button.Text = field.DisplayValueForNode(this, data);
+			base.Refresh();
+		}
+
+		/// <inheritdoc/>
+		public string[] GetItems(int page)
+		{
+			return listable.GetValues(Math.Max(listable.LowestItem(), page * ItemsPerPage), Math.Min(listable.HighestItem(), (page + 1) * ItemsPerPage));
+		}
+
+
+		public ItemSelectPanel? itemSelectPanel;
+
+		public Vector2 panelPos = new Vector2(200f, 15f);
+
+		public Vector2 panelSize = new Vector2(305f, 420f);
+
+		public float panelButtonWidth = 145f;
+
+		public int ItemsPerPage => (int)((panelSize.y - 60f) / 20f * panelColumns);
+
+		public int panelColumns = 2;
+	}
+
+	public class ItemSelectPanel : Panel, IDevUISignals
+	{
+		public ItemSelectPanel(
+			DevUI owner,
+			ManagedPanelButton parentNode,
+			Vector2 pos,
+			string idstring,
+			string title,
+			Vector2 size = default,
+			float buttonWidth = 145f,
+			int columns = 2)
+			: base(
+				owner,
+				idstring,
+				parentNode,
+				pos,
+				size == default ? new Vector2(305f, 420f) : size,
+				title)
+		{
+			managedParent = parentNode;
+			this.idstring = idstring;
+			this.buttonWidth = buttonWidth;
+			this.columns = columns;
+
+			currentOffset = 0;
+			perpage = (int)((this.size.y - 60f) / 20f * columns);
+			PopulateItems(currentOffset);
+		}
+		public void PopulateItems(int offset)
+		{
+			string[] items = managedParent.GetItems(offset);
+			if (items.Length == 0) return;
+			currentOffset = offset;
+			foreach (DevUINode devUINode in subNodes)
+			{
+				devUINode.ClearSprites();
+			}
+
+			subNodes.Clear();
+			var intVector = new RWCustom.IntVector2(0, 0);
+
+			foreach (string item in items)
+			{
+
+				var currentOption = new Button(owner, idstring + "Button99289_" + item, this, new Vector2(5f + intVector.x * (buttonWidth + 5f), size.y - 25f - 20f * intVector.y), buttonWidth, item);
+				string currentItem = item;
+				subNodes.Add(currentOption);
+				intVector.y++;
+				if (intVector.y >= (int)Mathf.Floor(perpage / columns))
+				{
+					intVector.x++;
+					intVector.y = 0;
+				}
+			}
+
+			float pageButtonWidth = (size.x - 15f) / 2f;
+
+			subNodes.Add(new Button(owner, idstring + BACKBUTTON, this, new Vector2(5f, size.y - 25f - 20f * (perpage / columns + 1f)), pageButtonWidth, "Previous"));
+			subNodes.Add(new Button(owner, idstring + NEXTBUTTON, this, new Vector2(size.x - 5f - pageButtonWidth, size.y - 25f - 20f * (perpage / columns + 1f)), pageButtonWidth, "Next"));
+		}
+
+		public void Signal(DevUISignalType type, DevUINode sender, string message)
+		{
+			//can't modify subnodes during Signal, as it is called during a loop through all subnodes
+			if (sender.IDstring == idstring + BACKBUTTON)
+			{ goPrev = true; }
+
+			else if (sender.IDstring == idstring + NEXTBUTTON)
+			{ goNext = true; }
+
+			else { managedParent.Signal(type, sender, message); }
+		}
+
+		public override void Update()
+		{
+			if (goNext)
+			{ PopulateItems(currentOffset + 1); goNext = false; }
+
+			if (goPrev)
+			{ PopulateItems(currentOffset - 1); goPrev = false; }
+
+			base.Update();
+		}
+
+		const string BACKBUTTON = "BackPage99289..?/~";
+		const string NEXTBUTTON = "NextPage99289..?/~";
+
+
+		private ManagedPanelButton managedParent;
+
+		private bool goNext = false;
+
+		private bool goPrev = false;
+
+		public string idstring;
+
+		private float buttonWidth;
+
+		private int columns;
+
+		private int perpage;
+
+		private int currentOffset;
+	}
 }

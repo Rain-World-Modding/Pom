@@ -1,4 +1,4 @@
-using DevInterface;
+﻿using DevInterface;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -316,7 +316,11 @@ public static partial class Pom
 			/// <summary>
 			/// Value is controlled with a textbox
 			/// </summary>
-			text
+			text,
+			/// <summary>
+			/// Value is controlled with a list panel that pops up when the button is clicked
+			/// </summary>
+			list
 		}
 
 		/// <summary>
@@ -384,6 +388,8 @@ public static partial class Pom
 				return new ManagedButton(this, managedData, panel, sizeOfDisplayname);
 			case ControlType.text:
 				return new ManagedStringControl(this, managedData, panel, sizeOfDisplayname);
+			case ControlType.list:
+				return new ManagedPanelButton(this, managedData, panel, sizeOfDisplayname);
 			}
 			return null;
 		}

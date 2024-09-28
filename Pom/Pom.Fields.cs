@@ -1,4 +1,4 @@
-using DevInterface;
+﻿using DevInterface;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -50,10 +50,18 @@ public static partial class Pom
 		void Prev(PositionedDevUINode node, ManagedData data);
 	}
 
+	public interface IListablePanelField
+	{
+		string[] GetValues(int start, int end);
+		int HighestItem();
+
+		int LowestItem();
+	}
+
 	/// <summary>
 	/// A <see cref="ManagedField"/> that stores a <see cref="float"/> value.
 	/// </summary>
-	public class FloatField : ManagedFieldWithPanel, IInterpolablePanelField, IIterablePanelField
+	public class FloatField : ManagedFieldWithPanel, IInterpolablePanelField, IIterablePanelField, IListablePanelField
 	{
 		/// <summary>
 		/// Minimum value this float field can take
@@ -177,6 +185,20 @@ public static partial class Pom
 			if (val < min) val = max;
 			data.SetValue<float>(key, val);
 		}
+
+		public string[] GetValues(int start, int end)
+		{
+			List<string> values = new();
+			for (int i = start; i < end; i++)
+			{
+				values.Add((i * increment).ToString());
+			}
+			return values.ToArray();
+		}
+
+		public int HighestItem() => (int)(max * increment) + 1;
+
+		public int LowestItem() => (int)(min * increment);
 		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
@@ -192,7 +214,7 @@ public static partial class Pom
 	/// <summary>
 	/// A <see cref="ManagedField"/> that stores a <see cref="bool"/> value.
 	/// </summary>
-	public class BooleanField : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField
+	public class BooleanField : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField, IListablePanelField
 	{
 		/// <summary>
 		/// Creates a <see cref="ManagedField"/> that stores a <see cref="bool"/>. Can be used as an Attribute for a field in your data class derived from <see cref="ManagedData"/>.
@@ -259,13 +281,22 @@ public static partial class Pom
 		{
 			data.SetValue(key, !data.GetValue<bool>(key));
 		}
+
+		public string[] GetValues(int start, int end)
+		{
+			return ["True", "False"];
+		}
+
+		public int HighestItem() => 1;
+
+		public int LowestItem() => 0;
 	}
 
 	/// <summary>
 	/// A <see cref="ManagedField"/> that stores an <see cref="Enum"/> value.
 	/// </summary>
 
-	public class EnumField<E> : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField
+	public class EnumField<E> : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField, IListablePanelField
 		where E : struct, Enum
 	{
 		/// <summary>
@@ -348,6 +379,19 @@ public static partial class Pom
 		{
 			data.SetValue<Enum>(key, PossibleValues[(Array.IndexOf(PossibleValues, data.GetValue<Enum>(key)) - 1 + PossibleValues.Length) % PossibleValues.Length]);
 		}
+		public string[] GetValues(int start, int end)
+		{
+			List<string> values = new();
+			for (int i = start; i < end; i++)
+			{
+				values.Add(PossibleValues[i].ToString());
+			}
+			return values.ToArray();
+		}
+
+		public int HighestItem() => PossibleValues.Count();
+
+		public int LowestItem() => 0;
 		/// <inheritdoc/>
 		public override void ParseFromText(PositionedDevUINode node, ManagedData data, string newValue)
 		{
@@ -379,7 +423,7 @@ public static partial class Pom
 	/// <summary>
 	/// A <see cref="ManagedField"/> that stores an <see cref="ExtEnumBase"/> value.
 	/// </summary>
-	public class ExtEnumField<XE> : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField
+	public class ExtEnumField<XE> : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField, IListablePanelField
 		where XE : ExtEnum<XE>
 	{
 		/// <summary>
@@ -509,6 +553,20 @@ public static partial class Pom
 		{
 			data.SetValue<ExtEnumBase>(key, PossibleValues[(Array.IndexOf(PossibleValues, data.GetValue<ExtEnumBase>(key)) - 1 + PossibleValues.Length) % PossibleValues.Length]);
 		}
+
+		public string[] GetValues(int start, int end)
+		{
+			List<string> values = new();
+			for (int i = start; i < end; i++)
+			{
+				values.Add(PossibleValues[i].value);
+			}
+			return values.ToArray();
+		}
+
+		public int HighestItem() => PossibleValues.Count();
+
+		public int LowestItem() => 0;
 		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
@@ -539,7 +597,7 @@ public static partial class Pom
 	/// <summary>
 	/// A <see cref="ManagedField"/> that stores an <see cref="int"/> value.
 	/// </summary>
-	public class IntegerField : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField
+	public class IntegerField : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField, IListablePanelField
 	{
 		/// <summary>
 		/// Minimum value data of this field can take
@@ -624,6 +682,20 @@ public static partial class Pom
 			if (val < min) val = max;
 			data.SetValue<int>(key, val);
 		}
+
+		public string[] GetValues(int start, int end)
+		{
+			List<string> values = new();
+			for (int i = start; i < end; i++)
+			{
+				values.Add(i.ToString());
+			}
+			return values.ToArray();
+		}
+
+		public int HighestItem() => max + 1;
+
+		public int LowestItem() => min;
 		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
@@ -905,7 +977,7 @@ public static partial class Pom
 	/// <summary>
 	/// A <see cref="ManagedField"/> for a <see cref="UnityEngine.Color"/> value.
 	/// </summary>
-	public class ColorField : ManagedFieldWithPanel, IInterpolablePanelField
+	public class ColorField : ManagedFieldWithPanel, IInterpolablePanelField, IListablePanelField
 	{
 		/// <summary>
 		/// Creates a <see cref="ManagedField"/> that stores a <see cref="UnityEngine.Color"/>.
@@ -957,7 +1029,7 @@ public static partial class Pom
 		public override object FromString(string str)
 		{
 			return new Color(
-					Convert.ToInt32(str.Substring(0, 2), 16) / 255f,
+				    Convert.ToInt32(str.Substring(0, 2), 16) / 255f,
 					Convert.ToInt32(str.Substring(2, 2), 16) / 255f,
 					Convert.ToInt32(str.Substring(4, 2), 16) / 255f);
 		}
@@ -976,7 +1048,11 @@ public static partial class Pom
 			string newValue)
 		{
 			if (newValue.StartsWith("#")) newValue = newValue.Substring(1);
-			if (newValue.Length != 6) throw new ArgumentException();
+			else if (namedColors.TryGetValue(newValue, out var hex))
+			{
+				newValue = hex;
+			}
+				if (newValue.Length != 6) throw new ArgumentException();
 			data.SetValue(key, this.FromString(newValue));
 		}
 		/// <inheritdoc/>
@@ -993,7 +1069,10 @@ public static partial class Pom
 				if (node == control.gslider) return Mathf.RoundToInt(color.g * 255).ToString();
 				return Mathf.RoundToInt(color.b * 255).ToString();
 			case ControlType.text:
-				return "#" + ToString(data.GetValue<object>(key) ?? "FFFFFF");
+			case ControlType.list:
+				string name = ToString(data.GetValue<object>(key) ?? "FFFFFF");
+				if (namedColors.ContainsKey(name)) return name;
+				return "#" + name;
 			default:
 				return null;
 			}
@@ -1006,6 +1085,7 @@ public static partial class Pom
 			case ControlType.slider:
 				return HUD.DialogBox.meanCharWidth * (4); ;
 			case ControlType.text:
+			case ControlType.list:
 				return HUD.DialogBox.meanCharWidth * (9); ;
 			default:
 				return 0;
@@ -1047,6 +1127,7 @@ public static partial class Pom
 			case ControlType.slider:
 				return new ColorSliderControl(this, managedData, panel, sizeOfDisplayname);
 			case ControlType.text:
+			case ControlType.list:
 				return base.MakeControlPanelNode(managedData, panel, sizeOfDisplayname);
 			case ControlType.arrows:
 			case ControlType.button:
@@ -1081,6 +1162,28 @@ public static partial class Pom
 			else color.b = factor;
 			data.SetValue<Color>(key, color);
 		}
+
+		readonly static Dictionary<string, string> namedColors = new() 
+		{
+			{"red", "FF0000" },
+			{"yellow", "FFFF00" },
+			{"green", "00FF00" },
+			{"cyan", "00FFFF" },
+			{"blue", "0000FF" },
+			{"magenta", "FF00FF" },
+			{"black", "000000" },
+			{"grey", "7F7F7F" },
+			{"white", "FFFFFF" },
+		};
+
+		public string[] GetValues(int start, int end)
+		{
+			return namedColors.Keys.ToArray();
+		}
+
+		public int HighestItem() => namedColors.Count();
+
+		public int LowestItem() => 0;
 
 		private class ColorSliderControl : PositionedDevUINode
 		{
