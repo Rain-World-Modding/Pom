@@ -1,4 +1,5 @@
-﻿using DevInterface;
+﻿using System.Linq;
+using DevInterface;
 using UnityEngine;
 
 namespace Pom;
@@ -555,8 +556,9 @@ public static partial class Pom
 	/// String input field. Can be used by things like 
 	/// <see cref="global::Pom.Pom.StringField"/> or <see cref="global::Pom.Pom.ColorField"/>
 	/// </summary>
-	public class ManagedStringControl : PositionedDevUINode
+	public class ManagedStringControl : PositionedDevUINode, IDevUISignals
 	{
+		StringControl stringControl;
 		/// <summary>
 		/// Currently focused string control. Can be any devui node, including not from POM assembly. As long as it's not null, POM should prevent anything else from taking keyboard input
 		/// </summary>
@@ -569,10 +571,6 @@ public static partial class Pom
 		/// Data of the associated placedobject
 		/// </summary>
 		protected readonly ManagedData data;
-		/// <summary>
-		/// Whether this was clicked last update 
-		/// </summary>
-		protected bool clickedLastUpdate = false;
 
 		/// <param name="field">Field definition</param>
 		/// <param name="data">Data of the associated placedobject</param>
@@ -588,22 +586,17 @@ public static partial class Pom
 				panel,
 				Vector2.zero)
 		{
-			_text = null!;
 			this.field = field;
 			this.data = data;
 
+			stringControl = new StringControl(owner, "Text", this, new Vector2(60, 0), 136, field.DisplayValueForNode(this, data)!, StringControl.TextIsAny);
 			subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0, 0), sizeOfDisplayname, field.displayName));
-			subNodes.Add(new DevUILabel(owner, "Text", this, new Vector2(60, 0), 136, ""));
+			subNodes.Add(stringControl);
 
-			Text = field.DisplayValueForNode(this, data)!;
-
-			DevUILabel textLabel = (this.subNodes[1] as DevUILabel)!;
-			textLabel.pos.x = sizeOfDisplayname + 10f;
-			textLabel.size.x = field.SizeOfLargestDisplayValue();
-			textLabel.fSprites[0].scaleX = textLabel.size.x;
+			stringControl.pos.x = sizeOfDisplayname + 10f;
+			stringControl.size.x = field.SizeOfLargestDisplayValue();
+			stringControl.fSprites[0].scaleX = stringControl.size.x;
 		}
-
-		private string _text;
 		/// <summary>
 		/// Text value of the instance. 
 		/// Changing this only changes the label, does not call <see cref="global::Pom.Pom.ManagedData.SetValue"/>.
@@ -612,39 +605,85 @@ public static partial class Pom
 		{
 			get
 			{
-				return _text;// subNodes[1].fLabels[0].text;
+				return stringControl.Text;
 			}
 			set
 			{
-				_text = value;
-				subNodes[1].fLabels[0].text = value;
+				stringControl.Text = value;
 			}
 		}
-		/// <inheritdoc/>
+		/// <summary>
+		/// Attempts to parse field value from given text and set it into manageddata. Recolors control depending on the result.
+		/// </summary>
+		/// <param name="newValue">Current text</param>
+		protected virtual void TrySetValue(string newValue, bool endTransaction)
+		{
+			try
+			{
+				field.ParseFromText(this, data, newValue);
+				stringControl.fLabels[0].color = new Color(0.1f, 0.4f, 0.2f); // positive feedback
+			}
+			catch (Exception ex)
+			{
+				LogWarning($"Failed to parse field from text: {ex}");
+				stringControl.fLabels[0].color = Color.red; // negative fedback
+			}
+			if (endTransaction)
+			{
+				Text = field.DisplayValueForNode(this, data)!;
+				stringControl.fLabels[0].color = Color.black;
+				Refresh();
+			}
+		}
+
+		public void Signal(DevUISignalType type, DevUINode sender, string message)
+		{
+			if (sender == stringControl)
+			{
+				TrySetValue(stringControl.Text, type == StringControl.StringFinish);
+			}
+		}
+	}
+
+	public class StringControl : DevUILabel
+	{
+		public StringControl(DevUI owner, string IDstring, DevUINode parentNode, Vector2 pos, float width, string text, IsTextValid del) : base(owner, IDstring, parentNode, pos, width, text)
+		{
+			isTextValid = del;
+			actualValue = text;
+			Text = text;
+			Refresh();
+		}
+
+		protected bool clickedLastUpdate = false;
+
+
+		public string actualValue;
+
 		public override void Refresh()
 		{
 			// No data refresh until the transaction is complete :/
 			// TrySet happens on input and focus loss
 			base.Refresh();
 		}
-		/// <inheritdoc/>
+
 		public override void Update()
 		{
 			if (owner.mouseClick && !clickedLastUpdate)
 			{
-				if ((subNodes[1] as RectangularDevUINode)!.MouseOver && activeStringControl != this)
+				if (MouseOver && ManagedStringControl.activeStringControl != this)
 				{
 					// replace whatever instance/null that was focused
-					Text = field.DisplayValueForNode(this, data) ?? "";
-					activeStringControl = this;
-					subNodes[1].fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
+					Text = actualValue;
+					ManagedStringControl.activeStringControl = this;
+					fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
 				}
-				else if (activeStringControl == this)
+				else if (ManagedStringControl.activeStringControl == this)
 				{
 					// focus lost
 					TrySetValue(Text, true);
-					activeStringControl = null;
-					subNodes[1].fLabels[0].color = Color.black;
+					ManagedStringControl.activeStringControl = null;
+					fLabels[0].color = Color.black;
 				}
 
 				clickedLastUpdate = true;
@@ -654,7 +693,7 @@ public static partial class Pom
 				clickedLastUpdate = false;
 			}
 
-			if (activeStringControl == this)
+			if (ManagedStringControl.activeStringControl == this)
 			{
 				foreach (char c in Input.inputString)
 				{
@@ -670,8 +709,8 @@ public static partial class Pom
 					{
 						// should lose focus
 						TrySetValue(Text, true);
-						activeStringControl = null;
-						subNodes[1].fLabels[0].color = Color.black;
+						ManagedStringControl.activeStringControl = null;
+						fLabels[0].color = Color.black;
 					}
 					else
 					{
@@ -681,31 +720,83 @@ public static partial class Pom
 				}
 			}
 		}
-		/// <summary>
-		/// Attempts to parse field value from given text and set it into manageddata. Recolors control depending on the result.
-		/// </summary>
-		/// <param name="newValue">Current text</param>
+
+		public delegate bool IsTextValid(string value);
+
+		public IsTextValid isTextValid;
+
+		public static void SendSignal(
+			DevUINode devUINode,
+			DevUISignalType signalType,
+			DevUINode sender,
+			string message)
+		{
+			while (devUINode != null)
+			{
+				devUINode = devUINode.parentNode;
+				if (devUINode is IDevUISignals signals)
+				{
+					signals.Signal(signalType, sender, message);
+					break;
+				}
+			}
+		}
+
 		protected virtual void TrySetValue(string newValue, bool endTransaction)
 		{
-			try
+			if (isTextValid(newValue))
 			{
-				field.ParseFromText(this, data, newValue);
-				subNodes[1].fLabels[0].color = new Color(0.1f, 0.4f, 0.2f); // positive feedback
+				actualValue = newValue;
+				fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
+				SendSignal(this, StringEdit, this, "");
 			}
-			catch (Exception ex)
+			else
 			{
-				LogWarning($"Failed to parse field from text: {ex}");
-				subNodes[1].fLabels[0].color = Color.red; // negative fedback
+				fLabels[0].color = Color.red;
 			}
 			if (endTransaction)
 			{
-				Text = field.DisplayValueForNode(this, data)!;
-				subNodes[1].fLabels[0].color = Color.black;
+				Text = actualValue;
+				fLabels[0].color = Color.black;
 				Refresh();
+				SendSignal(this, StringFinish, this, "");
 			}
 		}
-	}
 
+		/// <summary>
+		/// returns result of float.TryParse
+		/// </summary>
+		public static bool TextIsFloat(string value) => float.TryParse(value, out _);
+
+		/// <summary>
+		/// returns result of int.TryParse
+		/// </summary>
+		public static bool TextIsInt(string value) => (int.TryParse(value, out int i) && i.ToString() == value);
+
+		/// <summary>
+		/// returns true when text is ExtEnum
+		/// </summary>
+		public static bool TextIsExtEnum<T>(string value) where T : ExtEnum<T> => ExtEnumBase.TryParse(typeof(T), value, false, out _);
+
+		/// <summary>
+		/// always returns true
+		/// </summary>
+		public static bool TextIsAny(string value) => true;
+
+		/// <summary>
+		/// returns true if text could be a filename
+		/// </summary>
+		public static bool TextIsValidFilename(string value) => value.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+
+		/// <summary>
+		/// signal value sent by <see cref="StringControl"/> when value is changed without editing
+		/// </summary>
+		public static readonly DevUISignalType StringEdit = new DevUISignalType("StringEdit", true);
+		/// <summary>
+		/// signal value sent by <see cref="StringControl"/> when editing mode is finished
+		/// </summary>
+		public static readonly DevUISignalType StringFinish = new DevUISignalType("StringFinish", true);
+	}
 
 	/// <summary>
 	/// A button that brings up a panel of all the selectable options
@@ -768,8 +859,6 @@ public static partial class Pom
 			else
 			{
 				Vector2 setPos = panelPos - absPos;
-				//setPos.x = Mathf.Clamp(setPos.x, 10f, owner.game.rainWorld.screenSize.x - panelSize.x - absPos.x);
-				//setPos.y = Mathf.Clamp(setPos.y, 10f, owner.game.rainWorld.screenSize.y - panelSize.y - absPos.y);
 				itemSelectPanel = new ItemSelectPanel(owner, this, setPos, IDstring + "_Panel", field.key, panelSize, panelButtonWidth, panelColumns);
 				subNodes.Add(itemSelectPanel);
 			}
