@@ -1,3 +1,5 @@
+﻿using DevInterface;
+
 namespace PomCore;
 
 internal static class Utils
@@ -13,5 +15,21 @@ internal static class Utils
 		k = kvp.Key;
 		v = kvp.Value;
 	}
-	
+
+	public static void SendSignal(
+		this DevUINode devUINode,
+		DevUISignalType signalType,
+		DevUINode sender,
+		string message)
+	{
+		while (devUINode != null)
+		{
+			devUINode = devUINode.parentNode;
+			if (devUINode is IDevUISignals signals)
+			{
+				signals.Signal(signalType, sender, message);
+				break;
+			}
+		}
+	}
 }

@@ -12,6 +12,8 @@ public static class Examples
 {
 	internal class OneOfAll : ManagedData
 	{
+		[ColorField("color", 1, 1, 1, 1, ManagedFieldWithPanel.ControlType.button, "color")]
+		internal Color color;
 		[IntegerField("int", 0, 10, 0)]
 		internal int Int;
 		[FloatField("float", 0f, 10f, 0f)]

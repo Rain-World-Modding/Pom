@@ -1070,6 +1070,7 @@ public static partial class Pom
 				return Mathf.RoundToInt(color.b * 255).ToString();
 			case ControlType.text:
 			case ControlType.list:
+			case ControlType.button:
 				string name = ToString(data.GetValue<object>(key) ?? "FFFFFF");
 				if (namedColors.ContainsKey(name)) return name;
 				return "#" + name;
@@ -1086,6 +1087,7 @@ public static partial class Pom
 				return HUD.DialogBox.meanCharWidth * (4); ;
 			case ControlType.text:
 			case ControlType.list:
+			case ControlType.button:
 				return HUD.DialogBox.meanCharWidth * (9); ;
 			default:
 				return 0;
@@ -1131,7 +1133,7 @@ public static partial class Pom
 				return base.MakeControlPanelNode(managedData, panel, sizeOfDisplayname);
 			case ControlType.arrows:
 			case ControlType.button:
-				throw new NotImplementedException();
+				return new ManagedRGBSelectButton(this, managedData, panel, sizeOfDisplayname);
 			default:
 				break;
 			}
@@ -1163,7 +1165,7 @@ public static partial class Pom
 			data.SetValue<Color>(key, color);
 		}
 
-		readonly static Dictionary<string, string> namedColors = new() 
+		readonly internal static Dictionary<string, string> namedColors = new() 
 		{
 			{"red", "FF0000" },
 			{"yellow", "FFFF00" },
@@ -1171,9 +1173,9 @@ public static partial class Pom
 			{"cyan", "00FFFF" },
 			{"blue", "0000FF" },
 			{"magenta", "FF00FF" },
-			{"black", "000000" },
-			{"grey", "7F7F7F" },
 			{"white", "FFFFFF" },
+			{"grey", "7F7F7F" },
+			{"black", "000000" },
 		};
 
 		public string[] GetValues(int start, int end)
