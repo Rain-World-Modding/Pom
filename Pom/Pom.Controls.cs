@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using DevInterface;
 using UnityEngine;
+using static Pom.ItemSelectPanel;
 
 namespace Pom;
 
@@ -355,9 +356,9 @@ public static partial class Pom
 		}
 	}
 	/// <summary>
-	/// A multipurpose slider that can control data defined by any ManagedField that implements 
-	/// <see cref="global::Pom.Pom.IInterpolablePanelField"/>
-	/// </summary>
+	 /// A multipurpose slider that can control data defined by any ManagedField that implements 
+	 /// <see cref="global::Pom.Pom.IInterpolablePanelField"/>
+	 /// </summary>
 	public class ManagedSlider : Slider
 	{
 		/// <summary>
@@ -645,161 +646,6 @@ public static partial class Pom
 		}
 	}
 
-	public class StringControl : DevUILabel
-	{
-		public StringControl(DevUI owner, string IDstring, DevUINode parentNode, Vector2 pos, float width, string text, IsTextValid del) : base(owner, IDstring, parentNode, pos, width, text)
-		{
-			isTextValid = del;
-			actualValue = text;
-			Text = text;
-			Refresh();
-		}
-
-		protected bool clickedLastUpdate = false;
-
-
-		protected string actualValue;
-
-		public string ActualValue
-		{
-			get => actualValue;
-			set
-			{
-				actualValue = value;
-				Text = value;
-				Refresh();
-			}
-		}
-
-		public override void Refresh()
-		{
-			// No data refresh until the transaction is complete :/
-			// TrySet happens on input and focus loss
-			base.Refresh();
-		}
-
-		public override void Update()
-		{
-			if (owner.mouseClick && !clickedLastUpdate)
-			{
-				if (MouseOver && ManagedStringControl.activeStringControl != this)
-				{
-					// replace whatever instance/null that was focused
-					Text = actualValue;
-					ManagedStringControl.activeStringControl = this;
-					fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
-				}
-				else if (ManagedStringControl.activeStringControl == this)
-				{
-					// focus lost
-					TrySetValue(Text, true);
-					ManagedStringControl.activeStringControl = null;
-					fLabels[0].color = Color.black;
-				}
-
-				clickedLastUpdate = true;
-			}
-			else if (!owner.mouseClick)
-			{
-				clickedLastUpdate = false;
-			}
-
-			if (ManagedStringControl.activeStringControl == this)
-			{
-				foreach (char c in Input.inputString)
-				{
-					if (c == '\b')
-					{
-						if (Text.Length != 0)
-						{
-							Text = Text.Substring(0, Text.Length - 1);
-							TrySetValue(Text, false);
-						}
-					}
-					else if (c == '\n' || c == '\r')
-					{
-						// should lose focus
-						TrySetValue(Text, true);
-						ManagedStringControl.activeStringControl = null;
-						fLabels[0].color = Color.black;
-					}
-					else
-					{
-						Text += c;
-						TrySetValue(Text, false);
-					}
-				}
-			}
-		}
-
-		public delegate bool IsTextValid(string value);
-
-		public IsTextValid isTextValid;
-
-
-		protected virtual void TrySetValue(string newValue, bool endTransaction)
-		{
-			if (isTextValid(newValue))
-			{
-				actualValue = newValue;
-				fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
-				this.SendSignal(StringEdit, this, "");
-			}
-			else
-			{
-				fLabels[0].color = Color.red;
-			}
-			if (endTransaction)
-			{
-				Text = actualValue;
-				fLabels[0].color = Color.black;
-				Refresh();
-				this.SendSignal(StringFinish, this, "");
-			}
-		}
-
-		/// <summary>
-		/// returns result of float.TryParse
-		/// </summary>
-		public static bool TextIsFloat(string value) => float.TryParse(value, out _);
-
-		/// <summary>
-		/// returns result of int.TryParse
-		/// </summary>
-		public static bool TextIsInt(string value) => (int.TryParse(value, out int i) && i.ToString() == value);
-
-
-		public static bool TextIsColor(string value)
-		{
-			try { Color color = RWCustom.Custom.hexToColor(value); return RWCustom.Custom.colorToHex(color) == value; }
-			catch { return false; }
-		}
-
-		/// <summary>
-		/// returns true when text is ExtEnum
-		/// </summary>
-		public static bool TextIsExtEnum<T>(string value) where T : ExtEnum<T> => ExtEnumBase.TryParse(typeof(T), value, false, out _);
-
-		/// <summary>
-		/// always returns true
-		/// </summary>
-		public static bool TextIsAny(string value) => true;
-
-		/// <summary>
-		/// returns true if text could be a filename
-		/// </summary>
-		public static bool TextIsValidFilename(string value) => value.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
-
-		/// <summary>
-		/// signal value sent by <see cref="StringControl"/> when value is changed without editing
-		/// </summary>
-		public static readonly DevUISignalType StringEdit = new DevUISignalType("StringEdit", true);
-		/// <summary>
-		/// signal value sent by <see cref="StringControl"/> when editing mode is finished
-		/// </summary>
-		public static readonly DevUISignalType StringFinish = new DevUISignalType("StringFinish", true);
-	}
-
 	/// <summary>
 	/// A button that brings up a panel of all the selectable options
 	/// <see cref="global::Pom.Pom.IListablePanelField"/>
@@ -809,15 +655,11 @@ public static partial class Pom
 		/// <summary>
 		/// Contained button
 		/// </summary>
-		protected readonly Button button;
+		protected readonly ManagedItemSelectButton button;
 		/// <summary>
 		/// Field definition
 		/// </summary>
 		protected readonly ManagedFieldWithPanel field;
-		/// <summary>
-		/// <see cref="field"/> but cast to interface type
-		/// </summary>
-		protected readonly IListablePanelField listable;
 		/// <summary>
 		/// Data of the associated placedobject
 		/// </summary>
@@ -838,297 +680,47 @@ public static partial class Pom
 
 		{
 			this.field = field;
-			this.listable = (field as IListablePanelField)!;
-			if (listable == null) throw new ArgumentException("Field must implement IListablePanelField");
 			this.data = data;
 			this.subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0f, 0f), sizeOfDisplayname, field.displayName));
-			this.subNodes.Add(this.button = new Button(owner, "Button", this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data)));
+			this.subNodes.Add(this.button = new ManagedItemSelectButton(field, this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data) ?? ""));
 		}
 		/// <inheritdoc/>
 		public virtual void Signal(DevUISignalType type, DevUINode sender, string message) // from button
 		{
-			if (itemSelectPanel != null)
+			if (sender == button)
 			{
-				if (IsSubButtonID(sender.IDstring, out var item))
-				{
-					field.ParseFromText(this, data, item);
-				}
+				field.ParseFromText(this, data, button.ActualValue);
+			}
 
-				subNodes.Remove(itemSelectPanel);
-				itemSelectPanel.ClearSprites();
-				itemSelectPanel = null;
-			}
-			else
-			{
-				Vector2 setPos = panelPos - absPos;
-				itemSelectPanel = new ItemSelectPanel(owner, this, setPos, IDstring + "_Panel", field.key, panelSize, panelButtonWidth, panelColumns);
-				subNodes.Add(itemSelectPanel);
-			}
 			this.Refresh();
 		}
 
-		/// <summary>
-		/// detects if signal is from sub-button and if so, processes the actual item value
-		/// </summary>
-		public bool IsSubButtonID(string IDstring, out string subButtonID)
-		{
-			subButtonID = "";
-			if (itemSelectPanel != null && IDstring.StartsWith(itemSelectPanel.idstring + "Button99289_"))
-			{
-				subButtonID = IDstring.Remove(0, (itemSelectPanel.idstring + "Button99289_").Length);
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <inheritdoc/>
 		public override void Refresh()
 		{
-			this.button.Text = field.DisplayValueForNode(this, data);
+			button.Text = field.DisplayValueForNode(this, data);
 			base.Refresh();
 		}
 
-		/// <inheritdoc/>
-		public string[] GetItems(int page)
+		public class ManagedItemSelectButton : ItemSelectButton
 		{
-			return listable.GetValues(Math.Max(listable.LowestItem(), page * ItemsPerPage), Math.Min(listable.HighestItem(), (page + 1) * ItemsPerPage));
+			protected readonly IListablePanelField listable;
+			public ManagedItemSelectButton(ManagedFieldWithPanel field, DevUINode parentNode, Vector2 pos, float width, string text)
+				: base(parentNode.owner, field.key, parentNode, pos, width, text, new string[0])
+			{
+				if (field is IListablePanelField listable) this.listable = listable;
+				else throw new ArgumentException("Field must implement IListablePanelField");
+			}
+
+			public override IEnumerable<string> GetItems(int page)
+			{
+				return listable.GetValues(Math.Max(listable.LowestItem(), page * ItemsPerPage), Math.Min(listable.HighestItem(), (page + 1) * ItemsPerPage));
+			}
 		}
-
-
-		public ItemSelectPanel? itemSelectPanel;
-
-		public Vector2 panelPos = new Vector2(200f, 15f);
-
-		public Vector2 panelSize = new Vector2(305f, 420f);
-
-		public float panelButtonWidth = 145f;
-
-		public int ItemsPerPage => (int)((panelSize.y - 60f) / 20f * panelColumns);
-
-		public int panelColumns = 2;
 	}
 
-	public class ItemSelectPanel : Panel, IDevUISignals
-	{
-		public ItemSelectPanel(
-			DevUI owner,
-			ManagedPanelButton parentNode,
-			Vector2 pos,
-			string idstring,
-			string title,
-			Vector2 size = default,
-			float buttonWidth = 145f,
-			int columns = 2)
-			: base(
-				owner,
-				idstring,
-				parentNode,
-				pos,
-				size == default ? new Vector2(305f, 420f) : size,
-				title)
-		{
-			managedParent = parentNode;
-			this.idstring = idstring;
-			this.buttonWidth = buttonWidth;
-			this.columns = columns;
-
-			currentOffset = 0;
-			perpage = (int)((this.size.y - 60f) / 20f * columns);
-			PopulateItems(currentOffset);
-		}
-		public void PopulateItems(int offset)
-		{
-			string[] items = managedParent.GetItems(offset);
-			if (items.Length == 0) return;
-			currentOffset = offset;
-			foreach (DevUINode devUINode in subNodes)
-			{
-				devUINode.ClearSprites();
-			}
-
-			subNodes.Clear();
-			var intVector = new RWCustom.IntVector2(0, 0);
-
-			foreach (string item in items)
-			{
-
-				var currentOption = new Button(owner, idstring + "Button99289_" + item, this, new Vector2(5f + intVector.x * (buttonWidth + 5f), size.y - 25f - 20f * intVector.y), buttonWidth, item);
-				string currentItem = item;
-				subNodes.Add(currentOption);
-				intVector.y++;
-				if (intVector.y >= (int)Mathf.Floor(perpage / columns))
-				{
-					intVector.x++;
-					intVector.y = 0;
-				}
-			}
-
-			float pageButtonWidth = (size.x - 15f) / 2f;
-
-			subNodes.Add(new Button(owner, idstring + BACKBUTTON, this, new Vector2(5f, size.y - 25f - 20f * (perpage / columns + 1f)), pageButtonWidth, "Previous"));
-			subNodes.Add(new Button(owner, idstring + NEXTBUTTON, this, new Vector2(size.x - 5f - pageButtonWidth, size.y - 25f - 20f * (perpage / columns + 1f)), pageButtonWidth, "Next"));
-		}
-
-		public void Signal(DevUISignalType type, DevUINode sender, string message)
-		{
-			//can't modify subnodes during Signal, as it is called during a loop through all subnodes
-			if (sender.IDstring == idstring + BACKBUTTON)
-			{ goPrev = true; }
-
-			else if (sender.IDstring == idstring + NEXTBUTTON)
-			{ goNext = true; }
-
-			else { managedParent.Signal(type, sender, message); }
-		}
-
-		public override void Update()
-		{
-			if (goNext)
-			{ PopulateItems(currentOffset + 1); goNext = false; }
-
-			if (goPrev)
-			{ PopulateItems(currentOffset - 1); goPrev = false; }
-
-			base.Update();
-		}
-
-		const string BACKBUTTON = "BackPage99289..?/~";
-		const string NEXTBUTTON = "NextPage99289..?/~";
-
-
-		private ManagedPanelButton managedParent;
-
-		private bool goNext = false;
-
-		private bool goPrev = false;
-
-		public string idstring;
-
-		private float buttonWidth;
-
-		private int columns;
-
-		private int perpage;
-
-		private int currentOffset;
-	}
-	public class TextInputSlider : Slider, IDevUISignals
-	{
-		public float ActualValue
-		{
-			get => _actualValue;
-			set
-			{
-				_actualValue = value;
-				Refresh();
-			}
-		}
-
-		protected float _actualValue = 0;
-
-		public float defaultValue { get; init; } = 0f;
-
-		public float minValue { get; init; } = 0f;
-
-		public float maxValue { get; init; } = 1f;
-
-		public int valueRounding { get; init; } = -1;
-
-		public int displayRounding { get; init; } = 0;
-		private float stringWidth;
-		public TextInputSlider(string IDstring, DevUINode parentNode, Vector2 pos, string title, bool inheritButton, float titleWidth, float stringWidth = 16) : base(parentNode.owner, IDstring, parentNode, pos, title, inheritButton, titleWidth)
-		{
-			//swap out old value display with StringControl
-			subNodes[1].ClearSprites();
-			subNodes[1] = new StringControl(owner, IDstring, this, new Vector2(titleWidth + 10f, 0f), inheritButton ? stringWidth + 26f : stringWidth, _actualValue.ToString(), StringControl.TextIsFloat);
-
-			if (inheritButton && subNodes[2] is PositionedDevUINode node)
-			{ node.Move(new Vector2(node.pos.x + (stringWidth - 16f), node.pos.y)); }
-
-			this.stringWidth = stringWidth;
-		}
-
-		private new float SliderStartCoord
-		{
-			get
-			{
-				if (!inheritButton)
-				{
-					return titleWidth + 10f + stringWidth + 4f;
-				}
-				return titleWidth + 10f + 26f + stringWidth + 4f + 34f;
-			}
-		}
-
-		public SliderNub sliderNub => (SliderNub)subNodes[inheritButton ? 3 : 2];
-		public override void Update()
-		{
-			base.Update();
-			if (owner != null && sliderNub.held)
-			{
-				NubDragged(Mathf.InverseLerp(absPos.x + SliderStartCoord, absPos.x + SliderStartCoord + 92f, owner.mousePos.x + sliderNub.mousePosOffset));
-			}
-		}
-
-		public new void RefreshNubPos(float nubPos)
-		{
-			sliderNub.Move(new Vector2(Mathf.Lerp(SliderStartCoord, SliderStartCoord + 92f, nubPos), 0f));
-		}
-
-		public override void Refresh()
-		{
-			base.Refresh();
-
-			if (valueRounding >= 0)
-			{ _actualValue = (float)Math.Round(_actualValue, valueRounding); }
-
-			string str = "";
-			if (_actualValue == defaultValue && inheritButton) str = "<D>";
-			str += " ";
-			if (displayRounding >= 0) str += Math.Round(_actualValue, displayRounding).ToString();
-			else str += _actualValue.ToString();
-
-			NumberText = str;
-			(subNodes[1] as StringControl)!.ActualValue = _actualValue.ToString();
-
-			RefreshNubPos(Mathf.Clamp(Mathf.InverseLerp(minValue, maxValue, _actualValue), 0f, 1f));
-			MoveSprite(0, absPos + new Vector2(SliderStartCoord, 0f));
-			MoveSprite(1, absPos + new Vector2(SliderStartCoord, 7f));
-		}
-
-		public override void NubDragged(float nubPos)
-		{
-			ActualValue = Mathf.Lerp(minValue, maxValue, nubPos);
-			this.SendSignal(SliderUpdate, this, "");
-		}
-
-		public override void ClickedResetToInherent()
-		{
-			ActualValue = defaultValue;
-		}
-
-		public new void Signal(DevUISignalType type, DevUINode sender, string message)
-		{
-			if (sender.IDstring == "Inherit_Button")
-			{
-				ClickedResetToInherent();
-			}
-
-			else if (sender.IDstring == IDstring && type == StringControl.StringFinish)
-			{
-				_actualValue = float.Parse((subNodes[1] as StringControl)!.ActualValue);
-				Refresh();
-			}
-
-			this.SendSignal(SliderUpdate, this, "");
-		}
-
-		public static readonly DevUISignalType SliderUpdate = new DevUISignalType("SliderUpdate", true);
-	}
 
 	/// <summary>
-	/// A multipurpose button that can control data defined by any ManagedField that implements 
+	/// A button that brings up a color select panel
 	/// <see cref="global::Pom.Pom.IIterablePanelField"/>
 	/// </summary>
 	public class ManagedRGBSelectButton : PositionedDevUINode, IDevUISignals
@@ -1136,7 +728,7 @@ public static partial class Pom
 		/// <summary>
 		/// Contained button
 		/// </summary>
-		protected readonly RGBSelectButton button;
+		protected readonly RGBSelectPanel.RGBSelectButton button;
 		/// <summary>
 		/// Field definition
 		/// </summary>
@@ -1163,7 +755,7 @@ public static partial class Pom
 			this.field = field;
 			this.data = data;
 			this.subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0f, 0f), sizeOfDisplayname, field.displayName));
-			this.subNodes.Add(this.button = new RGBSelectButton(owner, "Button", this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data) ?? "", (Color)field.DefaultValue, "Select a color"));
+			this.subNodes.Add(this.button = new RGBSelectPanel.RGBSelectButton(owner, "Button", this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data) ?? "", data.GetValue<Color>(field.key), "Select a color"));
 		}
 		/// <inheritdoc/>
 		public virtual void Signal(DevUISignalType type, DevUINode sender, string message) // from button
@@ -1171,262 +763,11 @@ public static partial class Pom
 			data.SetValue<Color>(field.key, button.actualValue);
 			this.Refresh();
 		}
-	}
-
-
-	public class RGBSelectButton : Button, IDevUISignals
-	{
-		public bool recolor { get; init; } = false;
-		public bool hexDisplay { get; init; } = true;
-		public RGBSelectButton(DevUI owner, string IDstring, DevUINode parentNode, Vector2 pos, float width, string text,
-			Color color, string panelName)
-			: base(owner, IDstring, parentNode, pos, width, text)
-		{
-			actualValue = color;
-			RGBSelectPanel = null;
-			this.panelName = panelName;
-
-			if (hexDisplay)
-			{ Text = RWCustom.Custom.colorToHex(actualValue); }
-		}
-
-		public override void Update()
-		{
-			base.Update();
-			if (recolor)
-			{ fSprites[0].color = Color.Lerp(actualValue, colorA, 0.5f); }
-		}
-
-		public override void Clicked()
-		{
-			//sending signal first in case values wanna be changed
-			base.Clicked();
-			if (RGBSelectPanel != null)
-			{
-				subNodes.Remove(RGBSelectPanel);
-				RGBSelectPanel.ClearSprites();
-				RGBSelectPanel = null;
-			}
-			else
-			{
-				RGBSelectPanel = new RGBSelectPanel(owner, this, panelPos - pos, IDstring + "_Panel", panelName, actualValue);
-				subNodes.Add(RGBSelectPanel);
-			}
-		}
-
-		public void Signal(DevUISignalType type, DevUINode sender, string message)
-		{
-			if (RGBSelectPanel != null && sender == RGBSelectPanel)
-			{
-				actualValue = RGBSelectPanel.ActualValue;
-				if (hexDisplay)
-				{ Text = RWCustom.Custom.colorToHex(actualValue); }
-			}
-
-			//send signal up
-			this.SendSignal(DevUISignalType.ButtonClick, this, message);
-		}
-
-		public RGBSelectPanel? RGBSelectPanel;
-
-		public string panelName;
-
-		public Color actualValue;
-
-		public Vector2 panelPos = new Vector2(420f, 280f);
-	}
-
-	public class RGBSelectPanel : Panel, IDevUISignals
-	{
-		private TextInputSlider[] RGBSliders;
-		private TextInputSlider[] HSLSliders;
-		private StringControl Hex;
-		private ColorBox colorBox;
-		private Color _actualValue = new(0f, 0f, 0f);
-		public Color ActualValue
-		{
-			get => _actualValue;
-			set
-			{
-				_actualValue = value;
-				Refresh();
-			}
-		}
-
-		public RGBSelectPanel(DevUI owner, DevUINode parentNode, Vector2 pos, string idstring, string title, Color color)
-			: base(owner, idstring, parentNode, pos, new Vector2(305f, 200f), title)
-		{
-			RGBSliders = new TextInputSlider[3];
-			HSLSliders = new TextInputSlider[3];
-			//^ all set in PlaceNodes
-			this.idstring = idstring;
-			Vector2 elementPos = new Vector2(size.x - 185f, size.y - 25f);
-			AddSlider(ref RGBSliders[0], "R_RGB", " R", elementPos);
-
-			elementPos.y -= 20f;
-			AddSlider(ref RGBSliders[1], "G_RGB", " G", elementPos);
-
-			elementPos.y -= 20f;
-			AddSlider(ref RGBSliders[2], "B_RGB", " B", elementPos);
-
-			elementPos.y -= 40f;
-			Hex = new StringControl(owner, "HEX", this, elementPos + new Vector2(77f, 0f), 92f, "000000", StringControl.TextIsColor);
-			subNodes.Add(Hex);
-			subNodes.Add(new DevUILabel(owner, "HEX_LABEL", this, elementPos, 60f, "HEX"));
-			elementPos.y -= 40f;
-
-			AddSlider(ref HSLSliders[0], "H_HSL", " H", elementPos);
-
-			elementPos.y -= 20f;
-			AddSlider(ref HSLSliders[1], "S_HSL", " S", elementPos);
-
-			elementPos.y -= 20f;
-			AddSlider(ref HSLSliders[2], "L_HSL", " L", elementPos);
-
-			colorBox = new ColorBox(owner, this, new Vector2(5f, size.y - 69f), "colorbox", 64f, 64f, color);
-			subNodes.Add(colorBox);
-
-			elementPos = new Vector2(5f, 54f);
-			foreach ((string name, string namedColor) in ColorField.namedColors)
-			{
-				subNodes.Add(new ColorButton(owner, this, elementPos, name, 16, 16, RWCustom.Custom.hexToColor(namedColor)));
-				elementPos.y -= 20f;
-				if (elementPos.y < 0f)
-				{
-					elementPos.x += 20f;
-					elementPos.y = 54f;
-				}
-			}
-
-			ActualValue = color;
-		}
-
-		public void AddSlider(ref TextInputSlider slider, string name, string display, Vector2 pos)
-		{
-			if (slider != null && subNodes.Contains(slider)) subNodes.Remove(slider);
-			slider = new TextInputSlider(name, this, pos, display, false, 20f, 32f) { valueRounding = 2, displayRounding = 2 };
-			subNodes.Add(slider);
-		}
-
-		public void Signal(DevUISignalType type, DevUINode sender, string message)
-		{
-			if (RGBSliders.Contains(sender))
-			{
-				ActualValue = new Color(RGBSliders[0].ActualValue, RGBSliders[1].ActualValue, RGBSliders[2].ActualValue);
-			}
-			else if (HSLSliders.Contains(sender))
-			{
-				ActualValue = RWCustom.Custom.HSL2RGB(HSLSliders[0].ActualValue, HSLSliders[1].ActualValue, HSLSliders[2].ActualValue);
-			}
-
-			else if (sender == Hex)
-			{
-				ActualValue = RWCustom.Custom.hexToColor(Hex.ActualValue);
-			}
-
-			else if (sender is ColorButton cb)
-			{
-				ActualValue = cb.Color;
-			}
-
-			{ this.SendSignal(type, this, message); }
-		}
 
 		public override void Refresh()
 		{
 			base.Refresh();
-			UpdateRGBSliders();
-			UpdateHSLSliders();
-			UpdateHex();
-			colorBox.Color = ActualValue;
+			button.Text = field.DisplayValueForNode(this, data);
 		}
-
-		public void UpdateRGBSliders()
-		{
-			RGBSliders[0].ActualValue = ActualValue.r;
-			RGBSliders[0].Refresh();
-			RGBSliders[1].ActualValue = ActualValue.g;
-			RGBSliders[1].Refresh();
-			RGBSliders[2].ActualValue = ActualValue.b;
-			RGBSliders[2].Refresh();
-		}
-
-		public void UpdateHSLSliders()
-		{
-			Vector3 HSLpos = RWCustom.Custom.RGB2HSL(ActualValue);
-			HSLSliders[0].ActualValue = HSLpos.x;
-			HSLSliders[0].Refresh();
-			HSLSliders[1].ActualValue = HSLpos.y;
-			HSLSliders[1].Refresh();
-			HSLSliders[2].ActualValue = HSLpos.z;
-			HSLSliders[2].Refresh();
-		}
-
-		public void UpdateHex()
-		{
-			Hex.ActualValue = RWCustom.Custom.colorToHex(ActualValue);
-		}
-		public class ColorButton : DevUILabel
-		{
-			private bool down = false;
-			protected Color _actualValue;
-			public ColorButton(DevUI owner, DevUINode parentNode, Vector2 pos, string idstring, float width, float height, Color color) : base(owner, idstring, parentNode, pos, width, "")
-			{
-				fSprites[0].scaleY = height;
-				_actualValue = color;
-				fSprites[0].color = color;
-			}
-
-			public Color Color
-			{
-				get => _actualValue;
-				set
-				{
-					_actualValue = value;
-					Refresh();
-				}
-			}
-
-			public Color InvertedColor => new Color(1f - _actualValue.r, 1f - _actualValue.g, 1f - _actualValue.b);
-
-			public override void Update()
-			{
-				base.Update();
-				if (owner != null && owner.mouseClick && MouseOver)
-				{
-					this. down = true;
-					this.SendSignal(DevUISignalType.ButtonClick, this, "colorButton");
-					Refresh();
-				}
-				if (down && (!MouseOver || owner == null || !owner.mouseDown))
-				{
-					down = false;
-					Refresh();
-				}
-			}
-			public override void Refresh()
-			{
-				base.Refresh();
-				fSprites[0].alpha = !down ? 0.5f : 1f;
-				//fSprites[0].color = !down ? Color : InvertedColor;
-			}
-		}
-
-		public class ColorBox : MouseOverSwitchColorLabel
-		{
-			public ColorBox(DevUI owner, DevUINode parentNode, Vector2 pos, string idstring, float width, float height, Color color) : base(owner, idstring, parentNode, pos, width, "")
-			{
-				fSprites[0].scaleY = height;
-				fSprites[0].color = color;
-			}
-
-			public Color Color
-			{
-				get => fSprites[0].color;
-				set => fSprites[0].color = value;
-			}
-		}
-		public string idstring;
-
 	}
 }
