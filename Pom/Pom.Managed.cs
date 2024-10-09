@@ -389,7 +389,7 @@ public static partial class Pom
 			case ControlType.text:
 				return new ManagedStringControl(this, managedData, panel, sizeOfDisplayname);
 			case ControlType.list:
-				return new ManagedPanelButton(this, managedData, panel, sizeOfDisplayname);
+				return new ManagedItemSelect(this, managedData, panel, sizeOfDisplayname);
 			}
 			return null;
 		}

@@ -650,12 +650,12 @@ public static partial class Pom
 	/// A button that brings up a panel of all the selectable options
 	/// <see cref="global::Pom.Pom.IListablePanelField"/>
 	/// </summary>
-	public class ManagedPanelButton : PositionedDevUINode, IDevUISignals
+	public class ManagedItemSelect : PositionedDevUINode, IDevUISignals
 	{
 		/// <summary>
 		/// Contained button
 		/// </summary>
-		protected readonly ManagedItemSelectButton button;
+		protected readonly ManagedPanelSelectButton button;
 		/// <summary>
 		/// Field definition
 		/// </summary>
@@ -668,7 +668,7 @@ public static partial class Pom
 		/// <param name="data">Data of the associated placedobject</param>
 		/// <param name="panel">Containing panel</param>
 		/// <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
-		public ManagedPanelButton(
+		public ManagedItemSelect(
 			ManagedFieldWithPanel field,
 			ManagedData data,
 			ManagedControlPanel panel,
@@ -682,7 +682,7 @@ public static partial class Pom
 			this.field = field;
 			this.data = data;
 			this.subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0f, 0f), sizeOfDisplayname, field.displayName));
-			this.subNodes.Add(this.button = new ManagedItemSelectButton(field, this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data) ?? ""));
+			this.subNodes.Add(this.button = new ManagedPanelSelectButton(field, this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data) ?? ""));
 		}
 		/// <inheritdoc/>
 		public virtual void Signal(DevUISignalType type, DevUINode sender, string message) // from button
@@ -701,10 +701,10 @@ public static partial class Pom
 			base.Refresh();
 		}
 
-		public class ManagedItemSelectButton : ItemSelectButton
+		public class ManagedPanelSelectButton : PanelSelectButton
 		{
 			protected readonly IListablePanelField listable;
-			public ManagedItemSelectButton(ManagedFieldWithPanel field, DevUINode parentNode, Vector2 pos, float width, string text)
+			public ManagedPanelSelectButton(ManagedFieldWithPanel field, DevUINode parentNode, Vector2 pos, float width, string text)
 				: base(parentNode.owner, field.key, parentNode, pos, width, text, new string[0])
 			{
 				if (field is IListablePanelField listable) this.listable = listable;

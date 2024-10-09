@@ -9,7 +9,7 @@ public class ItemSelectPanel : Panel, IDevUISignals
 	const string BACKBUTTON = "BackPage99289..?/~";
 	const string NEXTBUTTON = "NextPage99289..?/~";
 
-	private readonly ItemSelectButton ownerButton;
+	private readonly PanelSelectButton ownerButton;
 
 	private bool goNext = false;
 
@@ -26,7 +26,7 @@ public class ItemSelectPanel : Panel, IDevUISignals
 
 	public ItemSelectPanel(
 		DevUI owner,
-		ItemSelectButton parentNode,
+		PanelSelectButton parentNode,
 		Vector2 pos,
 		string idstring,
 		string title,
@@ -102,7 +102,7 @@ public class ItemSelectPanel : Panel, IDevUISignals
 
 		base.Update();
 	}
-	public class ItemSelectButton(DevUI owner, string IDstring, DevUINode parentNode, Vector2 pos, float width, string text, string[] allItems)
+	public class PanelSelectButton(DevUI owner, string IDstring, DevUINode parentNode, Vector2 pos, float width, string text, string[] allItems)
 		: Button(owner, IDstring, parentNode, pos, width, text), IDevUISignals
 	{
 		public Vector2 panelPos { get; init; } = new Vector2(200f, 15f);

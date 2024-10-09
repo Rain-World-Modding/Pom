@@ -60,7 +60,6 @@ public class RGBSelectPanel : Panel, IDevUISignals
 		elementPos = new Vector2(5f, 54f);
 		foreach ((string name, string namedColor) in ColorField.namedColors)
 		{
-			Debug.Log($"adding color [{name}, {namedColor}]");
 			subNodes.Add(new ColorButton(owner, this, elementPos, name, 16, 16, RWCustom.Custom.hexToColor(namedColor)));
 			elementPos.y -= 20f;
 			if (elementPos.y < 0f)
@@ -177,7 +176,8 @@ public class RGBSelectPanel : Panel, IDevUISignals
 			}
 			else
 			{
-				RGBSelectPanel = new RGBSelectPanel(owner, this, panelPos - pos, IDstring + "_Panel", panelName, actualValue);
+				Vector2 setPos = panelPos - absPos;
+				RGBSelectPanel = new RGBSelectPanel(owner, this, setPos, IDstring + "_Panel", panelName, actualValue);
 				subNodes.Add(RGBSelectPanel);
 			}
 		}
