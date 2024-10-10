@@ -5,14 +5,14 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>12</LangVersion>
-		<FileVersion>2.9</FileVersion>
-		<AssemblyVersion>2.9</AssemblyVersion>
+		<FileVersion>3.0</FileVersion>
+		<AssemblyVersion>3.0</AssemblyVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<RootNamespace></RootNamespace>
 		<DebugType>Portable</DebugType>
 		<IncludeSymbols>False</IncludeSymbols>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
-    	<PathMap>$(AppOutputBase)=RegionKit\</PathMap>
+    	<PathMap>$(AppOutputBase)=POM\</PathMap>
 	</PropertyGroup>
 	<!-- Debug configuration. Build for release. -->
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
