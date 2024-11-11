@@ -557,9 +557,8 @@ public static partial class Pom
 	/// String input field. Can be used by things like 
 	/// <see cref="global::Pom.Pom.StringField"/> or <see cref="global::Pom.Pom.ColorField"/>
 	/// </summary>
-	public class ManagedStringControl : PositionedDevUINode, IDevUISignals
+	public class ManagedStringControl : PositionedDevUINode
 	{
-		StringControl stringControl;
 		/// <summary>
 		/// Currently focused string control. Can be any devui node, including not from POM assembly. As long as it's not null, POM should prevent anything else from taking keyboard input
 		/// </summary>
@@ -572,6 +571,10 @@ public static partial class Pom
 		/// Data of the associated placedobject
 		/// </summary>
 		protected readonly ManagedData data;
+		/// <summary>
+		/// Whether this was clicked last update 
+		/// </summary>
+		protected bool clickedLastUpdate = false;
 
 		/// <param name="field">Field definition</param>
 		/// <param name="data">Data of the associated placedobject</param>
@@ -587,17 +590,22 @@ public static partial class Pom
 				panel,
 				Vector2.zero)
 		{
+			_text = null!;
 			this.field = field;
 			this.data = data;
 
-			stringControl = new StringControl(owner, "Text", this, new Vector2(60, 0), 136, field.DisplayValueForNode(this, data)!, StringControl.TextIsAny);
 			subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0, 0), sizeOfDisplayname, field.displayName));
-			subNodes.Add(stringControl);
+			subNodes.Add(new DevUILabel(owner, "Text", this, new Vector2(60, 0), 136, ""));
 
-			stringControl.pos.x = sizeOfDisplayname + 10f;
-			stringControl.size.x = field.SizeOfLargestDisplayValue();
-			stringControl.fSprites[0].scaleX = stringControl.size.x;
+			Text = field.DisplayValueForNode(this, data)!;
+
+			DevUILabel textLabel = (this.subNodes[1] as DevUILabel)!;
+			textLabel.pos.x = sizeOfDisplayname + 10f;
+			textLabel.size.x = field.SizeOfLargestDisplayValue();
+			textLabel.fSprites[0].scaleX = textLabel.size.x;
 		}
+
+		private string _text;
 		/// <summary>
 		/// Text value of the instance. 
 		/// Changing this only changes the label, does not call <see cref="global::Pom.Pom.ManagedData.SetValue"/>.
@@ -606,11 +614,73 @@ public static partial class Pom
 		{
 			get
 			{
-				return stringControl.Text;
+				return _text;// subNodes[1].fLabels[0].text;
 			}
 			set
 			{
-				stringControl.Text = value;
+				_text = value;
+				subNodes[1].fLabels[0].text = value;
+			}
+		}
+		/// <inheritdoc/>
+		public override void Refresh()
+		{
+			// No data refresh until the transaction is complete :/
+			// TrySet happens on input and focus loss
+			base.Refresh();
+		}
+		/// <inheritdoc/>
+		public override void Update()
+		{
+			if (owner.mouseClick && !clickedLastUpdate)
+			{
+				if ((subNodes[1] as RectangularDevUINode)!.MouseOver && activeStringControl != this)
+				{
+					// replace whatever instance/null that was focused
+					Text = field.DisplayValueForNode(this, data) ?? "";
+					activeStringControl = this;
+					subNodes[1].fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
+				}
+				else if (activeStringControl == this)
+				{
+					// focus lost
+					TrySetValue(Text, true);
+					activeStringControl = null;
+					subNodes[1].fLabels[0].color = Color.black;
+				}
+
+				clickedLastUpdate = true;
+			}
+			else if (!owner.mouseClick)
+			{
+				clickedLastUpdate = false;
+			}
+
+			if (activeStringControl == this)
+			{
+				foreach (char c in Input.inputString)
+				{
+					if (c == '\b')
+					{
+						if (Text.Length != 0)
+						{
+							Text = Text.Substring(0, Text.Length - 1);
+							TrySetValue(Text, false);
+						}
+					}
+					else if (c == '\n' || c == '\r')
+					{
+						// should lose focus
+						TrySetValue(Text, true);
+						activeStringControl = null;
+						subNodes[1].fLabels[0].color = Color.black;
+					}
+					else
+					{
+						Text += c;
+						TrySetValue(Text, false);
+					}
+				}
 			}
 		}
 		/// <summary>
@@ -622,30 +692,21 @@ public static partial class Pom
 			try
 			{
 				field.ParseFromText(this, data, newValue);
-				stringControl.fLabels[0].color = new Color(0.1f, 0.4f, 0.2f); // positive feedback
+				subNodes[1].fLabels[0].color = new Color(0.1f, 0.4f, 0.2f); // positive feedback
 			}
 			catch (Exception ex)
 			{
 				LogWarning($"Failed to parse field from text: {ex}");
-				stringControl.fLabels[0].color = Color.red; // negative fedback
+				subNodes[1].fLabels[0].color = Color.red; // negative fedback
 			}
 			if (endTransaction)
 			{
 				Text = field.DisplayValueForNode(this, data)!;
-				stringControl.fLabels[0].color = Color.black;
+				subNodes[1].fLabels[0].color = Color.black;
 				Refresh();
 			}
 		}
-
-		public void Signal(DevUISignalType type, DevUINode sender, string message)
-		{
-			if (sender == stringControl)
-			{
-				TrySetValue(stringControl.Text, type == StringControl.StringFinish);
-			}
-		}
 	}
-
 	/// <summary>
 	/// A button that brings up a panel of all the selectable options
 	/// <see cref="global::Pom.Pom.IListablePanelField"/>
