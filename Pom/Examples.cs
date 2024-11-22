@@ -12,9 +12,9 @@ public static class Examples
 {
 	internal class OneOfAll : ManagedData
 	{
-		[ColorField("color", 1, 1, 1, 1, ManagedFieldWithPanel.ControlType.button, "color")]
+		/*[ColorField("color", 1, 1, 1, 1, ManagedFieldWithPanel.ControlType.button, "color")]
 		internal Color color;
-		[IntegerField("int", 0, 10, 0)]
+		[IntegerField("int", 0, 10, 0)] // TODO: Implement IntegerField automatically within Vector2ListField?
 		internal int Int;
 		[FloatField("float", 0f, 10f, 0f)]
 		internal float Float;
@@ -25,11 +25,14 @@ public static class Examples
 		[IntVector2Field("intvector", 3, 3, IntVector2Field.IntVectorReprType.tile)]
 		internal IntVector2 IntVec;
 		[Vector2ArrayField("vectorarray", 5, false, Vector2ArrayField.Vector2ArrayRepresentationType.Chain, 10f, 10f, 20f, 20f, 20f, -20f, -20f, -20f, -20f, 20f)]
-		internal Vector2[] VecArray = new Vector2[0];
-		[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
+		internal Vector2[] VecArray = new Vector2[0];*/
+		// TODO: Don't forget to uncomment all of this lmao
+		[Vector2ListField("vectorlist", 10, false, Vector2ListField.Vector2ListRepresentationType.Polygon)]
+		internal Vector2[] VecList = new Vector2[0];
+		/*[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
 		BepInEx.Logging.LogLevel Enum;
 		[ExtEnumField<AbstractCreature.AbstractObjectType>("extenum", nameof(AbstractCreature.AbstractObjectType.AttachedBee), new[] { nameof(AbstractCreature.AbstractObjectType.AttachedBee), nameof(AbstractCreature.AbstractObjectType.BubbleGrass) })]
-		AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;
+		AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;*/
 
 		public OneOfAll(PlacedObject owner) : base(owner, null)
 		{
@@ -61,7 +64,7 @@ public static class Examples
 
 			new IntegerField("i1", 0, 10, 1, ManagedFieldWithPanel.ControlType.slider, "Integer Slider"),
 			new IntegerField("i2", 0, 10, 2, ManagedFieldWithPanel.ControlType.button, "Integer Button"),
-			new IntegerField("i3", 0, 10, 3, ManagedFieldWithPanel.ControlType.arrows, "Integer Arrows"),
+			new IntegerField("i3", 0, 10, 3, ManagedFieldWithPanel.ControlType.arrows, "Integer Arrows"), // TODO: Get one of these badboys in the Vector2ListField class to control node amount
 			new IntegerField("i4", 0, 10, 3, ManagedFieldWithPanel.ControlType.text, "Integer Text"),
 
 			new StringField("str1", "your text here", "String"),
