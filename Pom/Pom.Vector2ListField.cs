@@ -10,7 +10,7 @@ public static partial class Pom
 	/// <summary>
 	/// A <see cref="ManagedField"/> that stores an array of <see cref="Vector2"/>s that can be modified in size.
 	/// </summary>
-	public class Vector2ListField : ManagedField
+	public class Vector2ListField : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField, IListablePanelField
 	{
 		/// <summary>
 		/// Chosen representation type
@@ -82,7 +82,7 @@ public static partial class Pom
 		/// <inheritdoc/>
 		public override DevUINode MakeAditionalNodes(ManagedData managedData, ManagedRepresentation managedRepresentation)
 		{
-			return new Vector2ListHandle(this, managedData, managedRepresentation);
+			return new Vector2ListWrapper(this, managedData, managedRepresentation);
 		}
 		/// <summary>
 		/// How the handle should look like
@@ -102,8 +102,9 @@ public static partial class Pom
 		/// Special handle for vector2listfield
 		/// </summary>
 // TODO: Solve a way to create or destroy Vector2ListHandles for the Nodes with Dev Tools Buttons
-		public class Vector2ListHandle : PositionedDevUINode
+		public class Vector2ListWrapper : PositionedDevUINode
 		{
+			private Vector2ListInt iteratorControl;
 			/// <summary>
 			/// Associated field
 			/// </summary>
@@ -124,7 +125,7 @@ public static partial class Pom
 			/// <param name="field">Field definition</param>
 			/// <param name="data">Associated placedobject's data</param>
 			/// <param name="representation">Associated placedobject's representation</param>
-			public Vector2ListHandle(
+			public Vector2ListWrapper(
 				Vector2ListField field,
 				ManagedData data,
 				ManagedRepresentation representation) : base(
@@ -166,6 +167,8 @@ public static partial class Pom
 					fSprites[currLine].anchorY = 0;
 					Lines.Add(currLine);
 				}
+
+				iteratorControl = new Vector2ListInt(Field, Data, new ManagedControlPanel());
 			}
 			/// <inheritdoc/>
 			// TODO: Figure out how to set control node to (0, 0) or other value if IncludeParent is false
@@ -208,6 +211,78 @@ public static partial class Pom
 				}
 			}
 		}
+		public class Vector2ListInt : IntegerControl
+		{
+		/// <summary>
+		/// Field definition
+		/// </summary>
+		protected readonly ManagedFieldWithPanel field;
+		/// <summary>
+		/// <see cref="field"/> but cast to interface type
+		/// </summary>
+		protected readonly IIterablePanelField iterable;
+		/// <summary>
+		/// Data of the associated placedobject
+		/// </summary>
+		protected readonly ManagedData data;
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="field">Field definition</param>
+		/// <param name="managedData">Data of the associated placedobject</param>
+		/// <param name="panel">Containing panel</param>
+		/// <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
+		public Vector2ListInt(ManagedFieldWithPanel field,
+			ManagedData managedData,
+			ManagedControlPanel panel,
+			float sizeOfDisplayname) : base(
+				panel.owner,
+				"ManagedArrowSelector",
+				panel,
+				Vector2.zero,
+				field.displayName)
+		{
+			this.field = field;
+			this.iterable = (field as IIterablePanelField)!;
+			if (iterable == null) throw new ArgumentException("Field must implement IIterablePanelField");
+			this.data = managedData;
+
+			DevUILabel titleLabel = (this.subNodes[0] as DevUILabel)!;
+			titleLabel.size.x = sizeOfDisplayname;
+			titleLabel.fSprites[0].scaleX = sizeOfDisplayname;
+
+			DevUILabel numberLabel = (this.subNodes[1] as DevUILabel)!;
+			numberLabel.pos.x = sizeOfDisplayname + 30f;
+			numberLabel.size.x = field.SizeOfLargestDisplayValue();
+			numberLabel.fSprites[0].scaleX = numberLabel.size.x;
+
+			ArrowButton arrowL = (this.subNodes[2] as ArrowButton)!;
+			arrowL.pos.x = sizeOfDisplayname + 10f;
+
+			ArrowButton arrowR = (this.subNodes[3] as ArrowButton)!;
+			arrowR.pos.x = numberLabel.pos.x + numberLabel.size.x + 4f;
+		}
+		/// <inheritdoc/>
+		public override void Increment(int change)
+		{
+			if (change == 1)
+			{
+				iterable.Next(this, data);
+			}
+			else if (change == -1)
+			{
+				iterable.Prev(this, data);
+			}
+
+			this.Refresh();
+		}
+		/// <inheritdoc/>
+		public override void Refresh()
+		{
+			NumberLabelText = field.DisplayValueForNode(this, data);
+			base.Refresh();
+		}
+	}
 		// Note to self: This makes an array of vector2s out of every two floats in the given array!
 		// Don't even need the other make nodes i think... since you can always add or subtract a node.
 		private static Vector2[] MakeVectors(float[] floats)
@@ -219,5 +294,67 @@ public static partial class Pom
 			}
 			return res;
 		}
+
+		public override float SizeOfLargestDisplayValue()
+		{
+			return HUD.DialogBox.meanCharWidth * ((Mathf.Max(Mathf.Abs(0), Mathf.Abs(Maximum))).ToString().Length + 2);
+		}
+
+		/// <summary>
+		/// Implements <see cref="IIterablePanelField"/>. Called from UI buttons and arrows.
+		/// </summary>
+		public virtual void Next(
+			PositionedDevUINode node,
+			ManagedData data)
+		{
+			int val = data.GetValue<int>(key) + 1;
+			if (val > Maximum) val = 0;
+			data.SetValue<int>(key, val);
+		}
+		/// <summary>
+		/// Implements <see cref="IIterablePanelField"/>. Called from UI buttons and arrows.
+		/// </summary>
+		public virtual void Prev(
+			PositionedDevUINode node,
+			ManagedData data)
+		{
+			int val = data.GetValue<int>(key) - 1;
+			if (val < 0) val = Maximum;
+			data.SetValue<int>(key, val);
+		}
+
+		/// <summary>
+		/// Implements <see cref="IInterpolablePanelField"/>. Called from UI sliders.
+		/// </summary>
+		public virtual float FactorOf(
+			PositionedDevUINode node,
+			ManagedData data)
+		{
+			return (Maximum - 0 == 0) ? 0f : (data.GetValue<int>(key) - 0) / (float)(Maximum - 0);
+		}
+		/// <summary>
+		/// Implements <see cref="IInterpolablePanelField"/>. Called from UI sliders.
+		/// </summary>
+		public virtual void NewFactor(
+			PositionedDevUINode node,
+			ManagedData data,
+			float factor)
+		{
+			data.SetValue<int>(key, Mathf.RoundToInt(0 + factor * (Maximum - 0)));
+		}
+
+		public string[] GetValues(int start, int end)
+		{
+			List<string> values = new();
+			for (int i = start; i < end; i++)
+			{
+				values.Add(i.ToString());
+			}
+			return values.ToArray();
+		}
+
+		public int HighestItem() => Maximum + 1;
+
+		public int LowestItem() => 0;
 	}
 }
