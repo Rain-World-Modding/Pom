@@ -23,11 +23,12 @@ public static class Examples
 		[Vector2Field("vector", 10f, 30f)]
 		internal Vector2 Vec;
 		[IntVector2Field("intvector", 3, 3, IntVector2Field.IntVectorReprType.tile)]
-		internal IntVector2 IntVec;
+		internal IntVector2 IntVec;*/
 		[Vector2ArrayField("vectorarray", 5, false, Vector2ArrayField.Vector2ArrayRepresentationType.Chain, 10f, 10f, 20f, 20f, 20f, -20f, -20f, -20f, -20f, 20f)]
-		internal Vector2[] VecArray = new Vector2[0];*/
+		internal Vector2[] VecArray = new Vector2[0];
 		// TODO: Don't forget to uncomment all of this lmao
-		[Vector2ListField("vectorlist", 10, false, Vector2ListField.Vector2ListRepresentationType.Polygon)]
+		internal static Vector2[] evilList = new Vector2[4];
+		[Vector2ListField("vectorlist", 10, 3, false, Vector2ListField.Vector2ListRepresentationType.Polygon)]
 		internal Vector2[] VecList = new Vector2[0];
 		/*[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
 		BepInEx.Logging.LogLevel Enum;

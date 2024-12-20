@@ -7,10 +7,11 @@ namespace Pom;
 // Written by Cactus
 public static partial class Pom
 {
+	
 	/// <summary>
 	/// A <see cref="ManagedField"/> that stores an array of <see cref="Vector2"/>s that can be modified in size.
 	/// </summary>
-	public class Vector2ListField : ManagedFieldWithPanel, IIterablePanelField, IInterpolablePanelField, IListablePanelField
+	public class Vector2ListField : ManagedFieldWithPanel, IInterpolablePanelField, IListablePanelField, IIterablePanelField
 	{
 		/// <summary>
 		/// Chosen representation type
@@ -22,6 +23,7 @@ public static partial class Pom
 		public int NodeCount;
 		public bool IncludeParent;
 		public int Maximum;
+		public int Minimum;
 
 		/// <summary>
 		/// Creates a <see cref="Vector2ListField"/> and assigns the proper values that are used in the handle
@@ -35,22 +37,29 @@ public static partial class Pom
 		public Vector2ListField(
 			string key,
 			int maximum,
+			int minimum,
 			bool includeParent,
 			Vector2ListRepresentationType representationType = Vector2ListRepresentationType.Polygon
 			) : base(
 				key,
-				ProcessNodes())
+				ProcessNodes(3))
 		{
-			NodeCount = 4;
+			NodeCount = 3;
 			RepresentationType = representationType;
 			IncludeParent = includeParent;
 			Maximum = maximum;
+			Minimum = minimum;
 		}
 
+		// The position of the int handle is added after the ToString and ForString methods of the list...
 		/// <inheritdoc/>
 		public override string ToString(object value)
 		{
+			// First toString position is from the position of the int handle
+			// Separates the vectors by "^", Separates the vector components by ";" 
 			Vector2[] vectors = (Vector2[])value;
+			foreach (Vector2 vector in vectors)
+				Debug.Log(vector);
 			return string.Join("^", vectors.Select(v => $"{v.x};{v.y}").ToArray());
 		}
 		/// <inheritdoc/>
@@ -59,40 +68,92 @@ public static partial class Pom
 			List<Vector2> positions = new List<Vector2>();
 			foreach (string substring in str.Split('^'))
 			{
+				Debug.Log(substring);
 				string[] split = substring.Split(';');
 				positions.Add(new Vector2(float.Parse(split[0]), float.Parse(split[1])));
 			}
 
 			return positions.ToArray();
 		}
-
-		// Make a square for the base node set
-		private static object ProcessNodes()
+		
+		public override PositionedDevUINode? MakeControlPanelNode(
+			ManagedData managedData,
+			ManagedControlPanel panel,
+			float sizeOfDisplayname)
 		{
-			Vector2[] result =
-			{
-				new (40f, 40f),
-				new (40f, -40f),
-				new (-40f, -40f),
-				new (-40f, 40f)
-			};
-			
-			return result;
+			return new ManagedArrowSelector(this, managedData, panel, 20f);
 		}
+		
+		public override string? DisplayValueForNode(
+			PositionedDevUINode node,
+			ManagedData data)
+		{
+			// field tostring, but fields can format on their own
+			return NodeCount.ToString();
+		}
+		
+		
+		
+		/// <summary>
+		/// Implements <see cref="IIterablePanelField"/>. Called from UI buttons and arrows.
+		/// </summary>
+		public virtual void Next(
+			PositionedDevUINode node,
+			ManagedData data)
+		{
+			if (NodeCount < Maximum)
+			{
+				// Save data from previous array and resize
+				int oldLength = NodeCount;
+				NodeCount++;
+
+				
+				Vector2[] copy = new Vector2[oldLength + 1];
+				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength);
+				
+				data.SetValue(key, copy);
+				Debug.Log(data.GetValue<Vector2[]>(key).Length);
+				Debug.Log(data.ToString());
+			}
+		}
+		
+		/// <summary>
+		/// Implements <see cref="IIterablePanelField"/>. Called from UI buttons and arrows.
+		/// </summary>
+		public virtual void Prev(
+			PositionedDevUINode node,
+			ManagedData data)
+		{
+			if (NodeCount > Minimum && NodeCount > 1)
+			{
+				// Save data from previous array and resize
+				int oldLength = NodeCount;
+				NodeCount--;
+				
+				Vector2[] copy = new Vector2[oldLength - 1];
+				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength - 2);
+				
+				data.SetValue(key, copy);
+				Debug.Log(data.GetValue<Vector2[]>(key).Length);
+				Debug.Log(data.ToString());
+			}
+		}
+		
+		private static object ProcessNodes(int nodeCount)
+		{
+			return new Vector2[nodeCount];
+		}
+		
 		/// <inheritdoc/>
 		public override DevUINode MakeAditionalNodes(ManagedData managedData, ManagedRepresentation managedRepresentation)
 		{
-			return new Vector2ListWrapper(this, managedData, managedRepresentation);
+			return new Vector2ListHandle(this, managedData, managedRepresentation);
 		}
 		/// <summary>
 		/// How the handle should look like
 		/// </summary>
 		public enum Vector2ListRepresentationType
 		{
-			/// <summary>
-			/// Handle is an open-ended chain
-			/// </summary>
-			Chain,
 			/// <summary>
 			/// Handle is a polygon (start and end connected)
 			/// </summary>
@@ -102,9 +163,8 @@ public static partial class Pom
 		/// Special handle for vector2listfield
 		/// </summary>
 // TODO: Solve a way to create or destroy Vector2ListHandles for the Nodes with Dev Tools Buttons
-		public class Vector2ListWrapper : PositionedDevUINode
+		public class Vector2ListHandle : PositionedDevUINode
 		{
-			private Vector2ListInt iteratorControl;
 			/// <summary>
 			/// Associated field
 			/// </summary>
@@ -125,7 +185,7 @@ public static partial class Pom
 			/// <param name="field">Field definition</param>
 			/// <param name="data">Associated placedobject's data</param>
 			/// <param name="representation">Associated placedobject's representation</param>
-			public Vector2ListWrapper(
+			public Vector2ListHandle(
 				Vector2ListField field,
 				ManagedData data,
 				ManagedRepresentation representation) : base(
@@ -134,6 +194,7 @@ public static partial class Pom
 					representation,
 					(data.GetValue<Vector2[]>(field.key) ?? new Vector2[] { default })[0])
 			{
+				Debug.Log("Making field handle!!!");
 				Field = field;
 				
 				Data = data;
@@ -167,8 +228,7 @@ public static partial class Pom
 					fSprites[currLine].anchorY = 0;
 					Lines.Add(currLine);
 				}
-
-				iteratorControl = new Vector2ListInt(Field, Data, new ManagedControlPanel());
+				
 			}
 			/// <inheritdoc/>
 			// TODO: Figure out how to set control node to (0, 0) or other value if IncludeParent is false
@@ -176,7 +236,9 @@ public static partial class Pom
 			{
 				First.Move(newPos);
 				Vector2[] vArr = Data.GetValue<Vector2[]>(Field.key)!;
+				// Sets initial value to 0,0 if include parent is false
 				vArr[0] = Field.IncludeParent ? new Vector2(0, 0) : newPos;
+				Debug.Log("Movement to here: " + vArr.ToString());
 				Data.SetValue(Field.key, vArr);
 				base.Move(newPos);
 			}
@@ -211,78 +273,6 @@ public static partial class Pom
 				}
 			}
 		}
-		public class Vector2ListInt : IntegerControl
-		{
-		/// <summary>
-		/// Field definition
-		/// </summary>
-		protected readonly ManagedFieldWithPanel field;
-		/// <summary>
-		/// <see cref="field"/> but cast to interface type
-		/// </summary>
-		protected readonly IIterablePanelField iterable;
-		/// <summary>
-		/// Data of the associated placedobject
-		/// </summary>
-		protected readonly ManagedData data;
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="field">Field definition</param>
-		/// <param name="managedData">Data of the associated placedobject</param>
-		/// <param name="panel">Containing panel</param>
-		/// <param name="sizeOfDisplayname">Size of name tag, can be 0</param>
-		public Vector2ListInt(ManagedFieldWithPanel field,
-			ManagedData managedData,
-			ManagedControlPanel panel,
-			float sizeOfDisplayname) : base(
-				panel.owner,
-				"ManagedArrowSelector",
-				panel,
-				Vector2.zero,
-				field.displayName)
-		{
-			this.field = field;
-			this.iterable = (field as IIterablePanelField)!;
-			if (iterable == null) throw new ArgumentException("Field must implement IIterablePanelField");
-			this.data = managedData;
-
-			DevUILabel titleLabel = (this.subNodes[0] as DevUILabel)!;
-			titleLabel.size.x = sizeOfDisplayname;
-			titleLabel.fSprites[0].scaleX = sizeOfDisplayname;
-
-			DevUILabel numberLabel = (this.subNodes[1] as DevUILabel)!;
-			numberLabel.pos.x = sizeOfDisplayname + 30f;
-			numberLabel.size.x = field.SizeOfLargestDisplayValue();
-			numberLabel.fSprites[0].scaleX = numberLabel.size.x;
-
-			ArrowButton arrowL = (this.subNodes[2] as ArrowButton)!;
-			arrowL.pos.x = sizeOfDisplayname + 10f;
-
-			ArrowButton arrowR = (this.subNodes[3] as ArrowButton)!;
-			arrowR.pos.x = numberLabel.pos.x + numberLabel.size.x + 4f;
-		}
-		/// <inheritdoc/>
-		public override void Increment(int change)
-		{
-			if (change == 1)
-			{
-				iterable.Next(this, data);
-			}
-			else if (change == -1)
-			{
-				iterable.Prev(this, data);
-			}
-
-			this.Refresh();
-		}
-		/// <inheritdoc/>
-		public override void Refresh()
-		{
-			NumberLabelText = field.DisplayValueForNode(this, data);
-			base.Refresh();
-		}
-	}
 		// Note to self: This makes an array of vector2s out of every two floats in the given array!
 		// Don't even need the other make nodes i think... since you can always add or subtract a node.
 		private static Vector2[] MakeVectors(float[] floats)
@@ -294,33 +284,10 @@ public static partial class Pom
 			}
 			return res;
 		}
-
+		// TODO: Figure out how to make this NOT an invalid data type
 		public override float SizeOfLargestDisplayValue()
 		{
 			return HUD.DialogBox.meanCharWidth * ((Mathf.Max(Mathf.Abs(0), Mathf.Abs(Maximum))).ToString().Length + 2);
-		}
-
-		/// <summary>
-		/// Implements <see cref="IIterablePanelField"/>. Called from UI buttons and arrows.
-		/// </summary>
-		public virtual void Next(
-			PositionedDevUINode node,
-			ManagedData data)
-		{
-			int val = data.GetValue<int>(key) + 1;
-			if (val > Maximum) val = 0;
-			data.SetValue<int>(key, val);
-		}
-		/// <summary>
-		/// Implements <see cref="IIterablePanelField"/>. Called from UI buttons and arrows.
-		/// </summary>
-		public virtual void Prev(
-			PositionedDevUINode node,
-			ManagedData data)
-		{
-			int val = data.GetValue<int>(key) - 1;
-			if (val < 0) val = Maximum;
-			data.SetValue<int>(key, val);
 		}
 
 		/// <summary>
