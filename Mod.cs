@@ -26,7 +26,7 @@ namespace PomCore;
 /// in multiple mods. It is not recommended to do that anymore, but
 /// you still can if you really want to.
 ///
-/// This fork is made to add additional features to POM, written by Cactus
+/// VectorList added by Cactus
 /// </summary>
 [BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "3.0")]
 public class Mod : BepInEx.BaseUnityPlugin
