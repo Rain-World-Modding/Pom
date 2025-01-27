@@ -12,7 +12,7 @@ public static class Examples
 {
 	internal class OneOfAll : ManagedData
 	{
-		/*[ColorField("color", 1, 1, 1, 1, ManagedFieldWithPanel.ControlType.button, "color")]
+		[ColorField("color", 1, 1, 1, 1, ManagedFieldWithPanel.ControlType.button, "color")]
 		internal Color color;
 		[IntegerField("int", 0, 10, 0)] // TODO: Implement IntegerField automatically within Vector2ListField?
 		internal int Int;
@@ -23,17 +23,15 @@ public static class Examples
 		[Vector2Field("vector", 10f, 30f)]
 		internal Vector2 Vec;
 		[IntVector2Field("intvector", 3, 3, IntVector2Field.IntVectorReprType.tile)]
-		internal IntVector2 IntVec;*/
+		internal IntVector2 IntVec;
 		[Vector2ArrayField("vectorarray", 5, false, Vector2ArrayField.Vector2ArrayRepresentationType.Chain, 10f, 10f, 20f, 20f, 20f, -20f, -20f, -20f, -20f, 20f)]
 		internal Vector2[] VecArray = new Vector2[0];
-		// TODO: Don't forget to uncomment all of this lmao
-		internal static Vector2[] evilList = new Vector2[4];
-		[Vector2ListField("vectorlist", 10, 3, false, Vector2ListField.Vector2ListRepresentationType.Polygon)]
+		[Vector2ListField("vectorlist", 10, 3,  Vector2ListField.Vector2ListRepresentationType.Polygon)]
 		internal Vector2[] VecList = new Vector2[0];
-		/*[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
+		[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
 		BepInEx.Logging.LogLevel Enum;
 		[ExtEnumField<AbstractCreature.AbstractObjectType>("extenum", nameof(AbstractCreature.AbstractObjectType.AttachedBee), new[] { nameof(AbstractCreature.AbstractObjectType.AttachedBee), nameof(AbstractCreature.AbstractObjectType.BubbleGrass) })]
-		AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;*/
+		AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;
 
 		public OneOfAll(PlacedObject owner) : base(owner, null)
 		{

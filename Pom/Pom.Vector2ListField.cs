@@ -3,7 +3,7 @@ using RWCustom;
 using UnityEngine;
 
 namespace Pom;
-// TODO: Solve a way to create or destroy Vector2ListHandles for the Nodes with Dev Tools Buttons
+
 // Written by Cactus
 public static partial class Pom
 {
@@ -32,13 +32,12 @@ public static partial class Pom
 		/// <param name="maximum">The max number of <see cref="Vector2"/>s that the field stores</param>
 		/// <param name="includeParent">Sets if the field should use the parent as the first node</param>
 		/// <param name="representationType">The type of the representation that should be created.</param>
-// TODO: Change Vector2[] nodes to be set for 4 nodes or a list, or even make it accept a min and max node count?
 // TODO: Remove includeParent?
+// TODO: Fix first node's position influencing other node positions on save
 		public Vector2ListField(
 			string key,
 			int maximum,
 			int minimum,
-			bool includeParent,
 			Vector2ListRepresentationType representationType = Vector2ListRepresentationType.Polygon
 			) : base(
 				key,
@@ -46,7 +45,7 @@ public static partial class Pom
 		{
 			NodeCount = 3;
 			RepresentationType = representationType;
-			IncludeParent = includeParent;
+			IncludeParent = true;
 			Maximum = maximum;
 			Minimum = minimum;
 		}
@@ -58,8 +57,6 @@ public static partial class Pom
 			// First toString position is from the position of the int handle
 			// Separates the vectors by "^", Separates the vector components by ";" 
 			Vector2[] vectors = (Vector2[])value;
-			foreach (Vector2 vector in vectors)
-				Debug.Log(vector);
 			return string.Join("^", vectors.Select(v => $"{v.x};{v.y}").ToArray());
 		}
 		/// <inheritdoc/>
@@ -68,7 +65,6 @@ public static partial class Pom
 			List<Vector2> positions = new List<Vector2>();
 			foreach (string substring in str.Split('^'))
 			{
-				Debug.Log(substring);
 				string[] split = substring.Split(';');
 				positions.Add(new Vector2(float.Parse(split[0]), float.Parse(split[1])));
 			}
@@ -81,7 +77,7 @@ public static partial class Pom
 			ManagedControlPanel panel,
 			float sizeOfDisplayname)
 		{
-			return new ManagedArrowSelector(this, managedData, panel, 20f);
+			return new ManagedArrowSelector(this, managedData, panel, 72f);
 		}
 		
 		public override string? DisplayValueForNode(
@@ -112,8 +108,7 @@ public static partial class Pom
 				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength);
 				
 				data.SetValue(key, copy);
-				Debug.Log(data.GetValue<Vector2[]>(key).Length);
-				Debug.Log(data.ToString());
+				
 			}
 		}
 		
@@ -134,8 +129,6 @@ public static partial class Pom
 				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength - 2);
 				
 				data.SetValue(key, copy);
-				Debug.Log(data.GetValue<Vector2[]>(key).Length);
-				Debug.Log(data.ToString());
 			}
 		}
 		
@@ -147,6 +140,7 @@ public static partial class Pom
 		/// <inheritdoc/>
 		public override DevUINode MakeAditionalNodes(ManagedData managedData, ManagedRepresentation managedRepresentation)
 		{
+			this.NodeCount = managedData.GetValue<Vector2[]>(this.key).Length;
 			return new Vector2ListHandle(this, managedData, managedRepresentation);
 		}
 		/// <summary>
@@ -194,7 +188,6 @@ public static partial class Pom
 					representation,
 					(data.GetValue<Vector2[]>(field.key) ?? new Vector2[] { default })[0])
 			{
-				Debug.Log("Making field handle!!!");
 				Field = field;
 				
 				Data = data;
@@ -238,7 +231,6 @@ public static partial class Pom
 				Vector2[] vArr = Data.GetValue<Vector2[]>(Field.key)!;
 				// Sets initial value to 0,0 if include parent is false
 				vArr[0] = Field.IncludeParent ? new Vector2(0, 0) : newPos;
-				Debug.Log("Movement to here: " + vArr.ToString());
 				Data.SetValue(Field.key, vArr);
 				base.Move(newPos);
 			}
@@ -284,7 +276,6 @@ public static partial class Pom
 			}
 			return res;
 		}
-		// TODO: Figure out how to make this NOT an invalid data type
 		public override float SizeOfLargestDisplayValue()
 		{
 			return HUD.DialogBox.meanCharWidth * ((Mathf.Max(Mathf.Abs(0), Mathf.Abs(Maximum))).ToString().Length + 2);
