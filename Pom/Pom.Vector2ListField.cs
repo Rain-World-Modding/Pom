@@ -1,6 +1,7 @@
 ﻿using DevInterface;
 using RWCustom;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Pom;
 
@@ -105,10 +106,34 @@ public static partial class Pom
 
 				
 				Vector2[] copy = new Vector2[oldLength + 1];
+				Vector2 newPos = new Vector2(Random.value * 500f * (Random.value - 0.5f), Random.value * 500f * (Random.value - 0.5f));
+				copy[copy.Length - 1] = newPos;
+				
 				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength);
 				
 				data.SetValue(key, copy);
 				
+				// Adds the handle to remove the node
+				List<DevInterface.DevUINode> uiList = node.parentNode.parentNode.subNodes;
+
+				for (int i = 0; i < uiList.Count; i++)
+				{
+					if (uiList[i].IDstring.Equals(this.key)) // Gets this current field
+					{
+						this.NodeCount = data.GetValue<Vector2[]>(this.key).Length;
+						
+						for (int j = 0; j < uiList[i].subNodes.Count; j++)
+						{
+							uiList[i].subNodes[j].ClearSprites();
+						}
+						for (int j = 0; j < uiList[i].fSprites.Count; j++)
+						{
+							uiList[i].fSprites[j].container.RemoveChild(uiList[i].fSprites[j]);
+						}
+						uiList[i] = new Vector2ListHandle(this, data, (uiList[i] as Vector2ListHandle).rep);
+						break;
+					}
+				}
 			}
 		}
 		
@@ -129,6 +154,28 @@ public static partial class Pom
 				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength - 2);
 				
 				data.SetValue(key, copy);
+				
+				// Reloads the handle to remove the node
+				List<DevInterface.DevUINode> uiList = node.parentNode.parentNode.subNodes;
+
+				for (int i = 0; i < uiList.Count; i++)
+				{
+					if (uiList[i].IDstring.Equals(this.key)) // Gets this current field
+					{
+						this.NodeCount = data.GetValue<Vector2[]>(this.key).Length;
+						//
+						for (int j = 0; j < uiList[i].subNodes.Count; j++)
+						{
+							uiList[i].subNodes[j].ClearSprites();
+						}
+						for (int j = 0; j < uiList[i].fSprites.Count; j++)
+						{
+							uiList[i].fSprites[j].container.RemoveChild(uiList[i].fSprites[j]);
+						}
+						uiList[i] = new Vector2ListHandle(this, data, (uiList[i] as Vector2ListHandle).rep);
+						break;
+					}
+				}
 			}
 		}
 		
@@ -171,6 +218,8 @@ public static partial class Pom
 			/// First node
 			/// </summary>
 			public PositionedDevUINode First;
+
+			internal ManagedRepresentation rep;
 			/// <summary>
 			/// List of line subnode indices
 			/// </summary>
@@ -189,7 +238,7 @@ public static partial class Pom
 					(data.GetValue<Vector2[]>(field.key) ?? new Vector2[] { default })[0])
 			{
 				Field = field;
-				
+				rep = representation;
 				Data = data;
 				bool includeParent = Field.IncludeParent;
 				if (includeParent)
