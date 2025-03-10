@@ -44,8 +44,16 @@ public static partial class Eff
 
 		if (flag)
 		{
-			LogTrace($"creating effects object for [{self.RoomSettings.effects.Last().type.value}]");
-			SpawnSingleEffectsObject(self.owner.room, self.RoomSettings.effects.Last());
+			if (self.RoomSettings.effects.Any())
+			{
+				var lastEffect = self.RoomSettings.effects.Last();
+				LogTrace($"creating effects object for [{lastEffect.type.value}]");
+				SpawnSingleEffectsObject(self.owner.room, lastEffect);
+			}
+			else
+			{
+				LogTrace("No effects available in self.RoomSettings.effects; skipping SpawnSingleEffectsObject.");
+			}
 		}
 	}
 
