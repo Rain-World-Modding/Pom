@@ -404,5 +404,5 @@ lib/**
 *.sln
 
 # backwards compatibility
-!mod/1.9.15b/**
+!mod/v1.9.15b/**
 !mod/plugins/**
