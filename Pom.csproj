@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net48</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<LangVersion>12</LangVersion>
+		<LangVersion>13</LangVersion>
 		<FileVersion>3.0</FileVersion>
 		<AssemblyVersion>3.0</AssemblyVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -12,7 +12,9 @@
 		<DebugType>Portable</DebugType>
 		<IncludeSymbols>False</IncludeSymbols>
 		<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
-    	<PathMap>$(AppOutputBase)=POM\</PathMap>
+		<PathMap>$(AppOutputBase)=POM\</PathMap>
+		<OutputPath>./mod/newest/plugins</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 	<!-- Debug configuration. Build for release. -->
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -49,22 +51,6 @@
 			<HintPath>lib/BepInEx.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="ConfigMachine">
-			<HintPath>lib/ConfigMachine.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="CustomRegions">
-			<HintPath>lib/CustomRegions.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="DevConsole">
-			<HintPath>lib/DevConsole.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="EnumExtender">
-			<HintPath>lib/EnumExtender.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
 		<Reference Include="HOOKS-Assembly-CSharp">
 			<HintPath>lib/HOOKS-Assembly-CSharp.dll</HintPath>
 			<Private>False</Private>
@@ -97,10 +83,6 @@
 			<HintPath>lib/MonoMod.Utils.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="SlugBase">
-			<HintPath>lib/SlugBase.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
 		<Reference Include="UnityEngine">
 			<HintPath>lib/UnityEngine.dll</HintPath>
 			<Private>False</Private>
@@ -121,10 +103,6 @@
 			<HintPath>lib/netstandard.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
-		<Reference Include="Newtonsoft.Json">
-			<HintPath>lib/Newtonsoft.Json.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
 		<Reference Include="Unity.Mathematics">
 			<HintPath>lib/Unity.Mathematics.dll</HintPath>
 			<Private>False</Private>
@@ -137,23 +115,5 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<Target Name="CopyOutput" AfterTargets="Build">
-		<!-- <Delete Files="mod/assets"/> -->
-		<Delete Files="mod/newest/plugins" />
-		<Message Text="POM: Buildcopy from [ $(TargetPath) ] to [ mod ] - @(_CopyItems)"
-			Importance="high" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).dll" DestinationFolder="mod/newest/plugins" Retries="3"
-			RetryDelayMilliseconds="300" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).pdb" DestinationFolder="mod/newest/plugins" Retries="3"
-			RetryDelayMilliseconds="300" />
-		<Copy SourceFiles="$(OutDir)$(ProjectName).xml" DestinationFolder="mod/newest/plugins" Retries="3"
-			RetryDelayMilliseconds="300" />
-		<!-- <Copy
-			SourceFiles="@(_CopyItems)"
-			DestinationFolder="mod/assets/regionkit/%(RecursiveDir)"
-			Retries="3"
-			RetryDelayMilliseconds="300" /> -->
-		<Copy SourceFiles="modinfo.json" DestinationFolder="mod" Retries="3"
-			RetryDelayMilliseconds="300" />
-	</Target>
+	<!-- please for the love of god just symlink it instead of doing copy shenanigans -->
 </Project>

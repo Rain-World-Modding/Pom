@@ -1,20 +1,16 @@
-﻿global using static PomCore.Mod;
-global using static PomCore.Utils;
+﻿global using PomCore;
 global using static PomCore.Logfix;
-global using PomCore;
-using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-
+global using static PomCore.Utils;
 using System.Security;
 using System.Security.Permissions;
 using BepInEx;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 [module: UnverifiableCode]
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
-
-
+#pragma warning restore CS0618 // Type or member is obsolete
 
 
 namespace PomCore;
@@ -26,8 +22,8 @@ namespace PomCore;
 /// in multiple mods. It is not recommended to do that anymore, but
 /// you still can if you really want to.
 /// </summary>
-[BepInEx.BepInPlugin("rwmodding.coreorg.pom", "Pom", "3.0")]
-public class Mod : BepInEx.BaseUnityPlugin
+[BepInPlugin("rwmodding.coreorg.pom", "Pom", "3.0")]
+public class Mod : BaseUnityPlugin
 {
 	BepInEx.Configuration.ConfigEntry<bool>? writeTraceConfig;
 	/// <inheritdoc/>

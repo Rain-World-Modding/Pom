@@ -401,3 +401,7 @@ FodyWeavers.xsd
 lib/**
 *.dll
 *.xml
+
+# backwards compatibility
+!mod/1.9.15b/**
+!mod/plugins/**
