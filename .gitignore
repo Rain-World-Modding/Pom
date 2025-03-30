@@ -401,6 +401,7 @@ FodyWeavers.xsd
 lib/**
 *.dll
 *.xml
+*.sln
 
 # backwards compatibility
 !mod/1.9.15b/**
