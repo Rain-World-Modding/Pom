@@ -569,7 +569,9 @@ public static partial class Pom
 			int datastart = 0;
 			if (NeedsControlPanel)
 			{
-				this.panelPos = new Vector2(float.Parse(array[0]), float.Parse(array[1]));
+				if (float.TryParse(array[0], out float x) && float.TryParse(array[1], out float y))
+					this.panelPos = new Vector2(x, y);
+				else this.panelPos = new Vector2(0f, 0f);
 				datastart = 2;
 			}
 
