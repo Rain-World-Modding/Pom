@@ -59,18 +59,10 @@ public static partial class Pom
 		}
 		//PlacedObjectsExample();
 	}
-	private static void IL_ObjectsPage_AssemblePages(MonoMod.Cil.ILContext il)
+	private static void IL_ObjectsPage_AssemblePages(ILContext il)
 	{
-		LogDebug("ILHook body start");
-		MonoMod.Cil.ILCursor c = new(il);
-		c.GotoNext(MonoMod.Cil.MoveType.Before,
-			x => x.MatchStloc(2),
-			x => x.MatchLdarg(0),
-			x => x.MatchLdloc(1),
-			x => x.MatchNewarr<PlacedObject.Type>()
-			);
-		LogDebug($"Found inj point, emitting");
-		c.Emit(OpCodes.Pop);
+		ILCursor c = new(il);
+		c.GotoNext(MoveType.After, x => x.MatchStloc(1));
 		c.Emit(OpCodes.Ldloc_0);
 		c.EmitDelegate((Dictionary<ObjCategory, List<PlacedObject.Type>> dict) =>
 		{
@@ -101,8 +93,6 @@ public static partial class Pom
 				LogDebug($"sorting of {cat} completed ({list.Count} items)");
 			}
 		});
-		c.Emit(OpCodes.Ldc_I4_0);
-		LogDebug("emit complete");
 	}
 
 	private static ObjCategory ObjectsPage_Sort(On.DevInterface.ObjectsPage.orig_DevObjectGetCategoryFromPlacedType orig, DevInterface.ObjectsPage self, PlacedObject.Type type)
