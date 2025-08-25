@@ -189,13 +189,21 @@ public static partial class Pom
 				Vector2 newpos)
 	{
 		orig(self, newpos);
-		if (self.parentNode is Vector2ArrayField.Vector2ArrayHandle v2ah)
+		if (self.parentNode is Vector2ArrayField.Vector2ArrayHandle v2ah) // somebody should unhardcode this check but it will NOT be me!!!! - cactus
 		{
 			Vector2[] vectors = v2ah.Data.GetValue<Vector2[]>(v2ah.Field.key)!;
 			int index = int.Parse(self.IDstring.Split('_')[1]);
 			if (index == 0) return;
 			vectors[index] = newpos;
 			v2ah.Data.SetValue(v2ah.Field.key, vectors);
+		}
+		else if (self.parentNode is Vector2ListField.Vector2ListHandle v2lh)
+		{
+			Vector2[] vectors = v2lh.Data.GetValue<Vector2[]>(v2lh.Field.key)!;
+			int index = int.Parse(self.IDstring.Split('_')[1]);
+			if (index == 0) return;
+			vectors[index] = newpos;
+			v2lh.Data.SetValue(v2lh.Field.key, vectors);
 		}
 	}
 }

@@ -21,6 +21,8 @@ namespace PomCore;
 /// to be "stackable" at runtime with multiple instances of POM
 /// in multiple mods. It is not recommended to do that anymore, but
 /// you still can if you really want to.
+///
+/// VectorList added by Cactus
 /// </summary>
 [BepInPlugin("rwmodding.coreorg.pom", "Pom", "3.0")]
 public class Mod : BaseUnityPlugin
