@@ -15,6 +15,7 @@ public static partial class Pom
 		//new PlacedObject.Type(obj)
 		managedObjectTypes.Add(obj);
 	}
+
 	/// <summary>
 	/// Shorthand for registering a <see cref="FullyManagedObjectType"/>.
 	/// Wraps an UpdateableAndDeletable into a managed type with managed data and UI.
@@ -55,6 +56,7 @@ public static partial class Pom
 		ManagedObjectType emptyObjectType = new ManagedObjectType(name, category ?? "POM", null, dataType, reprType);
 		RegisterManagedObject(emptyObjectType);
 	}
+
 	/// <summary>
 	/// Same as <see cref="RegisterEmptyObjectType"/>, but with generics.
 	/// </summary>
@@ -68,6 +70,7 @@ public static partial class Pom
 	{
 		RegisterEmptyObjectType(key, category, typeof(DATA), typeof(REPR));
 	}
+
 	/// <summary>
 	/// Same as <see cref="RegisterManagedObject(ManagedObjectType)"/>, but with generics.
 	/// </summary>
@@ -87,6 +90,24 @@ public static partial class Pom
 	{
 		RegisterManagedObject(new ManagedObjectType(key, category ?? "POM", typeof(UAD), typeof(DATA), typeof(REPR), singleInstance));
 	}
+
+	/// <summary>
+	/// Unregisters a managed object.
+	/// </summary>
+	/// <param name="key">Placed object type to unregister</param>
+	public static void UnregisterManagedObject(string key) => UnregisterManagedObject(new PlacedObject.Type(key, false));
+
+	/// <summary>
+	/// Unregisters a managed object.
+	/// </summary>
+	/// <param name="type">Placed object type to unregister</param>
+	public static void UnregisterManagedObject(PlacedObject.Type type)
+	{
+		Apply();
+		RemoveManagersForType(type);
+		type.Unregister();
+	}
+
 	/// <summary>
 	/// Forces a selected PlacedObjectType to be sorted into specific category. Works for non-POM objects. <para/>
 	/// Note that calling this force-creates the category.
@@ -100,6 +121,7 @@ public static partial class Pom
 		}
 		__objectCategories.Add(type.value, new(category, true));
 	}
+
 	/// <summary>
 	/// Selects how an object category should be sorted.<para/>
 	/// Note that calling this force-creates the category.

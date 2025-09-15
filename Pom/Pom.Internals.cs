@@ -1,4 +1,4 @@
-namespace Pom;
+﻿namespace Pom;
 
 public static partial class Pom
 {
@@ -9,11 +9,22 @@ public static partial class Pom
 	/// </summary>
 	private static ManagedObjectType? GetManagerForType(PlacedObject.Type tp)
 	{
+		CullUnregisteredTypes();
 		foreach (var manager in managedObjectTypes)
 		{
 			if (tp == manager.GetObjectType() && tp != PlacedObject.Type.None) return manager;
 		}
 		return null;
+	}
+
+	private static void RemoveManagersForType(PlacedObject.Type tp)
+	{
+		managedObjectTypes.RemoveAll(x => x.GetObjectType() == tp);
+	}
+
+	private static void CullUnregisteredTypes()
+	{
+		managedObjectTypes.RemoveAll(x => x.GetObjectType().Index == -1);
 	}
 
 	private static PlacedObject.Type DeclareOrGetEnum(string name)

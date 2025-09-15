@@ -1,4 +1,4 @@
-namespace EffExt;
+﻿namespace EffExt;
 
 public static partial class Eff
 {
@@ -32,6 +32,7 @@ public static partial class Eff
 			if (__effectDefinitions.Remove(name))
 			{
 				RoomSettings.RoomEffect.Type.values.RemoveEntry(name);
+				RoomSettings.RoomEffect.Type.valuesVersion++;
 			}
 			else
 			{
