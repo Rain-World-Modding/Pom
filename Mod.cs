@@ -24,7 +24,7 @@ namespace PomCore;
 ///
 /// VectorList added by Cactus
 /// </summary>
-[BepInPlugin("rwmodding.coreorg.pom", "Pom", "3.0")]
+[BepInPlugin("rwmodding.coreorg.pom", "Pom", "3.1")]
 public class Mod : BaseUnityPlugin
 {
 	BepInEx.Configuration.ConfigEntry<bool>? writeTraceConfig;

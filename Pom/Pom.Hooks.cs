@@ -61,45 +61,52 @@ public static partial class Pom
 	}
 	private static void IL_ObjectsPage_AssemblePages(ILContext il)
 	{
-		ILCursor c = new(il);
-		c.GotoNext(MoveType.After, x => x.MatchStloc(1));
-		c.Emit(OpCodes.Ldloc_0);
-		c.EmitDelegate((Dictionary<ObjCategory, List<PlacedObject.Type>> dict) =>
+		try
 		{
-			LogDebug("Sorter ilhook go");
-			foreach (var kvp in dict)
+			ILCursor c = new(il);
+			c.GotoNext(MoveType.After, x => x.MatchStloc(1));
+			c.Emit(OpCodes.Ldloc_0);
+			c.EmitDelegate((Dictionary<ObjCategory, List<PlacedObject.Type>> dict) =>
 			{
-				var cat = kvp.Key;
-				var list = kvp.Value;
-				if (!__sortCategorySettings.TryGetValue(cat, out CategorySortKind doSort)) doSort = __sortByDefault;
-				if (doSort is CategorySortKind.Default)
+				//LogDebug("Sorter ilhook go");
+				foreach (var kvp in dict)
 				{
-					LogDebug($"Sorting of {cat} not required");
-					continue;
-				}
-				System.Comparison<PlacedObject.Type> sorter = doSort switch
-				{
-					CategorySortKind.Alphabetical => static (ot1, ot2) =>
+					var cat = kvp.Key;
+					var list = kvp.Value;
+					if (!__sortCategorySettings.TryGetValue(cat, out CategorySortKind doSort)) doSort = __sortByDefault;
+					if (doSort is CategorySortKind.Default)
 					{
-						if (ot1 == PlacedObject.Type.None && ot2 == PlacedObject.Type.None) return 0;
-						if (ot1 == PlacedObject.Type.None) return 1;
-						if (ot2 == PlacedObject.Type.None) return -1;
-						else return StringComparer.InvariantCulture.Compare(ot1?.value, ot2?.value);
+						//LogDebug($"Sorting of {cat} not required");
+						continue;
 					}
-					,
-					_ => throw new ArgumentException($"ERROR: INVALID {nameof(CategorySortKind)} VALUE {doSort}")
-				};
-				list.Sort(sorter);
-				LogDebug($"sorting of {cat} completed ({list.Count} items)");
-			}
-		});
+					System.Comparison<PlacedObject.Type> sorter = doSort switch
+					{
+						CategorySortKind.Alphabetical => static (ot1, ot2) =>
+						{
+							if (ot1 == PlacedObject.Type.None && ot2 == PlacedObject.Type.None) return 0;
+							if (ot1 == PlacedObject.Type.None) return 1;
+							if (ot2 == PlacedObject.Type.None) return -1;
+							else return StringComparer.InvariantCulture.Compare(ot1?.value, ot2?.value);
+						}
+						,
+						_ => throw new ArgumentException($"ERROR: INVALID {nameof(CategorySortKind)} VALUE {doSort}")
+					};
+					list.Sort(sorter);
+					//LogDebug($"sorting of {cat} completed ({list.Count} items)");
+				}
+			});
+		}
+		catch (Exception e)
+		{
+			LogFatal(e);
+		}
 	}
 
 	private static ObjCategory ObjectsPage_Sort(On.DevInterface.ObjectsPage.orig_DevObjectGetCategoryFromPlacedType orig, DevInterface.ObjectsPage self, PlacedObject.Type type)
 	{
 		if (__objectCategories.TryGetValue(type.value, out ObjectsPage.DevObjectCategories cat))
 		{
-			LogDebug($"Sorting {type} into {cat}");
+			//LogDebug($"Sorting {type} into {cat}");
 			return cat;
 		}
 		return orig(self, type);
