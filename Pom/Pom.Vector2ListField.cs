@@ -22,8 +22,17 @@ public static partial class Pom
 		/// Number of vector2 nodes
 		/// </summary>
 		public int NodeCount;
+		/// <summary>
+		/// Indicates the field uses
+		/// </summary>
 		public bool IncludeParent;
+		/// <summary>
+		/// Maximum number of <see cref="Vector2"/>s that the field stores
+		/// </summary>
 		public int Maximum;
+		/// <summary>
+		/// Minimum number of <see cref="Vector2"/>s that the field stores
+		/// </summary>
 		public int Minimum;
 
 		/// <summary>
@@ -31,10 +40,8 @@ public static partial class Pom
 		/// </summary>
 		/// <param name="key">The key of the field that should be used in <see cref="ManagedData.GetValue{T}"/></param>
 		/// <param name="maximum">The max number of <see cref="Vector2"/>s that the field stores</param>
-		/// <param name="includeParent">Sets if the field should use the parent as the first node</param>
+		/// <param name="minimum">The min number of <see cref="Vector2"/>s that the field stores</param>
 		/// <param name="representationType">The type of the representation that should be created.</param>
-// TODO: Remove includeParent?
-// TODO: Fix first node's position influencing other node positions on save
 		public Vector2ListField(
 			string key,
 			int maximum,
@@ -72,7 +79,8 @@ public static partial class Pom
 
 			return positions.ToArray();
 		}
-		
+
+		/// <inheritdoc/>
 		public override PositionedDevUINode? MakeControlPanelNode(
 			ManagedData managedData,
 			ManagedControlPanel panel,
@@ -81,6 +89,7 @@ public static partial class Pom
 			return new ManagedArrowSelector(this, managedData, panel, 72f);
 		}
 		
+		/// <inheritdoc/>
 		public override string? DisplayValueForNode(
 			PositionedDevUINode node,
 			ManagedData data)
@@ -114,13 +123,13 @@ public static partial class Pom
 				data.SetValue(key, copy);
 				
 				// Adds the handle to remove the node
-				List<DevInterface.DevUINode> uiList = node.parentNode.parentNode.subNodes;
+				List<DevUINode> uiList = node.parentNode.parentNode.subNodes;
 
 				for (int i = 0; i < uiList.Count; i++)
 				{
 					if (uiList[i].IDstring.Equals(this.key)) // Gets this current field
 					{
-						this.NodeCount = data.GetValue<Vector2[]>(this.key).Length;
+						this.NodeCount = data.GetValue<Vector2[]>(this.key)!.Length;
 						
 						for (int j = 0; j < uiList[i].subNodes.Count; j++)
 						{
@@ -130,7 +139,7 @@ public static partial class Pom
 						{
 							uiList[i].fSprites[j].container.RemoveChild(uiList[i].fSprites[j]);
 						}
-						uiList[i] = new Vector2ListHandle(this, data, (uiList[i] as Vector2ListHandle).rep);
+						uiList[i] = new Vector2ListHandle(this, data, (uiList[i] as Vector2ListHandle)!.rep);
 						break;
 					}
 				}
@@ -151,18 +160,18 @@ public static partial class Pom
 				NodeCount--;
 				
 				Vector2[] copy = new Vector2[oldLength - 1];
-				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength - 2);
+				Array.Copy(data.GetValue<Vector2[]>(key), copy, oldLength - 1);
 				
 				data.SetValue(key, copy);
 				
 				// Reloads the handle to remove the node
-				List<DevInterface.DevUINode> uiList = node.parentNode.parentNode.subNodes;
+				List<DevUINode> uiList = node.parentNode.parentNode.subNodes;
 
 				for (int i = 0; i < uiList.Count; i++)
 				{
 					if (uiList[i].IDstring.Equals(this.key)) // Gets this current field
 					{
-						this.NodeCount = data.GetValue<Vector2[]>(this.key).Length;
+						this.NodeCount = data.GetValue<Vector2[]>(this.key)!.Length;
 						//
 						for (int j = 0; j < uiList[i].subNodes.Count; j++)
 						{
@@ -172,7 +181,7 @@ public static partial class Pom
 						{
 							uiList[i].fSprites[j].container.RemoveChild(uiList[i].fSprites[j]);
 						}
-						uiList[i] = new Vector2ListHandle(this, data, (uiList[i] as Vector2ListHandle).rep);
+						uiList[i] = new Vector2ListHandle(this, data, (uiList[i] as Vector2ListHandle)!.rep);
 						break;
 					}
 				}
@@ -187,7 +196,7 @@ public static partial class Pom
 		/// <inheritdoc/>
 		public override DevUINode MakeAditionalNodes(ManagedData managedData, ManagedRepresentation managedRepresentation)
 		{
-			this.NodeCount = managedData.GetValue<Vector2[]>(this.key).Length;
+			this.NodeCount = managedData.GetValue<Vector2[]>(this.key)!.Length;
 			return new Vector2ListHandle(this, managedData, managedRepresentation);
 		}
 		/// <summary>
@@ -347,7 +356,7 @@ public static partial class Pom
 			ManagedData data,
 			float factor)
 		{
-			data.SetValue<int>(key, Mathf.RoundToInt(0 + factor * (Maximum - 0)));
+			data.SetValue(key, Mathf.RoundToInt(0 + factor * (Maximum - 0)));
 		}
 
 		public string[] GetValues(int start, int end)

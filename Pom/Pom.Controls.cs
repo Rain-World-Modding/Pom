@@ -740,6 +740,7 @@ public static partial class Pom
 		/// Attempts to parse field value from given text and set it into manageddata. Recolors control depending on the result.
 		/// </summary>
 		/// <param name="newValue">Current text</param>
+		/// <param name="endTransaction">If we are ending the transaction</param>
 		protected virtual void TrySetValue(string newValue, bool endTransaction)
 		{
 			try

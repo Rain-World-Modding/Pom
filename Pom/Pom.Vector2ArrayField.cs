@@ -19,6 +19,9 @@ public static partial class Pom
 		/// Number of vector2 nodes
 		/// </summary>
 		public int NodeCount;
+		/// <summary>
+		/// Indicates the field uses the parent as the first node
+		/// </summary>
 		public bool IncludeParent;
 
 		/// <summary>
