@@ -11,10 +11,6 @@ public class StringControl : DevUILabel
 
 	public StringControl(DevUI owner, string IDstring, DevUINode parentNode, Vector2 pos, float width, string text, IsTextValid del) : base(owner, IDstring, parentNode, pos, width, text)
 	{
-		isTextValid = del;
-		actualValue = text; //shut up compiler
-		ActualValue = text;
-
 		outlineSprites = new FSprite[4];
 		for (int i = 0; i < outlineSprites.Length; i++)
 		{
@@ -31,6 +27,11 @@ public class StringControl : DevUILabel
 				Futile.stage.AddChild(outlineSprites[i]);
 			}
 		}
+
+		isTextValid = del;
+		actualValue = text; //shut up compiler
+		ActualValue = text;
+
 	}
 
 	protected bool clickedLastUpdate = false;
@@ -119,11 +120,9 @@ public class StringControl : DevUILabel
 
 		// Update outline sprite visibility
 		bool focused = ManagedStringControl.activeStringControl == this;
-		Color outlineColor = isTextValid(this, actualValue) ? Color.white : Color.red;
 		foreach (FSprite sprite in outlineSprites)
 		{
 			sprite.isVisible = focused;
-			sprite.color = outlineColor;
 		}
 	}
 
@@ -134,15 +133,22 @@ public class StringControl : DevUILabel
 
 	protected virtual void TrySetValue(string newValue, bool endTransaction)
 	{
+		Color outlineColor;
 		if (isTextValid(this, newValue))
 		{
 			actualValue = newValue;
 			fLabels[0].color = new Color(0.1f, 0.4f, 0.2f);
+			outlineColor = Color.white;
 			this.SendSignal(StringEdit, this, "");
 		}
 		else
 		{
 			fLabels[0].color = Color.red;
+			outlineColor = Color.red;
+		}
+		foreach (FSprite sprite in outlineSprites)
+		{
+			sprite.color = outlineColor;
 		}
 		if (endTransaction)
 		{

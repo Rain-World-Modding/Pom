@@ -97,6 +97,12 @@ public static partial class Pom
 			// field tostring, but fields can format on their own
 			return NodeCount.ToString();
 		}
+
+		/// <inheritdoc/>
+		protected override Vector2 SizeOfPanelNode()
+		{
+			return new Vector2(52f, 20f);
+		}
 		
 		
 		
