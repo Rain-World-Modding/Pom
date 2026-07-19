@@ -10,6 +10,7 @@ public static partial class Pom
 	// An undocumented mess. Have a look around, find what suits you, maybe implement your own.
 	// in commit d2dad8768371565bb9b538263ac0b0ac595913b7 there was a slider-button used for text before text input became a thing
 	// an arrows-text combo would also be amazing for enums and ints wink wink
+
 	/// <summary>
 	/// Managed handle controlling a single Vector2 value. Used for ALL vector2 representation types.
 	/// </summary>
@@ -94,7 +95,7 @@ public static partial class Pom
 		/// <inheritdoc/>
 		public override void Move(Vector2 newPos)
 		{
-			data.SetValue<Vector2>(field.key, newPos);
+			data.SetValue(field.key, newPos);
 			base.Move(newPos); // calls refresh
 		}
 		/// <inheritdoc/>
@@ -161,6 +162,7 @@ public static partial class Pom
 			}
 		}
 	}
+
 	/// <summary>
 	/// A managed handle controlling an IntVector2 value. Used for ALL IntVector representation types.
 	/// </summary>
@@ -280,7 +282,7 @@ public static partial class Pom
 			//RWCustom.IntVector2 ownIntPos = new RWCustom.IntVector2(Mathf.FloorToInt(roompos.x / 20f), Mathf.FloorToInt(roompos.y / 20f));
 			//newPos = ownIntPos.ToVector2() * 20f;
 
-			data.SetValue<RWCustom.IntVector2>(field.key, ownIntPos);
+			data.SetValue(field.key, ownIntPos);
 			base.Move(newPos); // calls refresh
 		}
 		/// <inheritdoc/>
@@ -355,10 +357,11 @@ public static partial class Pom
 			}
 		}
 	}
+
 	/// <summary>
-	 /// A multipurpose slider that can control data defined by any ManagedField that implements 
-	 /// <see cref="global::Pom.Pom.IInterpolablePanelField"/>
-	 /// </summary>
+	/// A multipurpose slider that can control data defined by any ManagedField that implements 
+	/// <see cref="IInterpolablePanelField"/>
+	/// </summary>
 	public class ManagedSlider : Slider
 	{
 		/// <summary>
@@ -420,9 +423,10 @@ public static partial class Pom
 			base.RefreshNubPos(value);
 		}
 	}
+
 	/// <summary>
 	/// A multipurpose button that can control data defined by any ManagedField that implements 
-	/// <see cref="global::Pom.Pom.IIterablePanelField"/>
+	/// <see cref="IIterablePanelField"/>
 	/// </summary>
 	public class ManagedButton : PositionedDevUINode, IDevUISignals
 	{
@@ -477,9 +481,10 @@ public static partial class Pom
 			base.Refresh();
 		}
 	}
+
 	/// <summary>
 	/// Multipurpose arrow selector that can control data defined by any ManagedField that implements 
-	/// <see cref="global::Pom.Pom.IIterablePanelField"/>
+	/// <see cref="IIterablePanelField"/>
 	/// </summary>
 	public class ManagedArrowSelector : IntegerControl
 	{
@@ -553,9 +558,10 @@ public static partial class Pom
 			base.Refresh();
 		}
 	}
+
 	/// <summary>
 	/// String input field. Can be used by things like 
-	/// <see cref="global::Pom.Pom.StringField"/> or <see cref="global::Pom.Pom.ColorField"/>
+	/// <see cref="StringField"/> or <see cref="ColorField"/>
 	/// </summary>
 	public class ManagedStringControl : PositionedDevUINode
 	{
@@ -575,6 +581,19 @@ public static partial class Pom
 		/// Whether this was clicked last update 
 		/// </summary>
 		protected bool clickedLastUpdate = false;
+		/// <summary>
+		/// Outline sprites that appear when focused
+		/// </summary>
+		protected FSprite[] outlineSprites;
+
+		/// <summary>
+		/// Label element used for title
+		/// </summary>
+		protected DevUILabel _titleLabel;
+		/// <summary>
+		/// Label element used for text
+		/// </summary>
+		protected DevUILabel _textLabel;
 
 		/// <param name="field">Field definition</param>
 		/// <param name="data">Data of the associated placedobject</param>
@@ -594,21 +613,37 @@ public static partial class Pom
 			this.field = field;
 			this.data = data;
 
-			subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0, 0), sizeOfDisplayname, field.displayName));
-			subNodes.Add(new DevUILabel(owner, "Text", this, new Vector2(60, 0), 136, ""));
+			subNodes.Add(_titleLabel = new DevUILabel(owner, "Title", this, new Vector2(0, 0), sizeOfDisplayname, field.displayName));
+			subNodes.Add(_textLabel = new DevUILabel(owner, "Text", this, new Vector2(60, 0), 136, ""));
 
 			Text = field.DisplayValueForNode(this, data)!;
 
-			DevUILabel textLabel = (this.subNodes[1] as DevUILabel)!;
-			textLabel.pos.x = sizeOfDisplayname + 10f;
-			textLabel.size.x = field.SizeOfLargestDisplayValue();
-			textLabel.fSprites[0].scaleX = textLabel.size.x;
+			_textLabel.pos.x = sizeOfDisplayname + 10f;
+			_textLabel.size.x = field.SizeOfLargestDisplayValue();
+			_textLabel.fSprites[0].scaleX = _textLabel.size.x;
+
+			outlineSprites = new FSprite[4];
+			for (int i = 0; i < outlineSprites.Length; i++)
+			{
+				outlineSprites[i] = new FSprite("pixel")
+				{
+					anchorX = 0f,
+					anchorY = 0f,
+					color = Color.white,
+					isVisible = false,
+				};
+				fSprites.Add(outlineSprites[i]);
+				if (owner != null)
+				{
+					Futile.stage.AddChild(outlineSprites[i]);
+				}
+			}
 		}
 
 		private string _text;
 		/// <summary>
 		/// Text value of the instance. 
-		/// Changing this only changes the label, does not call <see cref="global::Pom.Pom.ManagedData.SetValue"/>.
+		/// Changing this only changes the label, does not call <see cref="ManagedData.SetValue"/>.
 		/// </summary>
 		protected virtual string Text
 		{
@@ -628,7 +663,18 @@ public static partial class Pom
 			// No data refresh until the transaction is complete :/
 			// TrySet happens on input and focus loss
 			base.Refresh();
+
+			// Update outline sprites
+			outlineSprites[0].SetPosition(_textLabel.absPos - Vector2.one * 0.99f);
+			outlineSprites[0].scaleX = _textLabel.size.x + 2;
+			outlineSprites[1].SetPosition(_textLabel.absPos - Vector2.one * 0.99f);
+			outlineSprites[1].scaleY = _textLabel.size.y + 2;
+			outlineSprites[2].SetPosition(_textLabel.absPos + new Vector2(0f, _textLabel.size.y) + Vector2.one * 0.01f);
+			outlineSprites[2].scaleX = _textLabel.size.x + 1;
+			outlineSprites[3].SetPosition(_textLabel.absPos + new Vector2(_textLabel.size.x, 0f) + Vector2.one * 0.01f);
+			outlineSprites[3].scaleY = _textLabel.size.y + 1;
 		}
+
 		/// <inheritdoc/>
 		public override void Update()
 		{
@@ -682,6 +728,13 @@ public static partial class Pom
 					}
 				}
 			}
+
+			// Update outline sprite visibility
+			bool focused = activeStringControl == this;
+			foreach (FSprite sprite in outlineSprites)
+			{
+				sprite.isVisible = focused;
+			}
 		}
 		/// <summary>
 		/// Attempts to parse field value from given text and set it into manageddata. Recolors control depending on the result.
@@ -707,9 +760,10 @@ public static partial class Pom
 			}
 		}
 	}
+
 	/// <summary>
 	/// A button that brings up a panel of all the selectable options
-	/// <see cref="global::Pom.Pom.IListablePanelField"/>
+	/// <see cref="IListablePanelField"/>
 	/// </summary>
 	public class ManagedItemSelect : PositionedDevUINode, IDevUISignals
 	{
@@ -782,7 +836,7 @@ public static partial class Pom
 
 	/// <summary>
 	/// A button that brings up a color select panel
-	/// <see cref="global::Pom.Pom.IIterablePanelField"/>
+	/// <see cref="IIterablePanelField"/>
 	/// </summary>
 	public class ManagedRGBSelectButton : PositionedDevUINode, IDevUISignals
 	{
@@ -821,7 +875,7 @@ public static partial class Pom
 		/// <inheritdoc/>
 		public virtual void Signal(DevUISignalType type, DevUINode sender, string message) // from button
 		{
-			data.SetValue<Color>(field.key, button.actualValue);
+			data.SetValue(field.key, button.actualValue);
 			this.Refresh();
 		}
 

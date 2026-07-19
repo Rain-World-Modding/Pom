@@ -1,16 +1,36 @@
-﻿using UnityEngine;
-using DevInterface;
+﻿using DevInterface;
+using UnityEngine;
+using static Pom.Pom;
 
 namespace Pom;
 #pragma warning disable CS1591
 
 public class StringControl : DevUILabel
 {
+	protected FSprite[] outlineSprites;
+
 	public StringControl(DevUI owner, string IDstring, DevUINode parentNode, Vector2 pos, float width, string text, IsTextValid del) : base(owner, IDstring, parentNode, pos, width, text)
 	{
 		isTextValid = del;
 		actualValue = text; //shut up compiler
 		ActualValue = text;
+
+		outlineSprites = new FSprite[4];
+		for (int i = 0; i < outlineSprites.Length; i++)
+		{
+			outlineSprites[i] = new FSprite("pixel")
+			{
+				anchorX = 0f,
+				anchorY = 0f,
+				color = Color.white,
+				isVisible = false,
+			};
+			fSprites.Add(outlineSprites[i]);
+			if (owner != null)
+			{
+				Futile.stage.AddChild(outlineSprites[i]);
+			}
+		}
 	}
 
 	protected bool clickedLastUpdate = false;
@@ -27,6 +47,21 @@ public class StringControl : DevUILabel
 			Text = value;
 			Refresh();
 		}
+	}
+
+	public override void Refresh()
+	{
+		base.Refresh();
+
+		// Update outline sprites
+		outlineSprites[0].SetPosition(absPos - Vector2.one * 0.99f);
+		outlineSprites[0].scaleX = size.x + 2;
+		outlineSprites[1].SetPosition(absPos - Vector2.one * 0.99f);
+		outlineSprites[1].scaleY = size.y + 2;
+		outlineSprites[2].SetPosition(absPos + new Vector2(0f, size.y) + Vector2.one * 0.01f);
+		outlineSprites[2].scaleX = size.x + 1;
+		outlineSprites[3].SetPosition(absPos + new Vector2(size.x, 0f) + Vector2.one * 0.01f);
+		outlineSprites[3].scaleY = size.y + 1;
 	}
 
 	public override void Update()
@@ -80,6 +115,15 @@ public class StringControl : DevUILabel
 					TrySetValue(Text, false);
 				}
 			}
+		}
+
+		// Update outline sprite visibility
+		bool focused = ManagedStringControl.activeStringControl == this;
+		Color outlineColor = isTextValid(this, actualValue) ? Color.white : Color.red;
+		foreach (FSprite sprite in outlineSprites)
+		{
+			sprite.isVisible = focused;
+			sprite.color = outlineColor;
 		}
 	}
 
