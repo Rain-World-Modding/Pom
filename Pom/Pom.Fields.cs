@@ -50,11 +50,27 @@ public static partial class Pom
 		void Prev(PositionedDevUINode node, ManagedData data);
 	}
 
-	public interface IListablePanelField
+	/// <summary>
+	/// An interface for a <see cref="ManagedItemSelect"/>
+	/// </summary>
+	public interface IListablePanelField // select panel
 	{
+		/// <summary>
+		/// Gets values in the given range
+		/// </summary>
+		/// <param name="start">Start index</param>
+		/// <param name="end">End index</param>
+		/// <returns>All values in the start and end range</returns>
 		string[] GetValues(int start, int end);
+
+		/// <summary>
+		/// Returns maximum end of the range
+		/// </summary>
 		int HighestItem();
 
+		/// <summary>
+		/// Returns the minimum end of the range
+		/// </summary>
 		int LowestItem();
 	}
 
@@ -186,6 +202,7 @@ public static partial class Pom
 			data.SetValue<float>(key, val);
 		}
 
+		/// <inheritdoc/>
 		public string[] GetValues(int start, int end)
 		{
 			List<string> values = new();
@@ -196,9 +213,12 @@ public static partial class Pom
 			return values.ToArray();
 		}
 
+		/// <inheritdoc/>
 		public int HighestItem() => (int)(max * increment) + 1;
 
+		/// <inheritdoc/>
 		public int LowestItem() => (int)(min * increment);
+
 		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
@@ -282,13 +302,16 @@ public static partial class Pom
 			data.SetValue(key, !data.GetValue<bool>(key));
 		}
 
+		/// <inheritdoc/>
 		public string[] GetValues(int start, int end)
 		{
 			return ["True", "False"];
 		}
 
+		/// <inheritdoc/>
 		public int HighestItem() => 1;
 
+		/// <inheritdoc/>
 		public int LowestItem() => 0;
 	}
 
@@ -379,6 +402,8 @@ public static partial class Pom
 		{
 			data.SetValue<Enum>(key, PossibleValues[(Array.IndexOf(PossibleValues, data.GetValue<Enum>(key)) - 1 + PossibleValues.Length) % PossibleValues.Length]);
 		}
+
+		/// <inheritdoc/>
 		public string[] GetValues(int start, int end)
 		{
 			List<string> values = new();
@@ -389,8 +414,10 @@ public static partial class Pom
 			return values.ToArray();
 		}
 
+		/// <inheritdoc/>
 		public int HighestItem() => PossibleValues.Count();
 
+		/// <inheritdoc/>
 		public int LowestItem() => 0;
 		/// <inheritdoc/>
 		public override void ParseFromText(PositionedDevUINode node, ManagedData data, string newValue)
@@ -554,6 +581,7 @@ public static partial class Pom
 			data.SetValue<ExtEnumBase>(key, PossibleValues[(Array.IndexOf(PossibleValues, data.GetValue<ExtEnumBase>(key)) - 1 + PossibleValues.Length) % PossibleValues.Length]);
 		}
 
+		/// <inheritdoc/>
 		public string[] GetValues(int start, int end)
 		{
 			List<string> values = new();
@@ -564,8 +592,10 @@ public static partial class Pom
 			return values.ToArray();
 		}
 
+		/// <inheritdoc/>
 		public int HighestItem() => PossibleValues.Count();
 
+		/// <inheritdoc/>
 		public int LowestItem() => 0;
 		/// <inheritdoc/>
 		public override void ParseFromText(
@@ -683,6 +713,7 @@ public static partial class Pom
 			data.SetValue<int>(key, val);
 		}
 
+		/// <inheritdoc/>
 		public string[] GetValues(int start, int end)
 		{
 			List<string> values = new();
@@ -693,9 +724,12 @@ public static partial class Pom
 			return values.ToArray();
 		}
 
+		/// <inheritdoc/>
 		public int HighestItem() => max + 1;
 
+		/// <inheritdoc/>
 		public int LowestItem() => min;
+
 		/// <inheritdoc/>
 		public override void ParseFromText(
 			PositionedDevUINode node,
@@ -1178,13 +1212,16 @@ public static partial class Pom
 			{"black", "000000" },
 		};
 
+		/// <inheritdoc/>
 		public string[] GetValues(int start, int end)
 		{
 			return namedColors.Keys.ToArray();
 		}
 
+		/// <inheritdoc/>
 		public int HighestItem() => namedColors.Count();
 
+		/// <inheritdoc/>
 		public int LowestItem() => 0;
 
 		private class ColorSliderControl : PositionedDevUINode

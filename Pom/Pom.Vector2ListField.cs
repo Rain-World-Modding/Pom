@@ -340,6 +340,8 @@ public static partial class Pom
 			}
 			return res;
 		}
+
+		/// <inheritdoc/>
 		public override float SizeOfLargestDisplayValue()
 		{
 			return HUD.DialogBox.meanCharWidth * ((Mathf.Max(Mathf.Abs(0), Mathf.Abs(Maximum))).ToString().Length + 2);
@@ -365,6 +367,7 @@ public static partial class Pom
 			data.SetValue(key, Mathf.RoundToInt(0 + factor * (Maximum - 0)));
 		}
 
+		/// <inheritdoc/>
 		public string[] GetValues(int start, int end)
 		{
 			List<string> values = new();
@@ -375,8 +378,10 @@ public static partial class Pom
 			return values.ToArray();
 		}
 
+		/// <inheritdoc/>
 		public int HighestItem() => Maximum + 1;
 
+		/// <inheritdoc/>
 		public int LowestItem() => 0;
 	}
 }

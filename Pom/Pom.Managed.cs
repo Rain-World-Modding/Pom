@@ -767,14 +767,20 @@ public static partial class Pom
 		/// </summary>
 		public Dictionary<string, DevUINode> managedNodes; 
 		/// <summary>
-		/// Mirror of <see cref="global::Pom.Pom.ManagedRepresentation.managedFields"/>... Hold on, that doesn't exist o_O
+		/// Added from ManagedRepresentation. Unused for now, but seems convenient for specialization
 		/// </summary>
-		public Dictionary<string, ManagedFieldWithPanel> managedFields; // Added from ManagedRepresentation. Unused for now, but seems convenient for specialization
+		public Dictionary<string, ManagedFieldWithPanel> managedFields;
 		/// <summary>
 		/// Connector line sprite index
 		/// </summary>
 		protected readonly int lineSprt;
 		
+		/// <param name="owner"></param>
+		/// <param name="IDstring"></param>
+		/// <param name="parentNode"></param>
+		/// <param name="pos"></param>
+		/// <param name="size"></param>
+		/// <param name="title"></param>
 		public ManagedControlPanel(
 			DevUI owner,
 			string IDstring,

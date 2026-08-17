@@ -122,7 +122,7 @@ public static partial class Pom
 		if (GetManagerForType(tp) is not ManagedObjectType manager) return;
 
 		var isNew = pObj == null;
-		if (isNew) pObj = self.RoomSettings.placedObjects[self.RoomSettings.placedObjects.Count - 1];
+		pObj ??= self.RoomSettings.placedObjects[self.RoomSettings.placedObjects.Count - 1];
 		DevInterface.PlacedObjectRepresentation? placedObjectRepresentation = manager.MakeRepresentation(pObj, self);
 		if (placedObjectRepresentation == null) return;
 

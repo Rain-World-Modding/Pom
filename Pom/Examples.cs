@@ -6,12 +6,14 @@ using RWCustom;
 using static Pom.Pom;
 
 namespace Pom;
-#pragma warning disable 1591
+#pragma warning disable CS1591 // Missing XML comment
+#pragma warning disable CS0169 // Field is never used (it really doesn't like the enum field in OneOfAll)
 
 public static class Examples
 {
 	internal class OneOfAll : ManagedData
 	{
+#pragma warning disable CS0649 // Field is never assigned to
 		[ColorField("color", 1, 1, 1, 1, ManagedFieldWithPanel.ControlType.button, "color")]
 		internal Color color;
 		[IntegerField("int", 0, 10, 0)] // TODO: Implement IntegerField automatically within Vector2ListField?
@@ -29,9 +31,10 @@ public static class Examples
 		[Vector2ListField("vectorlist", 10, 3,  Vector2ListField.Vector2ListRepresentationType.Polygon)]
 		internal Vector2[] VecList = new Vector2[0];
 		[EnumField<BepInEx.Logging.LogLevel>("enum", BepInEx.Logging.LogLevel.Warning)]
-		BepInEx.Logging.LogLevel Enum;
+		internal BepInEx.Logging.LogLevel Enum;
 		[ExtEnumField<AbstractCreature.AbstractObjectType>("extenum", nameof(AbstractCreature.AbstractObjectType.AttachedBee), new[] { nameof(AbstractCreature.AbstractObjectType.AttachedBee), nameof(AbstractCreature.AbstractObjectType.BubbleGrass) })]
-		AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;
+		internal AbstractCreature.AbstractObjectType ExtEnum = AbstractCreature.AbstractObjectType.AttachedBee;
+#pragma warning restore CS0649 // Field is never assigned to
 
 		public OneOfAll(PlacedObject owner) : base(owner, null)
 		{
@@ -230,7 +233,7 @@ public static class Examples
 		// and we create another one called rotation that we manage on our own
 		class CuriousData : ManagedData
 		{
-#pragma warning disable 0649 // We're reflecting over these fields, stop worrying about it stupid compiler
+#pragma warning disable CS0649 // We're reflecting over these fields, stop worrying about it stupid compiler
 			// A field can be generated like this, and its value can be accessed directly
 			[FloatField("red", 0f, 1f, 0f, displayName: "Red Color")]
 			public float redcolor;
@@ -250,7 +253,7 @@ public static class Examples
 			// Until there is a better implementation, you'll have to do this for Vector2Field, IntVector2Field, EnumField and ColorField.
 			[BackedByField("msid")]
 			public SoundID mySound = SoundID.Bat_Afraid_Flying_Sounds;
-#pragma warning restore 0649
+#pragma warning restore CS0649
 
 			private static ManagedField[] customFields = new ManagedField[] {
 					new FloatField("scale", 0.1f, 10f, 1f, displayName:"Scale"),
@@ -305,4 +308,3 @@ public static class Examples
 	}
 	// And that was it, 3 somewhat functional objects in not an awful lot of code.
 }
-#pragma warning restore 1591

@@ -763,7 +763,7 @@ public static partial class Pom
 	}
 
 	/// <summary>
-	/// A button that brings up a panel of all the selectable options
+	/// A button with a label that brings up a panel of all the selectable options
 	/// <see cref="IListablePanelField"/>
 	/// </summary>
 	public class ManagedItemSelect : PositionedDevUINode, IDevUISignals
@@ -800,6 +800,7 @@ public static partial class Pom
 			this.subNodes.Add(new DevUILabel(owner, "Title", this, new Vector2(0f, 0f), sizeOfDisplayname, field.displayName));
 			this.subNodes.Add(this.button = new ManagedPanelSelectButton(field, this, new Vector2(sizeOfDisplayname + 10f, 0f), field.SizeOfLargestDisplayValue(), field.DisplayValueForNode(this, data) ?? ""));
 		}
+
 		/// <inheritdoc/>
 		public virtual void Signal(DevUISignalType type, DevUINode sender, string message) // from button
 		{
@@ -811,22 +812,41 @@ public static partial class Pom
 			this.Refresh();
 		}
 
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			button.Text = field.DisplayValueForNode(this, data);
 			base.Refresh();
 		}
 
+		/// <summary>
+		/// The actual button that brings up the select panel
+		/// </summary>
 		public class ManagedPanelSelectButton : PanelSelectButton
 		{
+			/// <summary>
+			/// The listable this button uses to generate the panel items
+			/// </summary>
 			protected readonly IListablePanelField listable;
+
+			/// <param name="field"></param>
+			/// <param name="parentNode"></param>
+			/// <param name="pos"></param>
+			/// <param name="width"></param>
+			/// <param name="text"></param>
+			/// <exception cref="ArgumentException"></exception>
 			public ManagedPanelSelectButton(ManagedFieldWithPanel field, DevUINode parentNode, Vector2 pos, float width, string text)
-				: base(parentNode.owner, field.key, parentNode, pos, width, text, new string[0])
+				: base(parentNode.owner, field.key, parentNode, pos, width, text, [])
 			{
 				if (field is IListablePanelField listable) this.listable = listable;
 				else throw new ArgumentException("Field must implement IListablePanelField");
 			}
 
+			/// <summary>
+			/// Gets the items for the given page
+			/// </summary>
+			/// <param name="page">The page</param>
+			/// <returns>The items on the page</returns>
 			public override IEnumerable<string> GetItems(int page)
 			{
 				return listable.GetValues(Math.Max(listable.LowestItem(), page * ItemsPerPage), Math.Min(listable.HighestItem(), (page + 1) * ItemsPerPage));
@@ -880,6 +900,7 @@ public static partial class Pom
 			this.Refresh();
 		}
 
+		/// <inheritdoc/>
 		public override void Refresh()
 		{
 			base.Refresh();
