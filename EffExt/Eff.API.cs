@@ -82,6 +82,6 @@ public static partial class Eff
 	/// <param name="effect">Effect instance</param>
 	/// <param name="result">Extra data, if present</param>
 	/// <returns>Whether effect data was found</returns>
-	public static bool TryGetExtraData(RoomSettings.RoomEffect effect, out EffectExtraData? result)
+	public static bool TryGetExtraData(this RoomSettings.RoomEffect effect, out EffectExtraData? result)
 		=> __attachedData.TryGetValue(effect, out result);
 }

@@ -82,7 +82,7 @@ public static partial class Pom
 			Type? reprType,
 			bool singleInstance = false)
 		{
-			if (name is null) throw new ArgumentNullException(nameof(name));
+			if (placedType is null) throw new ArgumentNullException(nameof(placedType));
 			if (category is null) throw new ArgumentNullException(nameof(category));
 			this.placedType = placedType;
 			this.name = placedType.value;
