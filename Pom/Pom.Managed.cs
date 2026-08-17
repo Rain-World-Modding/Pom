@@ -42,12 +42,13 @@ public static partial class Pom
 		/// Whether only one object is allowed per room
 		/// </summary>
 		protected readonly bool singleInstance;
-		/// <param name="name">The enum-name this manager responds for. Do NOT use EnumExt_MyEnum.MyObject.ToString() because on mod-loading enumextender might not have run yet and your enums aren't extended.</param>
+
+		/// <param name="name">The enum-name this manager responds for.</param>
+		/// <param name="category">The category in dev tools to add this object to</param>
 		/// <param name="objectType">The Type of your UpdateableAndDeletable object. Must have a constructor like (Room room, PlacedObject pObj) or (PlacedObject pObj, Room room), (PlacedObject pObj) or (Room room).</param>
 		/// <param name="dataType">The Type of your PlacedObject.Data. Must have a constructor like (PlacedObject pObj).</param>
 		/// <param name="reprType">The Type of your PlacedObjectRepresentation. Must have a constructor like (DevUI owner, string IDstring, DevUINode parentNode, PlacedObject pObj, string name) or (PlacedObject.Type placedType, ObjectsPage objPage, PlacedObject pObj).</param>
-		/// <param name="singleInstance">Wether only one of this object should be created per room. Corruption-object that scans for other placedobjects style.</param>
-
+		/// <param name="singleInstance">Whether only one of this object should be created per room. Corruption-object that scans for other placedobjects style.</param>
 		public ManagedObjectType(
 			string name,
 			string category,
@@ -58,10 +59,34 @@ public static partial class Pom
 		{
 			if (name is null) throw new ArgumentNullException(nameof(name));
 			if (category is null) throw new ArgumentNullException(nameof(category));
-			this.placedType = new(name, true); //no longer deferred
+			this.placedType = new(name, true);
 			__objectCategories.Add(name, new(category, true));
-			//__moddedTypes.Add(name);
 			this.name = name;
+			this.objectType = objectType;
+			this.dataType = dataType;
+			this.reprType = reprType;
+			this.singleInstance = singleInstance;
+		}
+
+		/// <param name="placedType">The placed object type this manager responds for.</param>
+		/// <param name="category">The category in dev tools to add this object to</param>
+		/// <param name="objectType">The Type of your UpdateableAndDeletable object. Must have a constructor like (Room room, PlacedObject pObj) or (PlacedObject pObj, Room room), (PlacedObject pObj) or (Room room).</param>
+		/// <param name="dataType">The Type of your PlacedObject.Data. Must have a constructor like (PlacedObject pObj).</param>
+		/// <param name="reprType">The Type of your PlacedObjectRepresentation. Must have a constructor like (DevUI owner, string IDstring, DevUINode parentNode, PlacedObject pObj, string name) or (PlacedObject.Type placedType, ObjectsPage objPage, PlacedObject pObj).</param>
+		/// <param name="singleInstance">Whether only one of this object should be created per room. Corruption-object that scans for other placedobjects style.</param>
+		public ManagedObjectType(
+			PlacedObject.Type placedType,
+			ObjectsPage.DevObjectCategories category,
+			Type? objectType,
+			Type? dataType,
+			Type? reprType,
+			bool singleInstance = false)
+		{
+			if (name is null) throw new ArgumentNullException(nameof(name));
+			if (category is null) throw new ArgumentNullException(nameof(category));
+			this.placedType = placedType;
+			this.name = placedType.value;
+			__objectCategories.Add(name, category);
 			this.objectType = objectType;
 			this.dataType = dataType;
 			this.reprType = reprType;
@@ -156,7 +181,7 @@ public static partial class Pom
 	}
 
 	/// <summary>
-	/// Class for managing a wraped <see cref="UpdatableAndDeletable"/> object. 
+	/// Class for managing a wrapped <see cref="UpdatableAndDeletable"/> object. 
 	/// Uses the fully managed data and representation types 
 	/// <see cref="ManagedData"/> and <see cref="ManagedRepresentation"/>
 	/// </summary>
@@ -188,11 +213,35 @@ public static partial class Pom
 		{
 			this.managedFields = managedFields;
 		}
+
+		/// <param name="placedType">Placed object type</param>
+		/// <param name="category">category the object should be in (null if unsorted)</param>
+		/// <param name="objectType">Type of <see cref="global::UpdatableAndDeletable"/> to be created (null if none)</param>
+		/// <param name="managedFields">Array containing all the data fields this object has</param>
+		/// <param name="singleInstance">Whether only one is allowed per room</param>
+		/// <returns></returns>
+		public FullyManagedObjectType(
+			PlacedObject.Type? placedType,
+			ObjectsPage.DevObjectCategories? category,
+			Type objectType,
+			ManagedField[] managedFields,
+			bool singleInstance = false) : base(
+				placedType ?? new PlacedObject.Type(objectType.Name, true),
+				category ?? new ObjectsPage.DevObjectCategories("POM", true),
+				objectType,
+				null,
+				null,
+				singleInstance)
+		{
+			this.managedFields = managedFields;
+		}
+
 		/// <inheritdoc/>
 		public override PlacedObject.Data MakeEmptyData(PlacedObject pObj)
 		{
 			return new ManagedData(pObj, managedFields);
 		}
+
 		/// <inheritdoc/>
 		public override PlacedObjectRepresentation MakeRepresentation(PlacedObject pObj, ObjectsPage objPage)
 		{

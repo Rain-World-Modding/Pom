@@ -44,6 +44,7 @@ public static partial class Eff
 			LogError($"Could not unregister effect {name} : {ex}");
 		}
 	}
+
 	/// <summary>
 	/// Attempts to fetch definition for a given effect type.
 	/// </summary>
