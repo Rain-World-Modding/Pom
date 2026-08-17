@@ -1,3 +1,5 @@
+﻿using System.Runtime.CompilerServices;
+
 namespace EffExt;
 
 /// <summary>
@@ -21,6 +23,7 @@ public static partial class Eff
 	{
 		__AddHooks();
 	}
+
 	internal const float CUSTOM_SLIDER_EXTRA_NUMBER_SPACE = 20f;
 	internal const float DEVUI_TITLE_WIDTH = 80f;
 	internal const float V_SPACING = 5f;
@@ -29,7 +32,7 @@ public static partial class Eff
 	internal const float INT_BUTTON_WIDTH = 20f;
 	internal const float INT_VALUELABEL_WIDTH = 60f;
 	internal const float BOOL_BUTTON_WIDTH = 50f;
-	internal readonly static Dictionary<int, EffectExtraData> __attachedData = new();
+	internal readonly static ConditionalWeakTable<RoomSettings.RoomEffect, EffectExtraData> __attachedData = new();
 	internal readonly static Dictionary<string, EffectDefinition> __effectDefinitions = new();
 	internal static Dictionary<string, DevInterface.RoomSettingsPage.DevEffectsCategories> __effectCategories = new();
 	internal static Dictionary<DevInterface.RoomSettingsPage.DevEffectsCategories, CategorySortKind> __sortCategorySettings = new();

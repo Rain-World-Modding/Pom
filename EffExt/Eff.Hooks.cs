@@ -14,7 +14,6 @@ public static partial class Eff
 		// On.RainWorldGame.ctor += __ClearAttachedData;
 		On.RoomSettings.RoomEffect.FromString += __ParseExtraData;
 		On.RoomSettings.RoomEffect.ToString += __SaveExtraData;
-		On.ProcessManager.PostSwitchMainProcess += __ClearAttachedData;
 		On.RoomSettings.RoomEffect.ctor += __GenerateEmptyData;
 		On.DevInterface.EffectPanel.ctor += __ConstructEffectPanel;
 		On.Room.Loaded += __SpawnEffectObjects;
@@ -64,11 +63,11 @@ public static partial class Eff
 		{
 			return;
 		}
-		self.unrecognizedAttributes ??= new string[0];
+		self.unrecognizedAttributes ??= [];
 
 		EffectExtraData newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
-		__attachedData[self.GetHashCode()] = newdata;
-		LogTrace(__attachedData[self.GetHashCode()]);
+		__attachedData.Remove(self);
+		__attachedData.Add(self, newdata);
 	}
 
 	private static float __OverrideSliderStartCoord(Func<Slider, float> orig, Slider self)
@@ -95,7 +94,7 @@ public static partial class Eff
 		{
 			return;
 		}
-		if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
+		if (!__attachedData.TryGetValue(effect, out EffectExtraData data))
 		{
 			LogTrace($"{effect.type} in {self.abstractRoom.name} has no attached data, can not run object factory");
 			return;
@@ -121,16 +120,6 @@ public static partial class Eff
 		}
 	}
 
-	private static void __ClearAttachedData(On.ProcessManager.orig_PostSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID procID)
-	{
-		orig(self, procID);
-		if (self.currentMainLoop is not RainWorldGame && !self.sideProcesses.Any((proc) => proc is RainWorldGame))
-		{
-			LogTrace("Clearing attached data");
-			__attachedData.Clear();
-		}
-	}
-
 	private static void __ConstructEffectPanel(On.DevInterface.EffectPanel.orig_ctor orig, EffectPanel self, DevUI owner, DevUINode parent, Vector2 pos, RoomSettings.RoomEffect effect)
 	{
 		orig(self, owner, parent, pos, effect);
@@ -138,9 +127,8 @@ public static partial class Eff
 		{
 			return;
 		}
-		if (!__attachedData.TryGetValue(effect.GetHashCode(), out EffectExtraData data))
+		if (!__attachedData.TryGetValue(effect, out EffectExtraData data))
 		{
-			LogTrace($"{effect.type} ({effect.GetHashCode()}) has no additional data attached. {__attachedData.Count}, {def}");
 			return;
 		}
 
@@ -236,13 +224,6 @@ public static partial class Eff
 		}
 	}
 
-	private static void __ClearAttachedData(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
-	{
-		orig(self, manager);
-		LogTrace("Clearing attached data");
-		__attachedData.Clear();
-	}
-
 	private static void __ParseExtraData(On.RoomSettings.RoomEffect.orig_FromString orig, RoomSettings.RoomEffect self, string[] text)
 	{
 		orig(self, text);
@@ -252,13 +233,13 @@ public static partial class Eff
 		self.unrecognizedAttributes ??= new string[0];
 
 		EffectExtraData newdata = new EffectExtraData(self, __ExtractRawExtraData(self), def ?? EffectDefinition.@default);
-		__attachedData[self.GetHashCode()] = newdata;
-		LogTrace(__attachedData[self.GetHashCode()]);
+		__attachedData.Remove(self);
+		__attachedData.Add(self, newdata);
 	}
 
 	private static string __SaveExtraData(On.RoomSettings.RoomEffect.orig_ToString orig, RoomSettings.RoomEffect self)
 	{
-		if (!__attachedData.TryGetValue(self.GetHashCode(), out EffectExtraData data))
+		if (!__attachedData.TryGetValue(self, out EffectExtraData data))
 		{
 			LogTrace("Could not find EffectExtraData, aborting");
 			return orig(self);
