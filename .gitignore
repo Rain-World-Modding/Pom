@@ -402,7 +402,3 @@ lib/**
 *.dll
 *.xml
 *.sln
-
-# backwards compatibility
-!mod/v1.9.15b/**
-!mod/plugins/**
